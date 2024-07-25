@@ -1,20 +1,20 @@
 export default class Provider {
-    static webviewId = '';
+  static webviewId = "";
 
-    static getWebview() {
-        // log('Provider.getWebview()', document.getElementById(this.webviewId));
-        return document.getElementById(this.webviewId);
-    }
+  static getWebview() {
+    // log('Provider.getWebview()', document.getElementById(this.webviewId));
+    return document.getElementById(this.webviewId);
+  }
 
-    static url = '';
+  static url = "";
 
-    static paneId() {
-        return `${this.name.toLowerCase()}Pane`;
-    }
+  static paneId() {
+    return `${this.name.toLowerCase()}Pane`;
+  }
 
-    static setupCustomPasteBehavior() {
-        this.getWebview().addEventListener('dom-ready', () => {
-            this.getWebview().executeJavaScript(`{
+  static setupCustomPasteBehavior() {
+    this.getWebview().addEventListener("dom-ready", () => {
+      this.getWebview().executeJavaScript(`{
 					document.addEventListener('paste', (event) => {
 					event.preventDefault();
 					var text = event.clipboardData.getData('text');
@@ -39,46 +39,46 @@ export default class Provider {
 					activeElement.selectionStart = activeElement.selectionEnd = start + text.length;
 					});
 				}`);
-        });
-    }
+    });
+  }
 
-    static handleInput(input) {
-        throw new Error(`Provider ${this.name} must implement handleInput()`);
-    }
+  static handleInput(input) {
+    throw new Error(`Provider ${this.name} must implement handleInput()`);
+  }
 
-    static handleSubmit() {
-        throw new Error(`Provider ${this.name} must implement handleSubmit()`);
-    }
+  static handleSubmit() {
+    throw new Error(`Provider ${this.name} must implement handleSubmit()`);
+  }
 
-    static handleCss() {
-        throw new Error(`Provider ${this.name} must implement handleCss()`);
-    }
+  static handleCss() {
+    throw new Error(`Provider ${this.name} must implement handleCss()`);
+  }
 
-    // Some providers will have their own dark mode implementation
-    static handleDarkMode(isDarkMode) {
-        // Implement dark or light mode using prodiver-specific code
-        if (isDarkMode) {
-            this.getWebview().executeJavaScript(`{
+  // Some providers will have their own dark mode implementation
+  static handleDarkMode(isDarkMode) {
+    // Implement dark or light mode using prodiver-specific code
+    if (isDarkMode) {
+      this.getWebview().executeJavaScript(`{
 				document.documentElement.classList.add('dark');
 				document.documentElement.classList.remove('light');
 			}`);
-        } else {
-            this.getWebview().executeJavaScript(`{
+    } else {
+      this.getWebview().executeJavaScript(`{
 				document.documentElement.classList.add('light');
 				document.documentElement.classList.remove('dark');
 			}`);
-        }
     }
+  }
 
-    static getUserAgent() {
-        return 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/114.0.0.0 Safari/537.36';
-    }
+  static getUserAgent() {
+    return "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/114.0.0.0 Safari/537.36";
+  }
 
-    static isEnabled() {
-        return window.electron.electronStore.get(`${this.webviewId}Enabled`);
-    }
+  static isEnabled() {
+    return window.electron.electronStore.get(`${this.webviewId}Enabled`);
+  }
 
-    static setEnabled(state) {
-        window.electron.electronStore.set(`${this.webviewId}Enabled`, state);
-    }
+  static setEnabled(state) {
+    window.electron.electronStore.set(`${this.webviewId}Enabled`, state);
+  }
 }

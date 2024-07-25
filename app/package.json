@@ -7,6 +7,7 @@
     "dev": "next dev",
     "build": "next build",
     "start": "./node_modules/.bin/electron .",
+    "prettier": "prettier -w .",
     "lint": "next lint"
   },
   "dependencies": {
@@ -14,6 +15,7 @@
     "electron-log": "^5.1.7",
     "electron-store": "^10.0.0",
     "next": "14.2.5",
+    "prettier": "^3.3.3",
     "react": "^18",
     "react-dom": "^18",
     "react-split": "^2.0.14"

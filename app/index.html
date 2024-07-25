@@ -1,34 +1,31 @@
-<!DOCTYPE html>
+<!doctype html>
 <html>
-
-<head>
+  <head>
     <title>Multi-LLM Interface</title>
     <style>
-        body {
-            display: flex;
-            flex-direction: column;
-            height: 100vh;
-            margin: 0;
-        }
+      body {
+        display: flex;
+        flex-direction: column;
+        height: 100vh;
+        margin: 0;
+      }
 
-        #prompt-area {
-            margin-top: 10px;
-            padding: 10px;
-            position: fixed;
-            bottom: 0;
-            left: 0;
-            right: 0;
-            background-color: #f0f0f0;
-        }
+      #prompt-area {
+        margin-top: 10px;
+        padding: 10px;
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        background-color: #f0f0f0;
+      }
     </style>
     <script type="module" src="renderer.js"></script>
+  </head>
 
-</head>
-
-<body>
+  <body>
     <div id="prompt-area">
-        <textarea id="prompt-input" rows="3" style="width: 100%;"></textarea>
+      <textarea id="prompt-input" rows="3" style="width: 100%"></textarea>
     </div>
-</body>
-
+  </body>
 </html>
