@@ -4,7 +4,25 @@ function logToWebPage(message) {
   ipcRenderer.send("enter-prompt", message);
 }
 
+function openClaudeMessage(message) {
+  ipcRenderer.send("open-claude", message);
+}
+
+function closeClaudeMessage(message) {
+  ipcRenderer.send("close-claude", message);
+}
+
 const textArea = document.getElementById("prompt-input");
+const openClaude = document.getElementById("showClaude")
+
+openClaude.addEventListener('click', (event) => {
+  if (openClaude.textContent === "Show Claude") {
+    console.log('work?')
+    openClaudeMessage('open claude now')
+  } else {
+    closeClaudeMessage('close claude now')
+  }
+})
 
 textArea.addEventListener("input", (event) => {
   logToWebPage(event.target.value);

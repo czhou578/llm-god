@@ -1,40 +1,42 @@
 <!doctype html>
 <html>
-  <head>
+
+<head>
     <title>Multi-LLM Interface</title>
     <style>
-      body {
-        display: flex;
-        flex-direction: column;
-        height: 100vh;
-        margin: 0;
-      }
+        body {
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+            margin: 0;
+        }
 
-      #prompt-area {
-        position: fixed;
-        bottom: 0;
-        left: 0;
-        right: 0;
-        background-color: #f0f0f0;
-        height: 90px;
-        margin-bottom: 10px;
-      }
+        #prompt-area {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background-color: #f0f0f0;
+            height: 90px;
+            margin-bottom: 10px;
+        }
 
-      #prompt-input {
-        font-size: 30px;
-        line-height: 1.5;
-      }
+        #prompt-input {
+            font-size: 30px;
+            line-height: 1.5;
+        }
     </style>
     <script type="module" src="renderer.js"></script>
-  </head>
+    <!-- <script type="module" src="popup.js"></script> -->
+</head>
 
-  <body>
-    <div id="prompt-area">
-      <textarea
-        id="prompt-input"
-        rows="3"
-        style="width: 100%; height: 100%"
-      ></textarea>
+<body>
+    <div id="prompt-area" style="display: flex;">
+        <textarea id="prompt-input" rows="3" style="width: 90%; height: 100%"></textarea>
+        <div style="height: 90px;">
+            <button id="showClaude" style="height: 100%; width: 100%;">Show Claude</button>
+        </div>
     </div>
-  </body>
+</body>
+
 </html>
