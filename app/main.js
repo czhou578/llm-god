@@ -1,9 +1,9 @@
 const { app, BrowserWindow, BrowserView, ipcMain } = require("electron");
-const path = require('path');
+const path = require("path");
 
 let mainWindow;
 const views = [];
-require('electron-reload')(path.join(__dirname, '.'));
+require("electron-reload")(path.join(__dirname, "."));
 
 function createWindow() {
     mainWindow = new BrowserWindow({
@@ -19,8 +19,9 @@ function createWindow() {
 
     const websites = [
         "https://chat.openai.com/",
-        "https://bard.google.com",
-        "https://claude.ai/chats/",
+        // "https://bard.google.com",
+        // "https://claude.ai/chats/",
+        "https://www.meta.ai/",
     ];
 
     const viewWidth = Math.floor(mainWindow.getBounds().width / websites.length);
@@ -41,6 +42,7 @@ function createWindow() {
         });
         view.webContents.setZoomFactor(1); // Set initial zoom factor to 150%
         view.webContents.loadURL(url);
+        view.webContents.openDevTools();
         ipcMain.on("console-log", (event, message) => {
             view.webContents.executeJavaScript(
                 `console.log(${JSON.stringify(message)})`,
@@ -119,8 +121,14 @@ ipcMain.on("enter-prompt", (event, prompt) => {
                 `);
         } else if (view.id.match("meta")) {
             view.webContents.executeJavaScript(`
-                var inputElement = document.querySelector    
-            
+                var inputElement = document.querySelector('textarea');
+		if (inputElement) {
+                var nativeTextAreaValueSetter = Object.getOwnPropertyDescriptor(window.HTMLTextAreaElement.prototype, "value").set;
+                nativeTextAreaValueSetter.call(inputElement, \`${prompt}\`);
+
+              const inputEvent = new Event('input', { bubbles: true });
+              inputElement.dispatchEvent(inputEvent);
+		};
                 `);
         } else if (view.id.match("claude")) {
             view.webContents.executeJavaScript(`{
@@ -177,6 +185,25 @@ ipcMain.on("send-prompt", (event, prompt) => {
 			btn.click();
 		}
   }`);
+        } else if (view.id.match("meta")) {
+            view.webContents.executeJavaScript(`{
+var btn = document.querySelector("div[aria-label*='Send Message'] path");
+
+// Check if the element exists to avoid errors
+if (btn) {
+  // Create a new mouse event
+  var event = new MouseEvent('click', {
+    view: window,
+    bubbles: true,
+    cancelable: true
+  });
+
+  // Dispatch the click event on the path element
+  btn.dispatchEvent(event);
+} else {
+  console.log("Element not found");
+}
+                }`);
         }
     });
 });
