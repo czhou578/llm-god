@@ -26,6 +26,7 @@
     "@types/react": "^18",
     "@types/react-dom": "^18",
     "electron": "^31.2.1",
+    "electron-reload": "^2.0.0-alpha.1",
     "eslint": "^8",
     "eslint-config-next": "14.2.5",
     "jest": "^29.7.0",
