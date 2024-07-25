@@ -2,25 +2,33 @@
   "name": "app",
   "version": "0.1.0",
   "private": true,
+  "main": "main.js",
   "scripts": {
     "dev": "next dev",
     "build": "next build",
-    "start": "next start",
+    "start": "./node_modules/.bin/electron .",
     "lint": "next lint"
   },
   "dependencies": {
+    "@testing-library/react": "^16.0.0",
+    "electron-log": "^5.1.7",
+    "electron-store": "^10.0.0",
+    "next": "14.2.5",
     "react": "^18",
     "react-dom": "^18",
-    "next": "14.2.5"
+    "react-split": "^2.0.14"
   },
   "devDependencies": {
-    "typescript": "^5",
+    "@types/jest": "^29.5.12",
     "@types/node": "^20",
     "@types/react": "^18",
     "@types/react-dom": "^18",
+    "electron": "^31.2.1",
+    "eslint": "^8",
+    "eslint-config-next": "14.2.5",
+    "jest": "^29.7.0",
     "postcss": "^8",
     "tailwindcss": "^3.4.1",
-    "eslint": "^8",
-    "eslint-config-next": "14.2.5"
+    "typescript": "^5"
   }
 }
