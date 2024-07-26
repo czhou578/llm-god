@@ -1,4 +1,7 @@
-const { app, BrowserWindow, BrowserView, ipcMain } = require("electron");
+const { app, BrowserWindow, BrowserView, ipcMain, webContents } = require("electron");
+const remote = require('@electron/remote/main')
+remote.initialize()
+
 const path = require("path");
 
 let mainWindow;
@@ -7,9 +10,9 @@ const views = [];
 require("electron-reload")(path.join(__dirname, "."));
 
 const websites = [
-    "https://chat.openai.com/",
-    "https://bard.google.com",
-    "https://www.meta.ai/",
+    // "https://chat.openai.com/",
+    // "https://bard.google.com",
+    // "https://www.meta.ai/",
 ];
 
 function createWindow() {
@@ -22,6 +25,8 @@ function createWindow() {
         },
         fullscreen: true
     });
+
+    remote.enable(mainWindow.webContents);
 
     mainWindow.loadFile("index.html");
     const viewWidth = Math.floor(mainWindow.getBounds().width / websites.length);

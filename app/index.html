@@ -25,6 +25,23 @@
             font-size: 30px;
             line-height: 1.5;
         }
+
+        .close-button {
+            position: absolute;
+            top: 0px;
+            right: 10px;
+            width: 30px;
+            height: 30px;
+            background-color: red;
+            color: white;
+            border: none;
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 18px;
+            line-height: 30px;
+            text-align: center;
+            z-index: 1000;
+        }
     </style>
     <script type="module" src="renderer.js"></script>
 </head>
@@ -33,6 +50,7 @@
     <div id="prompt-area" style="display: flex;">
         <textarea id="prompt-input" rows="3" style="width: 90%; height: 100%"></textarea>
         <div style="height: 90px;">
+            <button class="close-button" id="closeButton" style="height: 100%; width: 3%;">&times;</button>
             <button id="showClaude" style="height: 100%; width: 100%;">Show Claude</button>
         </div>
     </div>

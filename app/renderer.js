@@ -1,4 +1,6 @@
-const { ipcRenderer } = require("electron");
+const { ipcRenderer, webContents } = require("electron");
+const remote = require('@electron/remote')
+
 
 function logToWebPage(message) {
   ipcRenderer.send("enter-prompt", message);
@@ -36,6 +38,14 @@ textArea.addEventListener("keydown", (event) => {
       ipcRenderer.send("send-prompt");
       console.log("Ctrl + Enter pressed");
     }
-
   }
 });
+
+const closeButton = document.getElementById('closeButton')
+
+closeButton.addEventListener('click', (event) => {
+  console.log('is this owkring')
+  const window = remote.getCurrentWindow();
+  console.log()
+  window.close();
+})
