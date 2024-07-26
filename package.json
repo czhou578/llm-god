@@ -5,23 +5,18 @@
   "main": "main.js",
   "scripts": {
     "dev": "next dev",
-    "build": "next build",
     "start": "./node_modules/.bin/electron .",
     "prettier": "prettier -w .",
-    "lint": "next lint",
     "make": "electron-forge make",
     "package": "electron-forge package"
   },
   "dependencies": {
+    "@electron-forge/maker-zip": "^7.4.0",
     "@electron/remote": "^2.1.2",
     "@testing-library/react": "^16.0.0",
     "electron-log": "^5.1.7",
     "electron-store": "^10.0.0",
-    "next": "14.2.5",
-    "prettier": "^3.3.3",
-    "react": "^18",
-    "react-dom": "^18",
-    "react-split": "^2.0.14"
+    "prettier": "^3.3.3"
   },
   "devDependencies": {
     "@electron-forge/cli": "^7.4.0",
@@ -30,12 +25,8 @@
     "@types/react": "^18",
     "@types/react-dom": "^18",
     "electron": "^31.2.1",
+    "electron-builder": "^24.13.3",
     "electron-reload": "^2.0.0-alpha.1",
-    "eslint": "^8",
-    "eslint-config-next": "14.2.5",
-    "jest": "^29.7.0",
-    "postcss": "^8",
-    "tailwindcss": "^3.4.1",
-    "typescript": "^5"
+    "jest": "^29.7.0"
   }
 }
