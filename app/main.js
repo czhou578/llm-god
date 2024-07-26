@@ -5,9 +5,9 @@ let mainWindow;
 const views = [];
 require("electron-reload")(path.join(__dirname, "."));
 const websites = [
-    // "https://chat.openai.com/",
-    // "https://bard.google.com",
-    // "https://www.meta.ai/",
+    "https://chat.openai.com/",
+    "https://bard.google.com",
+    "https://www.meta.ai/",
     // "https://claude.ai/chats/",
 ];
 
@@ -23,6 +23,7 @@ function createWindow() {
 
     mainWindow.loadFile("index.html");
     const viewWidth = Math.floor(mainWindow.getBounds().width / websites.length);
+
     websites.forEach((url, index) => {
         const view = new BrowserView({
             webPreferences: {
@@ -40,11 +41,6 @@ function createWindow() {
         });
         view.webContents.setZoomFactor(1); // Set initial zoom factor to 150%
         view.webContents.loadURL(url);
-        ipcMain.on("console-log", (event, message) => {
-            view.webContents.executeJavaScript(
-                `console.log(${JSON.stringify(message)})`,
-            );
-        });
         views.push(view);
     });
 
@@ -75,7 +71,6 @@ function updateZoomFactor() {
 }
 
 app.whenReady().then(createWindow);
-
 app.on("window-all-closed", () => {
     if (process.platform !== "darwin") app.quit();
 });
@@ -207,25 +202,58 @@ if (btn) {
 
 ipcMain.on("open-claude", (event, prompt) => {
     if (prompt === "open claude now") {
-        let url = "https://claude.ai/chats/"
+        console.log('Opening Claude');
+        let url = "https://claude.ai/chats/";
+
+        // Check if Claude view already exists
+        const existingClaudeView = views.find(view => view.id === url);
+        if (existingClaudeView) {
+            console.log('Claude view already exists, bringing it to front');
+            mainWindow.setTopBrowserView(existingClaudeView);
+            return;
+        }
+
         const view = new BrowserView({
             webPreferences: {
                 nodeIntegration: false,
                 contextIsolation: true,
             },
         });
-        const viewWidth = Math.floor(mainWindow.getBounds().width / websites.length);
 
-        view.id = `${url}`;
+        view.id = url;
         mainWindow.addBrowserView(view);
+
+        // Recalculate view dimensions
+        const { width, height } = mainWindow.getBounds();
+        websites.push(url);
+        const viewWidth = Math.floor(width / websites.length);
+
+        // Update bounds for all views
+        views.forEach((v, index) => {
+            v.setBounds({
+                x: index * viewWidth,
+                y: 0,
+                width: viewWidth,
+                height: height - 150,
+            });
+        });
+
+        // Set bounds for new view
         view.setBounds({
-            x: websites.length * viewWidth,
+            x: (websites.length - 1) * viewWidth,
             y: 0,
             width: viewWidth,
-            height: 600,
+            height: height - 150,
         });
-        view.webContents.setZoomFactor(1); // Set initial zoom factor to 150%
+
+        view.webContents.setZoomFactor(1.5); // Set initial zoom factor to 150%
         view.webContents.loadURL(url);
-        views.push(view)
+        views.push(view);
+
+        console.log('New Claude view added', views.length);
+
+        // Bring the new view to the front
+        mainWindow.setTopBrowserView(view);
+
     }
 })

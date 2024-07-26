@@ -17,7 +17,6 @@ const openClaude = document.getElementById("showClaude")
 
 openClaude.addEventListener('click', (event) => {
   if (openClaude.textContent === "Show Claude") {
-    console.log('work?')
     openClaudeMessage('open claude now')
   } else {
     closeClaudeMessage('close claude now')
