@@ -250,10 +250,27 @@ ipcMain.on("open-claude", (event, prompt) => {
         view.webContents.loadURL(url);
         views.push(view);
 
-        console.log('New Claude view added', views.length);
-
         // Bring the new view to the front
         mainWindow.setTopBrowserView(view);
 
+    }
+})
+
+ipcMain.on("close-claude", (event, prompt) => {
+    if (prompt === "close claude now") {
+        const claudeView = views[3]
+        mainWindow.removeBrowserView(claudeView)
+        websites.pop()
+
+        const { width, height } = mainWindow.getBounds();
+        const viewWidth = Math.floor(width / websites.length);
+        views.forEach((v, index) => {
+            v.setBounds({
+                x: index * viewWidth,
+                y: 0,
+                width: viewWidth,
+                height: height - 150,
+            });
+        });
     }
 })
