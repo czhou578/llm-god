@@ -30,8 +30,12 @@ textArea.addEventListener("input", (event) => {
 });
 
 textArea.addEventListener("keydown", (event) => {
-  if (event.key === "Enter") {
-    ipcRenderer.send("send-prompt");
-    console.log("Ctrl + Enter pressed");
+  if (event.ctrlKey) {
+    if (event.key === "Enter") {
+      event.preventDefault()
+      ipcRenderer.send("send-prompt");
+      console.log("Ctrl + Enter pressed");
+    }
+
   }
 });

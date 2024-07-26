@@ -3,12 +3,13 @@ const path = require("path");
 
 let mainWindow;
 const views = [];
+
 require("electron-reload")(path.join(__dirname, "."));
+
 const websites = [
     "https://chat.openai.com/",
     "https://bard.google.com",
     "https://www.meta.ai/",
-    // "https://claude.ai/chats/",
 ];
 
 function createWindow() {
@@ -19,10 +20,12 @@ function createWindow() {
             nodeIntegration: true,
             contextIsolation: false,
         },
+        fullscreen: true
     });
 
     mainWindow.loadFile("index.html");
     const viewWidth = Math.floor(mainWindow.getBounds().width / websites.length);
+    const { height } = mainWindow.getBounds();
 
     websites.forEach((url, index) => {
         const view = new BrowserView({
@@ -37,7 +40,7 @@ function createWindow() {
             x: index * viewWidth,
             y: 0,
             width: viewWidth,
-            height: 600,
+            height: height - 150,
         });
         view.webContents.setZoomFactor(1); // Set initial zoom factor to 150%
         view.webContents.loadURL(url);
@@ -64,7 +67,6 @@ function createWindow() {
 }
 
 function updateZoomFactor() {
-    const bounds = mainWindow.getBounds();
     views.forEach((view) => {
         view.webContents.setZoomFactor(2);
     });
