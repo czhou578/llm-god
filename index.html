@@ -9,6 +9,7 @@
             flex-direction: column;
             height: 100vh;
             margin: 0;
+            background-color: black;
         }
 
         #prompt-area {
@@ -57,6 +58,11 @@
             margin-left: 20px;
         }
     </style>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            document.body.style.backgroundColor = 'black';
+        });
+    </script>
     <script type="module" src="renderer.js"></script>
 </head>
 

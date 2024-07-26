@@ -1,8 +1,9 @@
-const { app, BrowserWindow, BrowserView, ipcMain, webContents } = require("electron");
+const { app, BrowserWindow, BrowserView, ipcMain } = require("electron");
 const remote = require('@electron/remote/main')
+const path = require("path");
+
 remote.initialize()
 
-const path = require("path");
 
 let mainWindow;
 const views = [];
@@ -19,7 +20,9 @@ function createWindow() {
     mainWindow = new BrowserWindow({
         width: 1200,
         height: 800,
+        backgroundColor: '#000000',
         webPreferences: {
+            preload: path.join(__dirname, 'preload.js'),
             nodeIntegration: true,
             contextIsolation: false,
         },

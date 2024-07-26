@@ -8,7 +8,9 @@
     "build": "next build",
     "start": "./node_modules/.bin/electron .",
     "prettier": "prettier -w .",
-    "lint": "next lint"
+    "lint": "next lint",
+    "make": "electron-forge make",
+    "package": "electron-forge package"
   },
   "dependencies": {
     "@electron/remote": "^2.1.2",
@@ -22,6 +24,7 @@
     "react-split": "^2.0.14"
   },
   "devDependencies": {
+    "@electron-forge/cli": "^7.4.0",
     "@types/jest": "^29.5.12",
     "@types/node": "^20",
     "@types/react": "^18",
