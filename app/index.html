@@ -17,13 +17,15 @@
             left: 0;
             right: 0;
             background-color: #f0f0f0;
-            height: 90px;
+            height: 200px;
             margin-bottom: 10px;
         }
 
         #prompt-input {
             font-size: 30px;
             line-height: 1.5;
+            width: 90%;
+            height: 96%
         }
 
         .close-button {
@@ -35,12 +37,10 @@
             background-color: red;
             color: white;
             border: none;
-            border-radius: 50%;
             cursor: pointer;
             font-size: 18px;
             line-height: 30px;
             text-align: center;
-            z-index: 1000;
         }
     </style>
     <script type="module" src="renderer.js"></script>
@@ -48,10 +48,10 @@
 
 <body style="background-color: black;">
     <div id="prompt-area" style="display: flex;">
-        <textarea id="prompt-input" rows="3" style="width: 90%; height: 100%"></textarea>
+        <textarea id="prompt-input" rows="3"></textarea>
         <div style="height: 90px;">
             <button class="close-button" id="closeButton" style="height: 100%; width: 3%;">&times;</button>
-            <button id="showClaude" style="height: 100%; width: 100%;">Show Claude</button>
+            <button id="showClaude" style="height: 100%; width: 100%; font-size: 18px; ">Show Claude</button>
         </div>
     </div>
 </body>

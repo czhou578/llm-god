@@ -10,9 +10,9 @@ const views = [];
 require("electron-reload")(path.join(__dirname, "."));
 
 const websites = [
-    // "https://chat.openai.com/",
-    // "https://bard.google.com",
-    // "https://www.meta.ai/",
+    "https://chat.openai.com/",
+    "https://bard.google.com",
+    "https://www.meta.ai/",
 ];
 
 function createWindow() {
@@ -45,7 +45,7 @@ function createWindow() {
             x: index * viewWidth,
             y: 0,
             width: viewWidth,
-            height: height - 150,
+            height: height - 350,
         });
         view.webContents.setZoomFactor(1); // Set initial zoom factor to 150%
         view.webContents.loadURL(url);
@@ -212,14 +212,6 @@ ipcMain.on("open-claude", (event, prompt) => {
         console.log('Opening Claude');
         let url = "https://claude.ai/chats/";
 
-        // Check if Claude view already exists
-        const existingClaudeView = views.find(view => view.id === url);
-        if (existingClaudeView) {
-            console.log('Claude view already exists, bringing it to front');
-            mainWindow.setTopBrowserView(existingClaudeView);
-            return;
-        }
-
         const view = new BrowserView({
             webPreferences: {
                 nodeIntegration: false,
@@ -232,6 +224,7 @@ ipcMain.on("open-claude", (event, prompt) => {
 
         // Recalculate view dimensions
         const { width, height } = mainWindow.getBounds();
+
         websites.push(url);
         const viewWidth = Math.floor(width / websites.length);
 
@@ -241,7 +234,7 @@ ipcMain.on("open-claude", (event, prompt) => {
                 x: index * viewWidth,
                 y: 0,
                 width: viewWidth,
-                height: height - 150,
+                height: height - 350,
             });
         });
 
@@ -250,7 +243,7 @@ ipcMain.on("open-claude", (event, prompt) => {
             x: (websites.length - 1) * viewWidth,
             y: 0,
             width: viewWidth,
-            height: height - 150,
+            height: height - 350,
         });
 
         view.webContents.setZoomFactor(1.5); // Set initial zoom factor to 150%
@@ -276,7 +269,7 @@ ipcMain.on("close-claude", (event, prompt) => {
                 x: index * viewWidth,
                 y: 0,
                 width: viewWidth,
-                height: height - 150,
+                height: height - 350,
             });
         });
     }

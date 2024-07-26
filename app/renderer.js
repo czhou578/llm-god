@@ -1,4 +1,4 @@
-const { ipcRenderer, webContents } = require("electron");
+const { ipcRenderer } = require("electron");
 const remote = require('@electron/remote')
 
 
@@ -44,8 +44,6 @@ textArea.addEventListener("keydown", (event) => {
 const closeButton = document.getElementById('closeButton')
 
 closeButton.addEventListener('click', (event) => {
-  console.log('is this owkring')
   const window = remote.getCurrentWindow();
-  console.log()
   window.close();
 })
