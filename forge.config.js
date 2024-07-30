@@ -1,4 +1,7 @@
 module.exports = {
+    packagerConfig: {
+        asar: true,
+    },    
     makers: [
         {
             name: '@electron-forge/maker-zip',
@@ -11,5 +14,8 @@ module.exports = {
                 certificatePassword: process.env.CERTIFICATE_PASSWORD
             }
         }
+    ],
+    files: [
+        "**/*"
     ]
 };

@@ -31,7 +31,7 @@ function createWindow() {
 
     remote.enable(mainWindow.webContents);
 
-    mainWindow.loadFile("index.html");
+    mainWindow.loadFile(path.join(__dirname, 'index.html'));
     const viewWidth = Math.floor(mainWindow.getBounds().width / websites.length);
     const { height } = mainWindow.getBounds();
 
