@@ -20,7 +20,7 @@ const openClaude = document.getElementById("showClaude")
 openClaude.addEventListener('click', (event) => {
   if (openClaude.textContent === "Show Claude") {
     openClaudeMessage('open claude now')
-    openClaude.textContent = "Remove Claude"
+    openClaude.textContent = "Hide Claude"
   } else {
     closeClaudeMessage('close claude now')
     openClaude.textContent = "Show Claude"

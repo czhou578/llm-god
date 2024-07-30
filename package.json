@@ -7,7 +7,7 @@
   "description": "Prompt multiple LLM's at the same time!",
   "scripts": {
     "dev": "next dev",
-    "start": "./node_modules/.bin/electron .",
+    "start": "npx electron .",
     "prettier": "prettier -w .",
     "make": "electron-forge make",
     "package": "electron-forge package"

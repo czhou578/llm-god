@@ -8,7 +8,7 @@ remote.initialize()
 let mainWindow;
 const views = [];
 
-require("electron-reload")(path.join(__dirname, "."));
+// require("electron-reload")(path.join(__dirname, "."));
 
 const websites = [
     "https://chat.openai.com/",
@@ -48,7 +48,7 @@ function createWindow() {
             x: index * viewWidth,
             y: 0,
             width: viewWidth,
-            height: height - 350,
+            height: height - 200,
         });
         view.webContents.setZoomFactor(1); // Set initial zoom factor to 150%
         view.webContents.loadURL(url);
@@ -67,7 +67,7 @@ function createWindow() {
                 x: index * viewWidth,
                 y: 0,
                 width: viewWidth,
-                height: height - 150,
+                height: height - 200,
             });
         });
         updateZoomFactor();
@@ -76,7 +76,7 @@ function createWindow() {
 
 function updateZoomFactor() {
     views.forEach((view) => {
-        view.webContents.setZoomFactor(2);
+        view.webContents.setZoomFactor(1);
     });
 }
 
@@ -237,7 +237,7 @@ ipcMain.on("open-claude", (event, prompt) => {
                 x: index * viewWidth,
                 y: 0,
                 width: viewWidth,
-                height: height - 350,
+                height: height - 200,
             });
         });
 
@@ -246,7 +246,7 @@ ipcMain.on("open-claude", (event, prompt) => {
             x: (websites.length - 1) * viewWidth,
             y: 0,
             width: viewWidth,
-            height: height - 350,
+            height: height - 200,
         });
 
         view.webContents.setZoomFactor(1.5); // Set initial zoom factor to 150%
@@ -272,7 +272,7 @@ ipcMain.on("close-claude", (event, prompt) => {
                 x: index * viewWidth,
                 y: 0,
                 width: viewWidth,
-                height: height - 350,
+                height: height - 200,
             });
         });
     }
