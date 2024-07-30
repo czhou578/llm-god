@@ -1,6 +1,7 @@
 const { app, BrowserWindow, BrowserView, ipcMain } = require("electron");
 const remote = require('@electron/remote/main')
 const path = require("path");
+if (require('electron-squirrel-startup')) app.quit();
 
 remote.initialize()
 
