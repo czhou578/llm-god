@@ -91,12 +91,15 @@ ipcMain.on("enter-prompt", (event, prompt) => {
         if (view.id.match("openai")) {
             view.webContents.executeJavaScript(`
         {
-            var inputElement = document.querySelector('#prompt-textarea');
+            // var inputElement = document.querySelector('#prompt-textarea');
+
+            const inputElement = document.querySelector('#prompt-textarea > p');;
             if (inputElement) {
               const inputEvent = new Event('input', { bubbles: true });
-              inputElement.value = \`${prompt}\`; // must be escaped backticks to support multiline
+              inputElement.innerHTML = \`${prompt}\`; // must be escaped backticks to support multiline
               inputElement.dispatchEvent(inputEvent);
             }
+
           }
             `);
         } else if (view.id.match("bard")) {
