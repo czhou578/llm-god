@@ -37,6 +37,7 @@ textArea.addEventListener("keydown", (event) => {
       event.preventDefault()
       ipcRenderer.send("send-prompt");
       console.log("Ctrl + Enter pressed");
+      textArea.value = ""
     }
   }
 });
