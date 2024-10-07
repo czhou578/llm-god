@@ -220,6 +220,78 @@ if (btn) {
   });
 });
 
+ipcMain.on("open-perplexity", (event, prompt) => {
+  if (prompt === "open perplexity now") {
+    console.log("Opening Perplexity");
+    let url = "https://www.perplexity.ai/";
+
+    const view = new BrowserView({
+      webPreferences: {
+        nodeIntegration: false,
+        contextIsolation: true,
+        offscreen: false,
+        devTools: true,
+      },
+    });
+
+    view.id = url;
+    mainWindow.addBrowserView(view);
+    // mainWindow.webContents.openDevTools()
+    // Recalculate view dimensions
+    const { width, height } = mainWindow.getBounds();
+
+    websites.push(url);
+    const viewWidth = Math.floor(width / websites.length);
+
+    // Update bounds for all views
+    views.forEach((v, index) => {
+      v.setBounds({
+        x: index * viewWidth,
+        y: 0,
+        width: viewWidth,
+        // height: 100
+        height: height - 200,
+      });
+    });
+
+    // Set bounds for new view
+    view.setBounds({
+      x: (websites.length - 1) * viewWidth,
+      y: 0,
+      width: viewWidth,
+      // height: 100
+      height: height - 200,
+    });
+
+    view.webContents.setZoomFactor(1.5); // Set initial zoom factor to 150%
+    view.webContents.loadURL(url);
+    views.push(view);
+
+    // Bring the new view to the front
+    mainWindow.setTopBrowserView(view);
+  }
+});
+
+ipcMain.on("close-perplexity", (event, prompt) => {
+  if (prompt === "close perplexity now") {
+    const perplexityView = views[3];
+    mainWindow.removeBrowserView(perplexityView);
+    views.pop();
+    websites.pop();
+
+    const { width, height } = mainWindow.getBounds();
+    const viewWidth = Math.floor(width / websites.length);
+    views.forEach((v, index) => {
+      v.setBounds({
+        x: index * viewWidth,
+        y: 0,
+        width: viewWidth,
+        height: height - 200,
+      });
+    });
+  }
+});
+
 ipcMain.on("open-claude", (event, prompt) => {
   if (prompt === "open claude now") {
     console.log("Opening Claude");

@@ -13,8 +13,27 @@ function closeClaudeMessage(message) {
   ipcRenderer.send("close-claude", message);
 }
 
+function openPerplexityMessage(message) {
+  ipcRenderer.send("open-perplexity", message);
+}
+
+function closePerplexityMessage(message) {
+  ipcRenderer.send("close-perplexity", message);
+}
+
 const textArea = document.getElementById("prompt-input");
 const openClaude = document.getElementById("showClaude");
+const openPerplexity = document.getElementById("showPerplexity");
+
+openPerplexity.addEventListener("click", (event) => {
+  if (openPerplexity.textContent === "Show Perplexity") {
+    openPerplexityMessage("open perplexity now");
+    openPerplexity.textContent = "Hide Perplexity";
+  } else {
+    closePerplexityMessage("close perplexity now");
+    openPerplexity.textContent = "Show Perplexity";
+  }
+});
 
 openClaude.addEventListener("click", (event) => {
   if (openClaude.textContent === "Show Claude") {
