@@ -1,3 +1,3 @@
-window.addEventListener('DOMContentLoaded', () => {
-    document.body.style.backgroundColor = 'black';
+window.addEventListener("DOMContentLoaded", () => {
+  document.body.style.backgroundColor = "black";
 });

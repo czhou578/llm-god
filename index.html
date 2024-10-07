@@ -1,86 +1,87 @@
 <!doctype html>
 <html>
-
-<head>
-    <meta charset="utf-8">
-    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; style-src 'self' 'unsafe-inline';">
+  <head>
+    <meta charset="utf-8" />
+    <meta
+      http-equiv="Content-Security-Policy"
+      content="default-src 'self'; style-src 'self' 'unsafe-inline';"
+    />
     <title>Multi-LLM Interface</title>
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
 
-        body {
-            display: flex;
-            flex-direction: column;
-            justify-content: flex-end;
-            height: 100vh;
-            margin: 0;
-            background-color: black;
-        }
+      body {
+        display: flex;
+        flex-direction: column;
+        justify-content: flex-end;
+        height: 100vh;
+        margin: 0;
+        background-color: black;
+      }
 
-        #prompt-area {
-            display: flex;
-            background-color: #f0f0f0;
-            height: 200px;
-        }
+      #prompt-area {
+        display: flex;
+        background-color: #f0f0f0;
+        height: 200px;
+      }
 
-        #prompt-input {
-            padding: 10px;
-            font-size: 30px;
-            font-family:"Times New Roman", Times, serif; 
-            line-height: 1.5;
-            width: 90%;
-            height: 98%
-        }
+      #prompt-input {
+        padding: 10px;
+        font-size: 30px;
+        font-family: "Times New Roman", Times, serif;
+        line-height: 1.5;
+        width: 90%;
+        height: 98%;
+      }
 
-        #button-container {
-            margin-top: 30px;
-            margin-left: 20px;
-            height: 90px;
-            width: 200px;
-            display: flex;
-            justify-content: flex-end;
-            gap: 10px;
-        }
+      #button-container {
+        margin-top: 30px;
+        margin-left: 20px;
+        height: 90px;
+        width: 200px;
+        display: flex;
+        justify-content: flex-end;
+        gap: 10px;
+      }
 
-        .close-button {
-            height: 100%;
-            width: 100%;
-            background-color: red;
-            color: white;
-            border: none;
-            cursor: pointer;
-            font-size: 18px;
-            line-height: 30px;
-            text-align: center;
-            cursor: pointer;
-        }
+      .close-button {
+        height: 100%;
+        width: 100%;
+        background-color: red;
+        color: white;
+        border: none;
+        cursor: pointer;
+        font-size: 18px;
+        line-height: 30px;
+        text-align: center;
+        cursor: pointer;
+      }
 
-        #showClaude {
-            height: 100%;
-            width: 100%;
-            font-size: 18px;
-        }
+      #showClaude {
+        height: 100%;
+        width: 100%;
+        font-size: 18px;
+      }
     </style>
     <script>
-        document.addEventListener('DOMContentLoaded', () => {
-            document.body.style.backgroundColor = 'black';
-        });
+      document.addEventListener("DOMContentLoaded", () => {
+        document.body.style.backgroundColor = "black";
+      });
     </script>
     <script type="module" src="renderer.js"></script>
-</head>
+  </head>
 
-<body>
+  <body>
     <div id="prompt-area">
-        <textarea id="prompt-input" rows="3"></textarea>
-        <div id="button-container">
-            <button id="showClaude">Show Claude</button>
-            <button class="close-button" id="closeButton">&times;</button>
-        </div>
+      <textarea id="prompt-input" rows="3"></textarea>
+      <div id="button-container">
+        <button id="showClaude">Show Claude</button>
+        <button class="close-button" id="closeButton">&times;</button>
+      </div>
     </div>
-</body>
-
+  </body>
 </html>

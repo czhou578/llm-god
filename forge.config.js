@@ -1,21 +1,19 @@
 module.exports = {
-    packagerConfig: {
-        asar: true,
-    },    
-    makers: [
-        {
-            name: '@electron-forge/maker-zip',
-            platforms: ['linux'],
-        },
-        {
-            name: '@electron-forge/maker-squirrel',
-            config: {
-                certificateFile: './cert.pfx',
-                certificatePassword: process.env.CERTIFICATE_PASSWORD
-            }
-        }
-    ],
-    files: [
-        "**/*"
-    ]
+  packagerConfig: {
+    asar: true,
+  },
+  makers: [
+    {
+      name: "@electron-forge/maker-zip",
+      platforms: ["linux"],
+    },
+    {
+      name: "@electron-forge/maker-squirrel",
+      config: {
+        certificateFile: "./cert.pfx",
+        certificatePassword: process.env.CERTIFICATE_PASSWORD,
+      },
+    },
+  ],
+  files: ["**/*"],
 };

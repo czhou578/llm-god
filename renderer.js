@@ -1,6 +1,5 @@
 const { ipcRenderer } = require("electron");
-const remote = require('@electron/remote')
-
+const remote = require("@electron/remote");
 
 function logToWebPage(message) {
   ipcRenderer.send("enter-prompt", message);
@@ -15,17 +14,17 @@ function closeClaudeMessage(message) {
 }
 
 const textArea = document.getElementById("prompt-input");
-const openClaude = document.getElementById("showClaude")
+const openClaude = document.getElementById("showClaude");
 
-openClaude.addEventListener('click', (event) => {
+openClaude.addEventListener("click", (event) => {
   if (openClaude.textContent === "Show Claude") {
-    openClaudeMessage('open claude now')
-    openClaude.textContent = "Hide Claude"
+    openClaudeMessage("open claude now");
+    openClaude.textContent = "Hide Claude";
   } else {
-    closeClaudeMessage('close claude now')
-    openClaude.textContent = "Show Claude"
+    closeClaudeMessage("close claude now");
+    openClaude.textContent = "Show Claude";
   }
-})
+});
 
 textArea.addEventListener("input", (event) => {
   logToWebPage(event.target.value);
@@ -34,17 +33,17 @@ textArea.addEventListener("input", (event) => {
 textArea.addEventListener("keydown", (event) => {
   if (event.ctrlKey) {
     if (event.key === "Enter") {
-      event.preventDefault()
+      event.preventDefault();
       ipcRenderer.send("send-prompt");
       console.log("Ctrl + Enter pressed");
-      textArea.value = ""
+      textArea.value = "";
     }
   }
 });
 
-const closeButton = document.getElementById('closeButton')
+const closeButton = document.getElementById("closeButton");
 
-closeButton.addEventListener('click', (event) => {
+closeButton.addEventListener("click", (event) => {
   const window = remote.getCurrentWindow();
   window.close();
-})
+});
