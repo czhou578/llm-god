@@ -149,6 +149,17 @@ ipcMain.on("enter-prompt", (event, prompt) => {
 			inputElement.innerHTML = \`${prompt}\`
 		}
 	}`);
+    } else if (view.id.match("perplexity")) {
+      view.webContents.executeJavaScript(`
+        var inputElement = document.querySelector('textarea[placeholder*="Ask"]'); // can be "Ask anything" or "Ask follow-up"
+        if (inputElement) {
+          var nativeTextAreaValueSetter = Object.getOwnPropertyDescriptor(window.HTMLTextAreaElement.prototype, "value").set;
+          nativeTextAreaValueSetter.call(inputElement, \`${prompt}\`);
+
+          var event = new Event('input', { bubbles: true});
+          inputElement.dispatchEvent(event);
+        }        
+        `);
     }
   });
 });
@@ -216,6 +227,17 @@ if (btn) {
   console.log("Element not found");
 }
                 }`);
+    } else if (view.id.match("perplexity")) {
+      view.webContents.executeJavaScript(`
+        {
+        var buttons = Array.from(document.querySelectorAll('button.bg-super'));
+				if (buttons[0]) {
+					var buttonsWithSvgPath = buttons.filter(button => button.querySelector('svg path'));
+					var button = buttonsWithSvgPath[buttonsWithSvgPath.length - 1];
+					button.click();
+				}
+      }
+        `);
     }
   });
 });
