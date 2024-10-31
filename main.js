@@ -99,13 +99,12 @@ ipcMain.on("enter-prompt", (event, prompt) => {
         {
             // var inputElement = document.querySelector('#prompt-textarea');
 
-            const inputElement = document.querySelector('#prompt-textarea > p');;
+            const inputElement = document.querySelector('#prompt-textarea > p');
             if (inputElement) {
               const inputEvent = new Event('input', { bubbles: true });
-              inputElement.innerHTML = \`${prompt}\`; // must be escaped backticks to support multiline
+              inputElement.textContent = \`${prompt}\`; // must be escaped backticks to support multiline
               inputElement.dispatchEvent(inputEvent);
             }
-
           }
             `);
     } else if (view.id.match("bard")) {
@@ -385,3 +384,5 @@ ipcMain.on("close-claude", (event, prompt) => {
     });
   }
 });
+
+

@@ -68,27 +68,27 @@ closeButton.addEventListener("click", (event) => {
   window.close();
 });
 
-pasteArea.addEventListener('paste', function(e) {
-  e.preventDefault();
-  const items = e.clipboardData.items;
+// pasteArea.addEventListener('paste', function(e) {
+//   e.preventDefault();
+//   const items = e.clipboardData.items;
 
-  for (let i = 0; i < items.length; i++) {
-      if (items[i].type.indexOf('image') !== -1) {
-          const blob = items[i].getAsFile();
-          const reader = new FileReader();
+//   for (let i = 0; i < items.length; i++) {
+//       if (items[i].type.indexOf('image') !== -1) {
+//           const blob = items[i].getAsFile();
+//           const reader = new FileReader();
 
-          reader.onload = function(event) {
-              const img = document.createElement('img');
-              img.src = event.target.result;
-              imagePreview.innerHTML = '';
-              imagePreview.appendChild(img);
+//           reader.onload = function(event) {
+//               const img = document.createElement('img');
+//               img.src = event.target.result;
+//               imagePreview.innerHTML = '';
+//               imagePreview.appendChild(img);
 
-              // Here you would typically upload the image to your server
-              console.log('Image data:', event.target.result);
-              pasteArea.value = 'Image uploaded successfully!';
-          };
+//               // Here you would typically upload the image to your server
+//               console.log('Image data:', event.target.result);
+//               pasteArea.value = 'Image uploaded successfully!';
+//           };
 
-          reader.readAsDataURL(blob);
-      }
-  }
-});
+//           reader.readAsDataURL(blob);
+//       }
+//   }
+// });
