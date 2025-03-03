@@ -43,6 +43,7 @@ function createWindow() {
         contextIsolation: true,
       },
     });
+
     view.id = `${url}`;
     mainWindow.addBrowserView(view);
     view.setBounds({
@@ -85,12 +86,15 @@ function updateZoomFactor() {
   });
 }
 
-// app.disableHardwareAcceleration();
-
 app.whenReady().then(createWindow);
 app.on("window-all-closed", () => {
   if (process.platform !== "darwin") app.quit();
 });
+
+/**
+ * innerhtml doesn't work
+ * textContent doesn't work, but is less prone to breaking.
+ */
 
 ipcMain.on("enter-prompt", (event, prompt) => {
   views.forEach((view) => {
@@ -100,9 +104,14 @@ ipcMain.on("enter-prompt", (event, prompt) => {
             // var inputElement = document.querySelector('#prompt-textarea');
 
             const inputElement = document.querySelector('#prompt-textarea > p');
+            const fixDivContainer = document.querySelector('div.flex-1.overflow-hidden > div.h-full')
+
             if (inputElement) {
               const inputEvent = new Event('input', { bubbles: true });
-              inputElement.textContent = \`${prompt}\`; // must be escaped backticks to support multiline
+              inputElement.innerText = \`${prompt}\`; // must be escaped backticks to support multiline
+              fixDivContainer.style.height = '0'
+              console.log('the div container changed')
+              fixDivContainer.style.height = '100%'
               inputElement.dispatchEvent(inputEvent);
             }
           }
