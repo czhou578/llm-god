@@ -63,20 +63,30 @@ function addBrowserView(mainWindow, url, websites, views, webPreferences = {}) {
 }
 
 function removeBrowserView(mainWindow, view, websites, views) {
+  // Find the index of the view to remove
+  const viewIndex = views.indexOf(view);
+  if (viewIndex === -1) return; // View not found
+  
   // Remove the view from the window
   mainWindow.removeBrowserView(view);
-
-  // Remove the view from the views array
-  views = views.filter((v) => v !== view);
-
-  // Remove the URL from the websites array
-  websites = websites.filter((url) => url !== view.id);
-
+  
+  // Remove the URL from the websites array - use splice to modify the original array
+  const urlIndex = websites.findIndex(url => url === view.id);
+  if (urlIndex !== -1) {
+    websites.splice(urlIndex, 1);
+  }
+  
+  // Remove the view from the views array - use splice to modify the original array
+  views.splice(viewIndex, 1);
+  
+  // If there are no more views, return early
+  if (views.length === 0) return;
+  
   // Recalculate view dimensions
   const { width, height } = mainWindow.getBounds();
-  const viewWidth = Math.floor(width / websites.length);
-
-  // Update bounds for all existing views
+  const viewWidth = Math.floor(width / views.length); // Use views.length instead of websites.length
+  
+  // Update bounds for all remaining views to expand and fill the space
   views.forEach((v, index) => {
     v.setBounds({
       x: index * viewWidth,
