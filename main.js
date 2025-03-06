@@ -127,7 +127,6 @@ ipcMain.on("enter-prompt", (event, prompt) => {
     if (view.id.match("openai")) {
       view.webContents.executeJavaScript(`
         {
-            // var inputElement = document.querySelector('#prompt-textarea');
 
             const inputElement = document.querySelector('#prompt-textarea > p');
             const fixDivContainer = document.querySelector('div.flex-1.overflow-hidden > div.h-full')
@@ -199,6 +198,18 @@ ipcMain.on("enter-prompt", (event, prompt) => {
           const inputEvent = new Event('input', { bubbles: true });
           inputElement.dispatchEvent(inputEvent);          
 
+        }
+      `);
+    } else if (view.id.match("deepseek")) {
+      view.webContents.executeJavaScript(`
+        var inputElement = document.querySelector('textarea');
+
+        if (inputElement) {
+          var nativeTextAreaValueSetter = Object.getOwnPropertyDescriptor(window.HTMLTextAreaElement.prototype, "value").set;
+          nativeTextAreaValueSetter.call(inputElement, \`${prompt}\`);
+        
+          const inputEvent = new Event('input', { bubbles: true });
+          inputElement.dispatchEvent(inputEvent);           
         }
       `);
     }
@@ -293,6 +304,21 @@ ipcMain.on("send-prompt", (event, prompt) => {
           }
 
       }
+        `);
+    } else if (view.id.match("deepseek")) {
+      view.webContents.executeJavaScript(`
+        {
+        var buttons = Array.from(document.querySelectorAll('div[role="button"]'));
+        var btn = buttons[2]
+        if (btn) {
+            btn.focus();
+            btn.disabled = false;
+            btn.click();
+
+          } else {
+            console.log("Element not found");
+          }
+    }
         `);
     }
   });
@@ -458,7 +484,7 @@ ipcMain.on("open-grok", (event, prompt) => {
 
     view.id = url;
     mainWindow.addBrowserView(view);
-    view.webContents.openDevTools({ mode: "detach" });
+    // view.webContents.openDevTools({ mode: "detach" });
     // Recalculate view dimensions
     const { width, height } = mainWindow.getBounds();
 
@@ -530,6 +556,7 @@ ipcMain.on("open-deepseek", (event, prompt) => {
 
     view.id = url;
     mainWindow.addBrowserView(view);
+    view.webContents.openDevTools({ mode: "detach" });
     // mainWindow.webContents.openDevTools()
     // Recalculate view dimensions
     const { width, height } = mainWindow.getBounds();
