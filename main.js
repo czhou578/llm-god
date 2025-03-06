@@ -1,4 +1,10 @@
-const { app, BrowserWindow, globalShortcut, BrowserView, ipcMain } = require("electron");
+const {
+  app,
+  BrowserWindow,
+  globalShortcut,
+  BrowserView,
+  ipcMain,
+} = require("electron");
 const remote = require("@electron/remote/main");
 const path = require("path");
 if (require("electron-squirrel-startup")) app.quit();
@@ -90,18 +96,18 @@ function updateZoomFactor() {
 app.whenReady().then(createWindow);
 app.whenReady().then(() => {
   // Create your window and other setup code
-  
+
   // Register the Ctrl+W shortcut
-  globalShortcut.register('CommandOrControl+W', () => {
+  globalShortcut.register("CommandOrControl+W", () => {
     // Get the focused window
     const focusedWindow = BrowserWindow.getFocusedWindow();
-    
+
     if (focusedWindow) {
       // If the window is in full screen, exit full screen first
       if (focusedWindow.isFullScreen()) {
         focusedWindow.setFullScreen(false);
       }
-      
+
       // Close the window
       focusedWindow.close();
     }
@@ -177,17 +183,24 @@ ipcMain.on("enter-prompt", (event, prompt) => {
 			inputElement.innerHTML = \`${prompt}\`
 		}
 	}`);
-    } else if (view.id.match("perplexity")) {
+    } else if (view.id.match("grok")) {
       view.webContents.executeJavaScript(`
-        var inputElement = document.querySelector('textarea[placeholder*="Ask"]'); // can be "Ask anything" or "Ask follow-up"
+        var inputElement = document.querySelector('textarea');
+
         if (inputElement) {
+          const span = inputElement.previousElementSibling;
+          if (span) {
+            span.classList.add("hidden");
+          }
+
           var nativeTextAreaValueSetter = Object.getOwnPropertyDescriptor(window.HTMLTextAreaElement.prototype, "value").set;
           nativeTextAreaValueSetter.call(inputElement, \`${prompt}\`);
+        
+          const inputEvent = new Event('input', { bubbles: true });
+          inputElement.dispatchEvent(inputEvent);          
 
-          var event = new Event('input', { bubbles: true});
-          inputElement.dispatchEvent(event);
-        }        
-        `);
+        }
+      `);
     }
   });
 });
@@ -196,7 +209,6 @@ ipcMain.on("send-prompt", (event, prompt) => {
   views.forEach((view) => {
     if (view.id.match("openai")) {
       view.webContents.executeJavaScript(`
-            // var btn = document.querySelector("textarea[placeholder*='Send a message']+button"); // this one broke recently .. note that they add another div (for the file upload) in code interpreter mode
             var btn = document.querySelector('button[data-testid="send-button"]');
             if (btn) {
                 btn.focus();
@@ -238,22 +250,22 @@ ipcMain.on("send-prompt", (event, prompt) => {
   }`);
     } else if (view.id.match("meta")) {
       view.webContents.executeJavaScript(`{
-var btn = document.querySelector("div[aria-label*='Send Message'] path");
+          var btn = document.querySelector("div[aria-label*='Send Message'] path");
 
-// Check if the element exists to avoid errors
-if (btn) {
-  // Create a new mouse event
-  var event = new MouseEvent('click', {
-    view: window,
-    bubbles: true,
-    cancelable: true
-  });
+          // Check if the element exists to avoid errors
+          if (btn) {
+            // Create a new mouse event
+            var event = new MouseEvent('click', {
+              view: window,
+              bubbles: true,
+              cancelable: true
+            });
 
-  // Dispatch the click event on the path element
-  btn.dispatchEvent(event);
-} else {
-  console.log("Element not found");
-}
+            // Dispatch the click event on the path element
+            btn.dispatchEvent(event);
+          } else {
+            console.log("Element not found");
+          }
                 }`);
     } else if (view.id.match("perplexity")) {
       view.webContents.executeJavaScript(`
@@ -264,6 +276,22 @@ if (btn) {
 					var button = buttonsWithSvgPath[buttonsWithSvgPath.length - 1];
 					button.click();
 				}
+      }
+        `);
+    } else if (view.id.match("grok")) {
+      view.webContents.executeJavaScript(`
+        {
+        var btn = document.querySelector('button.group');
+
+        if (btn) {
+            btn.focus();
+			      btn.disabled = false;
+            btn.click();
+
+          } else {
+            console.log("Element not found");
+          }
+
       }
         `);
     }
@@ -430,7 +458,7 @@ ipcMain.on("open-grok", (event, prompt) => {
 
     view.id = url;
     mainWindow.addBrowserView(view);
-    // mainWindow.webContents.openDevTools()
+    view.webContents.openDevTools({ mode: "detach" });
     // Recalculate view dimensions
     const { width, height } = mainWindow.getBounds();
 
@@ -464,7 +492,6 @@ ipcMain.on("open-grok", (event, prompt) => {
     // Bring the new view to the front
     mainWindow.setTopBrowserView(view);
   }
-  
 });
 
 ipcMain.on("close-grok", (event, prompt) => {

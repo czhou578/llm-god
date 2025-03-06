@@ -43,7 +43,6 @@ const openPerplexity = document.getElementById("showPerplexity");
 const openGrok = document.getElementById("showGrok");
 const openDeepSeek = document.getElementById("showDeepSeek");
 
-
 openPerplexity.addEventListener("click", (event) => {
   if (openPerplexity.textContent === "Show Perplexity") {
     openPerplexityMessage("open perplexity now");
@@ -97,11 +96,4 @@ textArea.addEventListener("keydown", (event) => {
       textArea.value = "";
     }
   }
-});
-
-const closeButton = document.getElementById("closeButton");
-
-closeButton.addEventListener("click", (event) => {
-  const window = remote.getCurrentWindow();
-  window.close();
 });
