@@ -40,27 +40,6 @@
         height: 98%;
       }
 
-      .close-button {
-        position: fixed;
-        top: 10px;
-        right: 10px;
-        background-color: red;
-        color: white;
-        border: none;
-        cursor: pointer;
-        font-size: 24px;
-        width: 40px;
-        height: 40px;
-        border-radius: 50%;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        z-index: 10000; /* Ensure it appears above BrowserViews */
-        margin: 0;
-        padding: 0;
-        line-height: 1;
-      }
-
       .dropdown {
         position: relative;
         width: 10%;
@@ -89,8 +68,8 @@
         border: 3px solid #0078d7;
         border-radius: 8px;
         padding: 4px;
-        max-height: 200px;
-        overflow-y: auto;
+        max-height: 120px;
+        overflow-y: scroll;
       }
 
       .dropdown-item {
@@ -126,7 +105,6 @@
   </head>
 
   <body>
-    <button class="close-button" id="closeButton">&times;</button>
     <div id="prompt-area">
       <textarea id="prompt-input" rows="3"></textarea>
       <div class="dropdown">
@@ -134,6 +112,8 @@
         <div class="dropdown-content">
           <div class="dropdown-item" id="showClaude">Show Claude</div>
           <div class="dropdown-item" id="showPerplexity">Show Perplexity</div>
+          <div class="dropdown-item" id="showGrok">Show Grok</div>
+          <div class="dropdown-item" id="showDeepSeek">Show DeepSeek</div>
         </div>
       </div>
     </div>

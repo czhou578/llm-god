@@ -40,6 +40,9 @@ function closeGrokMessage(message) {
 const textArea = document.getElementById("prompt-input");
 const openClaude = document.getElementById("showClaude");
 const openPerplexity = document.getElementById("showPerplexity");
+const openGrok = document.getElementById("showGrok");
+const openDeepSeek = document.getElementById("showDeepSeek");
+
 
 openPerplexity.addEventListener("click", (event) => {
   if (openPerplexity.textContent === "Show Perplexity") {
@@ -58,6 +61,26 @@ openClaude.addEventListener("click", (event) => {
   } else {
     closeClaudeMessage("close claude now");
     openClaude.textContent = "Show Claude";
+  }
+});
+
+openGrok.addEventListener("click", (event) => {
+  if (openGrok.textContent === "Show Grok") {
+    openGrokMessage("open grok now");
+    openGrok.textContent = "Hide Grok";
+  } else {
+    closeGrokMessage("close grok now");
+    openGrok.textContent = "Show Grok";
+  }
+});
+
+openDeepSeek.addEventListener("click", (event) => {
+  if (openDeepSeek.textContent === "Show DeepSeek") {
+    openDeepSeekMessage("open deepseek now");
+    openDeepSeek.textContent = "Hide DeepSeek";
+  } else {
+    closeDeepSeekMessage("close deepseek now");
+    openDeepSeek.textContent = "Show DeepSeek";
   }
 });
 

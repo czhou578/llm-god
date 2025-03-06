@@ -1,4 +1,4 @@
-const { app, BrowserWindow, BrowserView, ipcMain } = require("electron");
+const { app, BrowserWindow, globalShortcut, BrowserView, ipcMain } = require("electron");
 const remote = require("@electron/remote/main");
 const path = require("path");
 if (require("electron-squirrel-startup")) app.quit();
@@ -33,7 +33,7 @@ function createWindow() {
   remote.enable(mainWindow.webContents);
 
   mainWindow.loadFile(path.join(__dirname, "index.html"));
-  mainWindow.webContents.openDevTools({ mode: "detach" });
+  // mainWindow.webContents.openDevTools({ mode: "detach" });
   const viewWidth = Math.floor(mainWindow.getBounds().width / websites.length);
   const { height } = mainWindow.getBounds();
 
@@ -88,6 +88,25 @@ function updateZoomFactor() {
 }
 
 app.whenReady().then(createWindow);
+app.whenReady().then(() => {
+  // Create your window and other setup code
+  
+  // Register the Ctrl+W shortcut
+  globalShortcut.register('CommandOrControl+W', () => {
+    // Get the focused window
+    const focusedWindow = BrowserWindow.getFocusedWindow();
+    
+    if (focusedWindow) {
+      // If the window is in full screen, exit full screen first
+      if (focusedWindow.isFullScreen()) {
+        focusedWindow.setFullScreen(false);
+      }
+      
+      // Close the window
+      focusedWindow.close();
+    }
+  });
+});
 app.on("window-all-closed", () => {
   if (process.platform !== "darwin") app.quit();
 });
@@ -395,36 +414,147 @@ ipcMain.on("close-claude", (event, prompt) => {
   }
 });
 
-// // Add these IPC handlers to toggle BrowserView visibility
-// // Replace your existing show-dropdown and hide-dropdown handlers with these:
+ipcMain.on("open-grok", (event, prompt) => {
+  if (prompt === "open grok now") {
+    console.log("Opening Grok");
+    let url = "https://grok.com/";
 
-// ipcMain.on("show-dropdown", () => {
-//   console.log("Show dropdown received");
-//   // Instead of moving views, set a higher z-index for the main window's webContents
-//   // This won't actually work directly since BrowserViews are always above webContents
+    const view = new BrowserView({
+      webPreferences: {
+        nodeIntegration: false,
+        contextIsolation: true,
+        offscreen: false,
+        devTools: true,
+      },
+    });
 
-//   // One approach is to temporarily reduce the BrowserView opacity
-//   views.forEach((view) => {
-//     // Make BrowserViews semi-transparent when dropdown is open
-//     view.webContents.executeJavaScript(`
-//       document.documentElement.style.pointerEvents = 'none';
-//     `);
-//   });
+    view.id = url;
+    mainWindow.addBrowserView(view);
+    // mainWindow.webContents.openDevTools()
+    // Recalculate view dimensions
+    const { width, height } = mainWindow.getBounds();
 
-//   // Force redraw to ensure changes take effect
-//   mainWindow.webContents.invalidate();
-// });
+    websites.push(url);
+    const viewWidth = Math.floor(width / websites.length);
 
-// ipcMain.on("hide-dropdown", () => {
-//   console.log("Hide dropdown received");
+    // Update bounds for all views
+    views.forEach((v, index) => {
+      v.setBounds({
+        x: index * viewWidth,
+        y: 0,
+        width: viewWidth,
+        // height: 100
+        height: height - 200,
+      });
+    });
 
-//   views.forEach((view) => {
-//     // Restore BrowserViews to normal
-//     view.webContents.executeJavaScript(`
-//       document.documentElement.style.pointerEvents = 'auto';
-//     `);
-//   });
+    // Set bounds for new view
+    view.setBounds({
+      x: (websites.length - 1) * viewWidth,
+      y: 0,
+      width: viewWidth,
+      // height: 100
+      height: height - 200,
+    });
 
-//   // Force redraw
-//   mainWindow.webContents.invalidate();
-// });
+    view.webContents.setZoomFactor(1.5); // Set initial zoom factor to 150%
+    view.webContents.loadURL(url);
+    views.push(view);
+
+    // Bring the new view to the front
+    mainWindow.setTopBrowserView(view);
+  }
+  
+});
+
+ipcMain.on("close-grok", (event, prompt) => {
+  if (prompt === "close grok now") {
+    const grokView = views[3];
+    mainWindow.removeBrowserView(grokView);
+    views.pop();
+    websites.pop();
+
+    const { width, height } = mainWindow.getBounds();
+    const viewWidth = Math.floor(width / websites.length);
+    views.forEach((v, index) => {
+      v.setBounds({
+        x: index * viewWidth,
+        y: 0,
+        width: viewWidth,
+        height: height - 200,
+      });
+    });
+  }
+});
+
+ipcMain.on("open-deepseek", (event, prompt) => {
+  if (prompt === "open deepseek now") {
+    console.log("Opening DeepSeek");
+    let url = "https://chat.deepseek.com/";
+
+    const view = new BrowserView({
+      webPreferences: {
+        nodeIntegration: false,
+        contextIsolation: true,
+        offscreen: false,
+        devTools: true,
+      },
+    });
+
+    view.id = url;
+    mainWindow.addBrowserView(view);
+    // mainWindow.webContents.openDevTools()
+    // Recalculate view dimensions
+    const { width, height } = mainWindow.getBounds();
+
+    websites.push(url);
+    const viewWidth = Math.floor(width / websites.length);
+
+    // Update bounds for all views
+    views.forEach((v, index) => {
+      v.setBounds({
+        x: index * viewWidth,
+        y: 0,
+        width: viewWidth,
+        // height: 100
+        height: height - 200,
+      });
+    });
+
+    // Set bounds for new view
+    view.setBounds({
+      x: (websites.length - 1) * viewWidth,
+      y: 0,
+      width: viewWidth,
+      // height: 100
+      height: height - 200,
+    });
+
+    view.webContents.setZoomFactor(1.5); // Set initial zoom factor to 150%
+    view.webContents.loadURL(url);
+    views.push(view);
+
+    // Bring the new view to the front
+    mainWindow.setTopBrowserView(view);
+  }
+});
+
+ipcMain.on("close-deepseek", (event, prompt) => {
+  if (prompt === "close deepseek now") {
+    const grokView = views[3];
+    mainWindow.removeBrowserView(grokView);
+    views.pop();
+    websites.pop();
+
+    const { width, height } = mainWindow.getBounds();
+    const viewWidth = Math.floor(width / websites.length);
+    views.forEach((v, index) => {
+      v.setBounds({
+        x: index * viewWidth,
+        y: 0,
+        width: viewWidth,
+        height: height - 200,
+      });
+    });
+  }
+});
