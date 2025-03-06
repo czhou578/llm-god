@@ -1,13 +1,9 @@
-const {
-  app,
-  BrowserWindow,
-  globalShortcut,
-  BrowserView,
-  ipcMain,
-} = require("electron");
+const { app, BrowserWindow, BrowserView, ipcMain } = require("electron");
 const remote = require("@electron/remote/main");
 const path = require("path");
 const electronLocalShortcut = require("electron-localshortcut");
+const { addBrowserView, removeBrowserView } = require("./utilities");
+
 if (require("electron-squirrel-startup")) app.quit();
 
 remote.initialize();
@@ -96,7 +92,7 @@ function updateZoomFactor() {
 
 app.whenReady().then(createWindow);
 app.whenReady().then(() => {
-  electronLocalShortcut.register(mainWindow, 'Ctrl+W', () => {
+  electronLocalShortcut.register(mainWindow, "Ctrl+W", () => {
     app.quit(); // or mainWindow.close();
   });
 });
@@ -316,70 +312,15 @@ ipcMain.on("open-perplexity", (event, prompt) => {
     console.log("Opening Perplexity");
     let url = "https://www.perplexity.ai/";
 
-    const view = new BrowserView({
-      webPreferences: {
-        nodeIntegration: false,
-        contextIsolation: true,
-        offscreen: false,
-        devTools: true,
-      },
-    });
-
-    view.id = url;
-    mainWindow.addBrowserView(view);
-    // mainWindow.webContents.openDevTools()
-    // Recalculate view dimensions
-    const { width, height } = mainWindow.getBounds();
-
-    websites.push(url);
-    const viewWidth = Math.floor(width / websites.length);
-
-    // Update bounds for all views
-    views.forEach((v, index) => {
-      v.setBounds({
-        x: index * viewWidth,
-        y: 0,
-        width: viewWidth,
-        // height: 100
-        height: height - 200,
-      });
-    });
-
-    // Set bounds for new view
-    view.setBounds({
-      x: (websites.length - 1) * viewWidth,
-      y: 0,
-      width: viewWidth,
-      // height: 100
-      height: height - 200,
-    });
-
-    view.webContents.setZoomFactor(1.5); // Set initial zoom factor to 150%
-    view.webContents.loadURL(url);
-    views.push(view);
-
-    // Bring the new view to the front
-    mainWindow.setTopBrowserView(view);
+    addBrowserView(mainWindow, url, websites, views);
   }
 });
 
 ipcMain.on("close-perplexity", (event, prompt) => {
   if (prompt === "close perplexity now") {
-    const perplexityView = views[3];
-    mainWindow.removeBrowserView(perplexityView);
-    views.pop();
-    websites.pop();
-
-    const { width, height } = mainWindow.getBounds();
-    const viewWidth = Math.floor(width / websites.length);
-    views.forEach((v, index) => {
-      v.setBounds({
-        x: index * viewWidth,
-        y: 0,
-        width: viewWidth,
-        height: height - 200,
-      });
-    });
+    console.log("Closing Perplexity");
+    const perplexityView = views.find((view) => view.id.match("perplexity"));
+    removeBrowserView(mainWindow, perplexityView, websites, views);
   }
 });
 
@@ -388,70 +329,16 @@ ipcMain.on("open-claude", (event, prompt) => {
     console.log("Opening Claude");
     let url = "https://claude.ai/chats/";
 
-    const view = new BrowserView({
-      webPreferences: {
-        nodeIntegration: false,
-        contextIsolation: true,
-        offscreen: false,
-        devTools: true,
-      },
-    });
-
-    view.id = url;
-    mainWindow.addBrowserView(view);
-    // mainWindow.webContents.openDevTools({mode: 'detach'})
-    // Recalculate view dimensions
-    const { width, height } = mainWindow.getBounds();
-
-    websites.push(url);
-    const viewWidth = Math.floor(width / websites.length);
-
-    // Update bounds for all views
-    views.forEach((v, index) => {
-      v.setBounds({
-        x: index * viewWidth,
-        y: 0,
-        width: viewWidth,
-        // height: 100
-        height: height - 200,
-      });
-    });
-
-    // Set bounds for new view
-    view.setBounds({
-      x: (websites.length - 1) * viewWidth,
-      y: 0,
-      width: viewWidth,
-      // height: 100
-      height: height - 200,
-    });
-
-    view.webContents.setZoomFactor(1.5); // Set initial zoom factor to 150%
-    view.webContents.loadURL(url);
-    views.push(view);
-
-    // Bring the new view to the front
-    mainWindow.setTopBrowserView(view);
+    addBrowserView(mainWindow, url, websites, views);
   }
 });
 
 ipcMain.on("close-claude", (event, prompt) => {
   if (prompt === "close claude now") {
-    const claudeView = views[3];
-    mainWindow.removeBrowserView(claudeView);
-    views.pop();
-    websites.pop();
+    console.log("Closing Claude");
 
-    const { width, height } = mainWindow.getBounds();
-    const viewWidth = Math.floor(width / websites.length);
-    views.forEach((v, index) => {
-      v.setBounds({
-        x: index * viewWidth,
-        y: 0,
-        width: viewWidth,
-        height: height - 200,
-      });
-    });
+    const claudeView = views.find((view) => view.id.match("claude"));
+    removeBrowserView(mainWindow, claudeView, websites, views);
   }
 });
 
@@ -460,70 +347,17 @@ ipcMain.on("open-grok", (event, prompt) => {
     console.log("Opening Grok");
     let url = "https://grok.com/";
 
-    const view = new BrowserView({
-      webPreferences: {
-        nodeIntegration: false,
-        contextIsolation: true,
-        offscreen: false,
-        devTools: true,
-      },
-    });
-
-    view.id = url;
-    mainWindow.addBrowserView(view);
-    // view.webContents.openDevTools({ mode: "detach" });
-    // Recalculate view dimensions
-    const { width, height } = mainWindow.getBounds();
-
-    websites.push(url);
-    const viewWidth = Math.floor(width / websites.length);
-
-    // Update bounds for all views
-    views.forEach((v, index) => {
-      v.setBounds({
-        x: index * viewWidth,
-        y: 0,
-        width: viewWidth,
-        // height: 100
-        height: height - 200,
-      });
-    });
-
-    // Set bounds for new view
-    view.setBounds({
-      x: (websites.length - 1) * viewWidth,
-      y: 0,
-      width: viewWidth,
-      // height: 100
-      height: height - 200,
-    });
-
-    view.webContents.setZoomFactor(1.5); // Set initial zoom factor to 150%
-    view.webContents.loadURL(url);
-    views.push(view);
-
-    // Bring the new view to the front
-    mainWindow.setTopBrowserView(view);
+    addBrowserView(mainWindow, url, websites, views);
   }
 });
 
 ipcMain.on("close-grok", (event, prompt) => {
   if (prompt === "close grok now") {
-    const grokView = views[3];
-    mainWindow.removeBrowserView(grokView);
-    views.pop();
-    websites.pop();
+    console.log("Closing Grok");
 
-    const { width, height } = mainWindow.getBounds();
-    const viewWidth = Math.floor(width / websites.length);
-    views.forEach((v, index) => {
-      v.setBounds({
-        x: index * viewWidth,
-        y: 0,
-        width: viewWidth,
-        height: height - 200,
-      });
-    });
+    const grokView = views.find((view) => view.id.match("grok"));
+
+    removeBrowserView(mainWindow, grokView, websites, views);
   }
 });
 
@@ -532,70 +366,15 @@ ipcMain.on("open-deepseek", (event, prompt) => {
     console.log("Opening DeepSeek");
     let url = "https://chat.deepseek.com/";
 
-    const view = new BrowserView({
-      webPreferences: {
-        nodeIntegration: false,
-        contextIsolation: true,
-        offscreen: false,
-        devTools: true,
-      },
-    });
-
-    view.id = url;
-    mainWindow.addBrowserView(view);
-    // view.webContents.openDevTools({ mode: "detach" });
-
-    // Recalculate view dimensions
-    const { width, height } = mainWindow.getBounds();
-
-    websites.push(url);
-    const viewWidth = Math.floor(width / websites.length);
-
-    // Update bounds for all views
-    views.forEach((v, index) => {
-      v.setBounds({
-        x: index * viewWidth,
-        y: 0,
-        width: viewWidth,
-        // height: 100
-        height: height - 200,
-      });
-    });
-
-    // Set bounds for new view
-    view.setBounds({
-      x: (websites.length - 1) * viewWidth,
-      y: 0,
-      width: viewWidth,
-      // height: 100
-      height: height - 200,
-    });
-
-    view.webContents.setZoomFactor(1.5); // Set initial zoom factor to 150%
-    view.webContents.loadURL(url);
-    views.push(view);
-
-    // Bring the new view to the front
-    mainWindow.setTopBrowserView(view);
+    addBrowserView(mainWindow, url, websites, views);
   }
 });
 
 ipcMain.on("close-deepseek", (event, prompt) => {
   if (prompt === "close deepseek now") {
-    const grokView = views[3];
-    mainWindow.removeBrowserView(grokView);
-    views.pop();
-    websites.pop();
+    console.log("Closing Deepseek");
 
-    const { width, height } = mainWindow.getBounds();
-    const viewWidth = Math.floor(width / websites.length);
-    views.forEach((v, index) => {
-      v.setBounds({
-        x: index * viewWidth,
-        y: 0,
-        width: viewWidth,
-        height: height - 200,
-      });
-    });
+    const deepseekView = views.find((view) => view.id.match("deepseek"));
+    removeBrowserView(mainWindow, deepseekView, websites, views);
   }
 });
