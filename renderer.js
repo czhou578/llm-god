@@ -21,10 +21,25 @@ function closePerplexityMessage(message) {
   ipcRenderer.send("close-perplexity", message);
 }
 
+function openDeepSeekMessage(message) {
+  ipcRenderer.send("open-deepseek", message);
+}
+
+function closeDeepSeekMessage(message) {
+  ipcRenderer.send("close-deepseek", message);
+}
+
+function openGrokMessage(message) {
+  ipcRenderer.send("open-grok", message);
+}
+
+function closeGrokMessage(message) {
+  ipcRenderer.send("close-grok", message);
+}
+
 const textArea = document.getElementById("prompt-input");
 const openClaude = document.getElementById("showClaude");
 const openPerplexity = document.getElementById("showPerplexity");
-const imagePreview = document.getElementById('imagePreview');
 
 openPerplexity.addEventListener("click", (event) => {
   if (openPerplexity.textContent === "Show Perplexity") {
@@ -67,28 +82,3 @@ closeButton.addEventListener("click", (event) => {
   const window = remote.getCurrentWindow();
   window.close();
 });
-
-// pasteArea.addEventListener('paste', function(e) {
-//   e.preventDefault();
-//   const items = e.clipboardData.items;
-
-//   for (let i = 0; i < items.length; i++) {
-//       if (items[i].type.indexOf('image') !== -1) {
-//           const blob = items[i].getAsFile();
-//           const reader = new FileReader();
-
-//           reader.onload = function(event) {
-//               const img = document.createElement('img');
-//               img.src = event.target.result;
-//               imagePreview.innerHTML = '';
-//               imagePreview.appendChild(img);
-
-//               // Here you would typically upload the image to your server
-//               console.log('Image data:', event.target.result);
-//               pasteArea.value = 'Image uploaded successfully!';
-//           };
-
-//           reader.readAsDataURL(blob);
-//       }
-//   }
-// });

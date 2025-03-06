@@ -8,7 +8,7 @@ remote.initialize();
 let mainWindow;
 const views = [];
 
-// require("electron-reload")(path.join(__dirname, "."));
+require("electron-reload")(path.join(__dirname, "."));
 
 const websites = [
   "https://chat.openai.com/",
@@ -33,6 +33,7 @@ function createWindow() {
   remote.enable(mainWindow.webContents);
 
   mainWindow.loadFile(path.join(__dirname, "index.html"));
+  mainWindow.webContents.openDevTools({ mode: "detach" });
   const viewWidth = Math.floor(mainWindow.getBounds().width / websites.length);
   const { height } = mainWindow.getBounds();
 
@@ -338,7 +339,7 @@ ipcMain.on("open-claude", (event, prompt) => {
 
     view.id = url;
     mainWindow.addBrowserView(view);
-    // mainWindow.webContents.openDevTools()
+    // mainWindow.webContents.openDevTools({mode: 'detach'})
     // Recalculate view dimensions
     const { width, height } = mainWindow.getBounds();
 
@@ -394,4 +395,36 @@ ipcMain.on("close-claude", (event, prompt) => {
   }
 });
 
+// // Add these IPC handlers to toggle BrowserView visibility
+// // Replace your existing show-dropdown and hide-dropdown handlers with these:
 
+// ipcMain.on("show-dropdown", () => {
+//   console.log("Show dropdown received");
+//   // Instead of moving views, set a higher z-index for the main window's webContents
+//   // This won't actually work directly since BrowserViews are always above webContents
+
+//   // One approach is to temporarily reduce the BrowserView opacity
+//   views.forEach((view) => {
+//     // Make BrowserViews semi-transparent when dropdown is open
+//     view.webContents.executeJavaScript(`
+//       document.documentElement.style.pointerEvents = 'none';
+//     `);
+//   });
+
+//   // Force redraw to ensure changes take effect
+//   mainWindow.webContents.invalidate();
+// });
+
+// ipcMain.on("hide-dropdown", () => {
+//   console.log("Hide dropdown received");
+
+//   views.forEach((view) => {
+//     // Restore BrowserViews to normal
+//     view.webContents.executeJavaScript(`
+//       document.documentElement.style.pointerEvents = 'auto';
+//     `);
+//   });
+
+//   // Force redraw
+//   mainWindow.webContents.invalidate();
+// });
