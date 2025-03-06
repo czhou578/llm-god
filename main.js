@@ -7,6 +7,7 @@ const {
 } = require("electron");
 const remote = require("@electron/remote/main");
 const path = require("path");
+const electronLocalShortcut = require("electron-localshortcut");
 if (require("electron-squirrel-startup")) app.quit();
 
 remote.initialize();
@@ -14,7 +15,7 @@ remote.initialize();
 let mainWindow;
 const views = [];
 
-require("electron-reload")(path.join(__dirname, "."));
+// require("electron-reload")(path.join(__dirname, "."));
 
 const websites = [
   "https://chat.openai.com/",
@@ -95,22 +96,8 @@ function updateZoomFactor() {
 
 app.whenReady().then(createWindow);
 app.whenReady().then(() => {
-  // Create your window and other setup code
-
-  // Register the Ctrl+W shortcut
-  globalShortcut.register("CommandOrControl+W", () => {
-    // Get the focused window
-    const focusedWindow = BrowserWindow.getFocusedWindow();
-
-    if (focusedWindow) {
-      // If the window is in full screen, exit full screen first
-      if (focusedWindow.isFullScreen()) {
-        focusedWindow.setFullScreen(false);
-      }
-
-      // Close the window
-      focusedWindow.close();
-    }
+  electronLocalShortcut.register(mainWindow, 'Ctrl+W', () => {
+    app.quit(); // or mainWindow.close();
   });
 });
 app.on("window-all-closed", () => {
@@ -556,8 +543,8 @@ ipcMain.on("open-deepseek", (event, prompt) => {
 
     view.id = url;
     mainWindow.addBrowserView(view);
-    view.webContents.openDevTools({ mode: "detach" });
-    // mainWindow.webContents.openDevTools()
+    // view.webContents.openDevTools({ mode: "detach" });
+
     // Recalculate view dimensions
     const { width, height } = mainWindow.getBounds();
 
