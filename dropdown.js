@@ -1,5 +1,3 @@
-const { ipcRenderer } = require("electron");
-
 document.addEventListener("DOMContentLoaded", () => {
   document.body.style.backgroundColor = "black";
 

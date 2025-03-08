@@ -10,7 +10,8 @@
     "start": "npx electron .",
     "prettier": "prettier -w .",
     "make": "electron-forge make",
-    "package": "electron-forge package"
+    "package": "electron-forge package",
+    "test": "jest"
   },
   "dependencies": {
     "@electron-forge/maker-zip": "^7.4.0",
@@ -18,12 +19,14 @@
     "electron-localshortcut": "^3.2.1",
     "electron-squirrel-startup": "^1.0.1",
     "electron-store": "^10.0.0",
+    "jest-environment-jsdom": "^29.7.0",
     "prettier": "^3.3.3"
   },
   "devDependencies": {
     "@electron-forge/cli": "^7.4.0",
     "@electron-forge/maker-squirrel": "^7.4.0",
     "electron": "^31.2.1",
-    "electron-reload": "^2.0.0-alpha.1"
+    "electron-reload": "^2.0.0-alpha.1",
+    "jest": "^29.7.0"
   }
 }

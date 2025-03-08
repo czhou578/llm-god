@@ -1,5 +1,4 @@
 const { ipcRenderer } = require("electron");
-const remote = require("@electron/remote");
 
 function logToWebPage(message) {
   ipcRenderer.send("enter-prompt", message);
