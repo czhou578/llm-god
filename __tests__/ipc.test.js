@@ -1,10 +1,10 @@
 // First, mock the electron module
-jest.mock('electron', () => ({
+jest.mock("electron", () => ({
   ipcMain: {
     on: jest.fn(),
     emit: jest.fn(),
-    removeAllListeners: jest.fn()
-  }
+    removeAllListeners: jest.fn(),
+  },
 }));
 
 // Then import it
@@ -32,7 +32,7 @@ describe("IPC Handlers", () => {
     });
 
     ipcMain.on("close-perplexity", (event, prompt) => {
-      const view = views.find(v => v.id === "perplexity");
+      const view = views.find((v) => v.id === "perplexity");
       if (view) {
         removeBrowserView(mainWindow, view, websites, views);
       }
@@ -55,7 +55,7 @@ describe("IPC Handlers", () => {
       mainWindow,
       "https://www.perplexity.ai/",
       websites,
-      views
+      views,
     );
   });
 
@@ -72,7 +72,7 @@ describe("IPC Handlers", () => {
       mainWindow,
       view,
       websites,
-      views
+      views,
     );
   });
 });
