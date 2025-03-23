@@ -3,6 +3,7 @@ const remote = require("@electron/remote/main");
 const path = require("path");
 const electronLocalShortcut = require("electron-localshortcut");
 const { addBrowserView, removeBrowserView } = require("./utilities");
+// const { BrowserView } = require("@electron/remote");
 
 if (require("electron-squirrel-startup")) app.quit();
 
