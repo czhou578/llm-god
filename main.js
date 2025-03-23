@@ -3,6 +3,7 @@ const remote = require("@electron/remote/main");
 const path = require("path");
 const electronLocalShortcut = require("electron-localshortcut");
 const { addBrowserView, removeBrowserView } = require("./utilities");
+// const { BrowserView } = require("@electron/remote");
 
 if (require("electron-squirrel-startup")) app.quit();
 
@@ -33,6 +34,19 @@ function createWindow() {
     fullscreen: true,
   });
 
+  let overlayWindow = new BrowserWindow({
+    width: 400,
+    height: 200,
+    alwaysOnTop: true, // Ensures it stays above the main window
+    transparent: true, // Allows transparency
+    frame: false, // Removes window borders
+    resizable: false,
+    webPreferences: {
+      nodeIntegration: true,
+    },
+    loadURL: `http://google.com`,
+  });
+
   remote.enable(mainWindow.webContents);
 
   mainWindow.loadFile(path.join(__dirname, "index.html"));
@@ -54,7 +68,7 @@ function createWindow() {
       x: index * viewWidth,
       y: 0,
       width: viewWidth,
-      height: height - 200,
+      height: height - 500,
     });
     view.webContents.setZoomFactor(1); // Set initial zoom factor to 150%
     view.webContents.loadURL(url);
