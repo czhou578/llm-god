@@ -19,10 +19,10 @@ jobs:
         run: npm ci
 
       - name: Debug Prettier
-        run: npx prettier --check "**/*.{js,json,css,html,md}" --loglevel debug
+        run: npx prettier --check "**/*.{js,json,css,html,md}" --log-level debug
 
       - name: Prettier (Fix Formatting)
-        run: npx prettier --write "**/*.{js,json,css,html,md}"
+        run: npx prettier --check .
 
       - name: Security audit
         run: npm audit --production
