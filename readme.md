@@ -53,6 +53,12 @@ npm install
 npm run start
 ```
 
+4. Make sure to run the code formatter Prettier for all the files by running the following in the project root folder
+
+```
+npm run prettier
+```
+
 ## Debugging Tools
 
 While developing, I liked to have the devtools of the app be visible and also have the option to have hot reloading on every save. Uncomment the following two lines to do so:
