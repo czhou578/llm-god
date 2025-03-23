@@ -18,9 +18,6 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
-      - name: Debug Prettier
-        run: npx prettier --check "**/*.{js,json,css,html,md}" --log-level debug
-
       - name: Prettier (Fix Formatting)
         run: npx prettier --write "**/*.{js,json,css,html,md}"
 
