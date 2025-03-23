@@ -12,13 +12,22 @@ Currently, the following LLM web interfaces are supported:
 - X.ai Grok
 - DeepSeek
 
+## Downloading the App for Personal Use
+
+Go to the Releases section, and download the .exe. It is going to say that Microsoft has flagged this as untrusted. Windows codesigning has not
+been done yet, so you can ignore the warning and proceed to installation.
+
+The app should open immediately after you bypass the warning and you can add the desktop shortcut to your computer!
+
 ## How to Use the App
 
 ### Selecting the Model
 
 Use the dropdown at the bottom right corner to add and remove LLM web consoles. By default, ChatGPT, Gemini, and Llama are there by default and cannot be changed.
 
-Note that if you are on free tier, then you will face the typical usage limits as specified by the LLM provider.
+\*Note that if you are on free tier, then you will face the typical usage limits as specified by the LLM provider.
+
+To launch the prompt to all the LLM's, press Ctrl + Enter on your keyboard
 
 If you want to close the app, press Ctrl + W on your keyboard.
 
@@ -53,11 +62,13 @@ npm install
 npm run start
 ```
 
-4. Make sure to run the code formatter Prettier for all the files by running the following in the project root folder
+4. To check if the build works properly, run the following command in the root folder
 
 ```
-npm run prettier
+npm run make
 ```
+
+This will create a launchable app in the `/out/app-win32-x64` path. You can then add this to your task bar for daily use outside of development!
 
 ## Debugging Tools
 
