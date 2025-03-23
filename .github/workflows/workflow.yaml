@@ -22,7 +22,7 @@ jobs:
         run: npx prettier --check "**/*.{js,json,css,html,md}" --log-level debug
 
       - name: Prettier (Fix Formatting)
-        run: npx prettier --check .
+        run: npx prettier --write "**/*.{js,json,css,html,md}"
 
       - name: Security audit
         run: npm audit --production
