@@ -1,6 +1,10 @@
 # LLM-God
 
-This is a desktop app for Windows machines only (currently) that allows users to simultaneously prompt multiple LLM's at once in one environment.
+## Screenshot
+
+![Screenshot](./image.png)
+
+This is a desktop app for Windows machines only (currently) that allows users to simultaneously prompt multiple LLM's at once in one environment. I use this app every day, for coding or non coding purposes. It has saved me countless hours of copypasting and is just so much more efficient.
 
 Currently, the following LLM web interfaces are supported:
 
@@ -15,7 +19,7 @@ Currently, the following LLM web interfaces are supported:
 ## Downloading the App for Personal Use
 
 Go to the Releases section, and download the .exe. It is going to say that Microsoft has flagged this as untrusted. Windows codesigning has not
-been done yet, so you can ignore the warning and proceed to installation.
+been done yet, so for now, ignore the warning and proceed to installation.
 
 The app should open immediately after you bypass the warning and you can add the desktop shortcut to your computer!
 
@@ -34,10 +38,6 @@ If you want to close the app, press Ctrl + W on your keyboard.
 ## Disclaimer
 
 I did find out about the [GodMode](https://github.com/smol-ai/GodMode) project, but I felt that people needed an app that just provided the models from the few big companies like OpenAI and Anthropic. Many of the other smaller models are not very useful. In addition, that project doesn't seem to be very well maintained anymore and doesn't have some of the new models like Grok.
-
-## Screenshot
-
-![Screenshot](./image.png)
 
 ## Contributing
 
