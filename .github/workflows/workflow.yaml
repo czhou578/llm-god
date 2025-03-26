@@ -3,6 +3,8 @@ name: Build and Release
 on:
   push:
     branches: [master]
+    tags:
+      - "v*.*.*" # Trigger on tags like v1.0.0 for releases
   pull_request:
     branches: [master]
 
@@ -10,16 +12,39 @@ jobs:
   build:
     runs-on: windows-latest
     steps:
-      - uses: actions/checkout@v3
-      - uses: actions/setup-node@v3
+      # Step 1: Check out the repository code
+      - uses: actions/checkout@v4 # Updated to v4 for better performance
+        with:
+          fetch-depth: 0 # Ensures tags are fetched for versioning
+
+      # Step 2: Set up Node.js
+      - uses: actions/setup-node@v4 # Updated to v4
         with:
           node-version: 18
+          cache: "npm" # Cache npm dependencies for faster runs
 
+      # Step 3: Install dependencies
       - name: Install dependencies
         run: npm ci
 
+      # Step 4: Prettier (Fix Formatting)
       - name: Prettier (Fix Formatting)
         run: npx prettier --write "**/*.{js,json,css,html,md}"
 
+      # Step 5: Security audit
       - name: Security audit
         run: npm audit --production
+
+      # Step 6: Build the Electron app for Windows using electron-forge
+      - name: Build Electron app
+        run: npm run make
+        env:
+          # Optional: If electron-forge needs GitHub token for publishing
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      # Step 7: Upload the built artifact
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: windows-build
+          path: out/make/**/*.exe # Path to the .exe file created by electron-forge
