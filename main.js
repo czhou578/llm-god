@@ -12,7 +12,7 @@ remote.initialize();
 let mainWindow;
 const views = [];
 
-// require("electron-reload")(path.join(__dirname, "."));
+require("electron-reload")(path.join(__dirname, "."));
 
 const websites = [
   "https://chat.openai.com/",
@@ -22,8 +22,9 @@ const websites = [
 
 function createWindow() {
   mainWindow = new BrowserWindow({
-    width: 1200,
-    height: 800,
+    width: 2000,
+    height: 1000,
+    center: true,
     backgroundColor: "#000000",
     webPreferences: {
       preload: path.join(__dirname, "preload.js"),
@@ -31,12 +32,12 @@ function createWindow() {
       contextIsolation: false,
       offscreen: false,
     },
-    fullscreen: true,
   });
 
   remote.enable(mainWindow.webContents);
 
   mainWindow.loadFile(path.join(__dirname, "index.html"));
+
   // mainWindow.webContents.openDevTools({ mode: "detach" });
   const viewWidth = Math.floor(mainWindow.getBounds().width / websites.length);
   const { height } = mainWindow.getBounds();
@@ -58,6 +59,7 @@ function createWindow() {
       height: height - 200,
     });
     view.webContents.setZoomFactor(1); // Set initial zoom factor to 150%
+
     view.webContents.loadURL(url);
     views.push(view);
   });
@@ -110,20 +112,37 @@ ipcMain.on("enter-prompt", (event, prompt) => {
   views.forEach((view) => {
     if (view.id.match("openai")) {
       view.webContents.executeJavaScript(`
-        {
+          (function() {
+    const inputElement = document.querySelector('#prompt-textarea > p');
+    const fixDivContainer = document.querySelector('div.flex-1.overflow-hidden > div.h-full');
 
-            const inputElement = document.querySelector('#prompt-textarea > p');
-            const fixDivContainer = document.querySelector('div.flex-1.overflow-hidden > div.h-full')
+    if (inputElement && fixDivContainer) {
+      // Check if the height has already been adjusted
+      if (!fixDivContainer.dataset.adjusted) {
+        fixDivContainer.style.height = '100%';
+        fixDivContainer.dataset.adjusted = 'true'; // Mark as adjusted to prevent further changes
+      }
 
-            if (inputElement) {
-              const inputEvent = new Event('input', { bubbles: true });
-              inputElement.innerText = \`${prompt}\`; // must be escaped backticks to support multiline
-              fixDivContainer.style.height = '0'
-              console.log('the div container changed')
-              fixDivContainer.style.height = '100%'
-              inputElement.dispatchEvent(inputEvent);
-            }
-          }
+      // Update the input value and dispatch the input event
+      const inputEvent = new Event('input', { bubbles: true });
+      inputElement.innerText = \`${prompt}\`; // Must be escaped backticks to support multiline
+      inputElement.dispatchEvent(inputEvent);
+    }
+  })();
+        // {
+
+        //     const inputElement = document.querySelector('#prompt-textarea > p');
+        //     const fixDivContainer = document.querySelector('div.flex-1.overflow-hidden > div.h-full')
+
+        //     if (inputElement) {
+        //       const inputEvent = new Event('input', { bubbles: true });
+        //       inputElement.innerText = \`${prompt}\`; // must be escaped backticks to support multiline
+        //       fixDivContainer.style.height = '0'
+        //       console.log('the div container changed')
+        //       fixDivContainer.style.height = '100%'
+        //       inputElement.dispatchEvent(inputEvent);
+        //     }
+        //   }
             `);
     } else if (view.id.match("bard")) {
       view.webContents.executeJavaScript(`{

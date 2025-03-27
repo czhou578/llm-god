@@ -26,8 +26,10 @@
       #prompt-area {
         display: flex;
         background-color: #f0f0f0;
-        height: 200px;
+        height: auto;
         padding: 10px;
+        min-height: 100px; /* Ensure a minimum height */
+        max-height: 30%; /* Prevent it from taking too much space */
         position: relative; /* Add this to create a new stacking context */
       }
 
