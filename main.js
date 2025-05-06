@@ -12,12 +12,12 @@ remote.initialize();
 let mainWindow;
 const views = [];
 
-require("electron-reload")(path.join(__dirname, "."));
+// require("electron-reload")(path.join(__dirname, "."));
 
 const websites = [
   "https://chat.openai.com/",
   "https://bard.google.com",
-  "https://www.meta.ai/",
+  "https://www.perplexity.ai/",
 ];
 
 function createWindow() {
@@ -58,8 +58,8 @@ function createWindow() {
       width: viewWidth,
       height: height - 200,
     });
+    // view.webContents.openDevTools({ mode: "detach" });
     view.webContents.setZoomFactor(1); // Set initial zoom factor to 150%
-
     view.webContents.loadURL(url);
     views.push(view);
   });
@@ -166,17 +166,6 @@ ipcMain.on("enter-prompt", (event, prompt) => {
           var event = new Event('input', { bubbles: true});
           inputElement.dispatchEvent(event);
         }
-                `);
-    } else if (view.id.match("meta")) {
-      view.webContents.executeJavaScript(`
-                var inputElement = document.querySelector('textarea');
-		if (inputElement) {
-                var nativeTextAreaValueSetter = Object.getOwnPropertyDescriptor(window.HTMLTextAreaElement.prototype, "value").set;
-                nativeTextAreaValueSetter.call(inputElement, \`${prompt}\`);
-
-              const inputEvent = new Event('input', { bubbles: true });
-              inputElement.dispatchEvent(inputEvent);
-		};
                 `);
     } else if (view.id.match("claude")) {
       view.webContents.executeJavaScript(`{
