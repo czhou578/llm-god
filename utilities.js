@@ -99,5 +99,5 @@ function removeBrowserView(mainWindow, view, websites, views) {
 
 module.exports = {
   addBrowserView,
-  removeBrowserView,
+  removeBrowserView
 };
