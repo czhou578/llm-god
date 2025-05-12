@@ -10,7 +10,6 @@ Currently, the following LLM web interfaces are supported:
 
 - ChatGPT
 - Google Gemini
-- Meta Llama
 - Anthropic Claude
 - Perplexity
 - X.ai Grok

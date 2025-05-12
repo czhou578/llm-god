@@ -26,8 +26,10 @@
       #prompt-area {
         display: flex;
         background-color: #f0f0f0;
-        height: 200px;
+        height: auto;
         padding: 10px;
+        min-height: 100px; /* Ensure a minimum height */
+        max-height: 30%; /* Prevent it from taking too much space */
         position: relative; /* Add this to create a new stacking context */
       }
 
@@ -111,7 +113,6 @@
         <button id="dropdown-button">Show Models ▼</button>
         <div class="dropdown-content">
           <div class="dropdown-item" id="showClaude">Show Claude</div>
-          <div class="dropdown-item" id="showPerplexity">Show Perplexity</div>
           <div class="dropdown-item" id="showGrok">Show Grok</div>
           <div class="dropdown-item" id="showDeepSeek">Show DeepSeek</div>
         </div>
