@@ -1,4 +1,4 @@
-import { app, BrowserWindow, BrowserView, ipcMain, IpcMainEvent } from "electron";
+import { app, BrowserWindow, BrowserView, ipcMain, IpcMainEvent} from "electron";
 import * as remote from "@electron/remote/main/index.js";
 import path from "path";
 import electronLocalShortcut from "electron-localshortcut";
@@ -43,7 +43,6 @@ function createWindow(): void {
       offscreen: false,
     },
   });
-
   remote.enable(mainWindow.webContents);
 
   mainWindow.loadFile(path.join(__dirname, "..", "index.html")); // Changed to point to root index.html
@@ -57,6 +56,7 @@ function createWindow(): void {
       webPreferences: {
         nodeIntegration: false,
         contextIsolation: true,
+        // userAgent: "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/100.0.0.0 Safari/537.36"
       },
     }) as CustomBrowserView; // Cast to CustomBrowserView
 
@@ -117,10 +117,8 @@ app.on("window-all-closed", () => {
 ipcMain.on("enter-prompt", (event: IpcMainEvent, prompt: string) => { // Added type for prompt
   views.forEach((view: CustomBrowserView) => {
     if (view.id.match("chatgpt")) {
-        console.log("ChatGPT view found");
       view.webContents.executeJavaScript(`
           (function() {
-          console.log('hello')
     const inputElement = document.querySelector('#prompt-textarea > p');
     if (inputElement) {
       const inputEvent = new Event('input', { bubbles: true });

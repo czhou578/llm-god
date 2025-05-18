@@ -1,6 +1,3 @@
-// ````
-// typescript
-// filepath: c:\Users\mycol\WebProjects\llm-god\src\preload.cts
 import { ipcRenderer } from 'electron'; // Use import for .cts, it will be compiled to require
 
 // Define the structure on the window object for TypeScript
@@ -21,4 +18,3 @@ window.electron = {
 window.addEventListener("DOMContentLoaded", () => {
   document.body.style.backgroundColor = "black";
 });
-// ````

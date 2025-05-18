@@ -52,7 +52,7 @@ function createWindow() {
             width: viewWidth,
             height: height - 200,
         });
-        // view.webContents.openDevTools({ mode: "detach" });
+        view.webContents.openDevTools({ mode: "detach" });
         view.webContents.setZoomFactor(1);
         view.webContents.loadURL(url);
         views.push(view);
@@ -95,10 +95,8 @@ app.on("window-all-closed", () => {
 ipcMain.on("enter-prompt", (event, prompt) => {
     views.forEach((view) => {
         if (view.id.match("chatgpt")) {
-            console.log("ChatGPT view found");
             view.webContents.executeJavaScript(`
           (function() {
-          console.log('hello')
     const inputElement = document.querySelector('#prompt-textarea > p');
     if (inputElement) {
       const inputEvent = new Event('input', { bubbles: true });
