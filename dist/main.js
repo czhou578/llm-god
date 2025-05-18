@@ -42,6 +42,7 @@ function createWindow() {
             webPreferences: {
                 nodeIntegration: false,
                 contextIsolation: true,
+                // userAgent: "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/100.0.0.0 Safari/537.36"
             },
         }); // Cast to CustomBrowserView
         view.id = `${url}`;
@@ -52,7 +53,7 @@ function createWindow() {
             width: viewWidth,
             height: height - 200,
         });
-        view.webContents.openDevTools({ mode: "detach" });
+        // view.webContents.openDevTools({ mode: "detach" });
         view.webContents.setZoomFactor(1);
         view.webContents.loadURL(url);
         views.push(view);
