@@ -79,3 +79,7 @@ While developing, I liked to have the devtools of the app be visible and also ha
 ```
 
 Please check out the Issues tab for existing issues to tackle, and feel free to suggest new issues as well! Make a pull request to this repo once a feature or bug fix is done.
+
+## Updates
+
+5/17: Migrated to using TypeScript across the app.
