@@ -37,7 +37,7 @@ function createWindow(): void {
     center: true,
     backgroundColor: "#000000",
     webPreferences: {
-      preload: path.join(__dirname, "preload.js"), // This will point to dist/preload.js at runtime
+      preload: path.join(__dirname, "preload.cjs"), // This will point to dist/preload.js at runtime
       nodeIntegration: true,
       contextIsolation: false,
       offscreen: false,
@@ -68,7 +68,7 @@ function createWindow(): void {
       width: viewWidth,
       height: height - 200,
     });
-    view.webContents.openDevTools({ mode: "detach" });
+    // view.webContents.openDevTools({ mode: "detach" });
     view.webContents.setZoomFactor(1);
     view.webContents.loadURL(url);
 

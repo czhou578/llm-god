@@ -1,5 +1,5 @@
-import { ipcRenderer } from "electron";
-
+// import { ipcRenderer } from "electron";
+const ipcRenderer = window.electron.ipcRenderer;
 
 export function logToWebPage(message: string): void {
   ipcRenderer.send("enter-prompt", message);
