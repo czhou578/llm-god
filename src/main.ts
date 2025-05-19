@@ -1,4 +1,4 @@
-import { app, BrowserWindow, BrowserView, ipcMain, IpcMainEvent} from "electron";
+import { app, BrowserWindow, BrowserView, ipcMain, IpcMainEvent, WebContentsView, BaseWindow } from "electron";
 import * as remote from "@electron/remote/main/index.js";
 import path from "path";
 import electronLocalShortcut from "electron-localshortcut";
@@ -8,15 +8,22 @@ import { fileURLToPath } from "node:url"; // Import fileURLToPath
 
 const require = createRequire(import.meta.url);
 
-interface CustomBrowserView extends BrowserView {
-    id: string; // Make id optional as it's assigned after creation
+// interface CustomBrowserView extends BrowserView {
+//     id: string; // Make id optional as it's assigned after creation
+// }
+
+interface CustomBrowserView extends WebContentsView {
+  id: string; // Make id optional as it's assigned after creation
 }
+
 
 if (require("electron-squirrel-startup")) app.quit();
 
 remote.initialize();
 
-let mainWindow: BrowserWindow;
+// let mainWindow: BrowserWindow;
+let mainWindow: BaseWindow;
+
 const views: CustomBrowserView[] = [];
 
 const __filename = fileURLToPath(import.meta.url);
@@ -31,19 +38,20 @@ const websites: string[] = [
 ];
 
 function createWindow(): void {
-  mainWindow = new BrowserWindow({
+  mainWindow = new BaseWindow({
     width: 2000,
     height: 1000,
     center: true,
     backgroundColor: "#000000",
-    webPreferences: {
-      preload: path.join(__dirname, "preload.cjs"), // This will point to dist/preload.js at runtime
-      nodeIntegration: true,
-      contextIsolation: false,
-      offscreen: false,
-    },
+    // webPreferences: {
+    //   preload: path.join(__dirname, "preload.cjs"), // This will point to dist/preload.js at runtime
+    //   nodeIntegration: true,
+    //   contextIsolation: false,
+    //   offscreen: false,
+    // },
   });
-  remote.enable(mainWindow.webContents);
+  // remote.enable(mainWindow.webContents);
+  remote.enable(mainWindow);
 
   mainWindow.loadFile(path.join(__dirname, "..", "index.html")); // Changed to point to root index.html
 
@@ -52,13 +60,23 @@ function createWindow(): void {
   const { height } = mainWindow.getBounds();
 
   websites.forEach((url: string, index: number) => {
-    const view = new BrowserView({
+    // const view = new BrowserView({
+    //   webPreferences: {
+    //     nodeIntegration: false,
+    //     contextIsolation: true,
+    //     // userAgent: "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/100.0.0.0 Safari/537.36"
+    //   },
+    // }) as CustomBrowserView; // Cast to CustomBrowserView
+
+
+    const view = new WebContentsView({
       webPreferences: {
         nodeIntegration: false,
         contextIsolation: true,
         // userAgent: "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/100.0.0.0 Safari/537.36"
       },
     }) as CustomBrowserView; // Cast to CustomBrowserView
+    
 
     view.id = `${url}`;
     mainWindow.addBrowserView(view);
