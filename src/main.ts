@@ -1,4 +1,4 @@
-import { app, BrowserWindow, BrowserView, ipcMain, IpcMainEvent} from "electron";
+import { app, BrowserWindow, ipcMain, IpcMainEvent, WebContentsView } from "electron";
 import * as remote from "@electron/remote/main/index.js";
 import path from "path";
 import electronLocalShortcut from "electron-localshortcut";
@@ -8,8 +8,8 @@ import { fileURLToPath } from "node:url"; // Import fileURLToPath
 
 const require = createRequire(import.meta.url);
 
-interface CustomBrowserView extends BrowserView {
-    id: string; // Make id optional as it's assigned after creation
+interface CustomBrowserView extends WebContentsView {
+  id: string; // Make id optional as it's assigned after creation
 }
 
 if (require("electron-squirrel-startup")) app.quit();
@@ -17,6 +17,7 @@ if (require("electron-squirrel-startup")) app.quit();
 remote.initialize();
 
 let mainWindow: BrowserWindow;
+
 const views: CustomBrowserView[] = [];
 
 const __filename = fileURLToPath(import.meta.url);
@@ -47,21 +48,22 @@ function createWindow(): void {
 
   mainWindow.loadFile(path.join(__dirname, "..", "index.html")); // Changed to point to root index.html
 
-//   mainWindow.webContents.openDevTools({ mode: "detach" });
+  // mainWindow.webContents.openDevTools({ mode: "detach" });
   const viewWidth = Math.floor(mainWindow.getBounds().width / websites.length);
   const { height } = mainWindow.getBounds();
 
   websites.forEach((url: string, index: number) => {
-    const view = new BrowserView({
+
+    const view = new WebContentsView({
       webPreferences: {
         nodeIntegration: false,
         contextIsolation: true,
-        // userAgent: "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/100.0.0.0 Safari/537.36"
       },
     }) as CustomBrowserView; // Cast to CustomBrowserView
+    
 
     view.id = `${url}`;
-    mainWindow.addBrowserView(view);
+    mainWindow.contentView.addChildView(view);
     view.setBounds({
       x: index * viewWidth,
       y: 0,
@@ -83,18 +85,23 @@ function createWindow(): void {
     mainWindow.webContents.invalidate();
   });
 
+  let resizeTimeout: NodeJS.Timeout;
+
   mainWindow.on("resize", () => {
-    const { width, height } = mainWindow.getBounds();
-    const viewWidth = Math.floor(width / websites.length);
-    views.forEach((view, index) => {
-      view.setBounds({
-        x: index * viewWidth,
-        y: 0,
-        width: viewWidth,
-        height: height - 200,
+    clearTimeout(resizeTimeout);
+    resizeTimeout = setTimeout(() => {
+      const { width, height } = mainWindow.getBounds();
+      const viewWidth = Math.floor(width / websites.length);
+      views.forEach((view, index) => {
+        view.setBounds({
+          x: index * viewWidth,
+          y: 0,
+          width: viewWidth,
+          height: height - 200,
+        });
       });
-    });
-    updateZoomFactor();
+      updateZoomFactor();
+    }, 200);
   });
 }
 

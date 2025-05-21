@@ -4,7 +4,7 @@ const electron_1 = require("electron"); // Use import for .cts, it will be compi
 // Expose ipcRenderer to the window object.
 // This is possible because contextIsolation is false in your mainWindow webPreferences.
 window.electron = {
-    ipcRenderer: electron_1.ipcRenderer
+    ipcRenderer: electron_1.ipcRenderer,
 };
 window.addEventListener("DOMContentLoaded", () => {
     document.body.style.backgroundColor = "black";

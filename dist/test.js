@@ -10,7 +10,9 @@ export function extractGeminiResponse(rawResponse) {
             return "Could not parse the response format";
         }
         let innerJsonStr = match[1];
-        innerJsonStr = innerJsonStr.replace(/\\\\\\\\/g, "\\\\").replace(/\\\\"/g, '"');
+        innerJsonStr = innerJsonStr
+            .replace(/\\\\\\\\/g, "\\\\")
+            .replace(/\\\\"/g, '"');
         const parsedData = JSON.parse(innerJsonStr);
         if (Array.isArray(parsedData) && parsedData.length > 3) {
             const responseContainer = parsedData[3];
@@ -41,7 +43,8 @@ export function extractGeminiResponse(rawResponse) {
             }
             if (data !== null && typeof data === "object") {
                 for (const key in data) {
-                    if (Object.prototype.hasOwnProperty.call(data, key)) { // Added hasOwnProperty check
+                    if (Object.prototype.hasOwnProperty.call(data, key)) {
+                        // Added hasOwnProperty check
                         const result = findTextInNestedStructure(data[key]);
                         if (result) {
                             return result;
@@ -57,7 +60,8 @@ export function extractGeminiResponse(rawResponse) {
         }
         return `Could not extract response text. Full parsed data: ${JSON.stringify(parsedData)}`;
     }
-    catch (error) { // Typed error
+    catch (error) {
+        // Typed error
         return `Error extracting response: ${error.message}`;
     }
 }

@@ -1,4 +1,4 @@
 "use strict";
 window.addEventListener("DOMContentLoaded", () => {
-    document.body.style.backgroundColor = "black";
+  document.body.style.backgroundColor = "black";
 });

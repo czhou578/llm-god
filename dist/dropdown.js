@@ -1,6 +1,5 @@
 "use strict";
 document.addEventListener("DOMContentLoaded", () => {
-    // document.body.style.backgroundColor = "black"; // Already set in preload or CSS
     const dropdownButton = document.getElementById("dropdown-button");
     const dropdownContent = document.querySelector(".dropdown-content");
     if (dropdownButton && dropdownContent) {
@@ -15,7 +14,8 @@ document.addEventListener("DOMContentLoaded", () => {
             });
         });
         window.addEventListener("click", (event) => {
-            if (dropdownButton && !dropdownButton.contains(event.target)) { // Check if click is outside button
+            if (dropdownButton && !dropdownButton.contains(event.target)) {
+                // Check if click is outside button
                 if (dropdownContent.classList.contains("show")) {
                     dropdownContent.classList.remove("show");
                 }

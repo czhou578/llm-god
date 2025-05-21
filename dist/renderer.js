@@ -1,4 +1,3 @@
-// import { ipcRenderer } from "electron";
 const ipcRenderer = window.electron.ipcRenderer;
 export function logToWebPage(message) {
     ipcRenderer.send("enter-prompt", message);
@@ -62,8 +61,12 @@ if (openDeepSeekButton) {
     });
 }
 if (textArea) {
+    let inputTimeout;
     textArea.addEventListener("input", (event) => {
-        logToWebPage(event.target.value);
+        clearTimeout(inputTimeout);
+        inputTimeout = setTimeout(() => {
+            logToWebPage(event.target.value);
+        }, 300);
     });
     textArea.addEventListener("keydown", (event) => {
         if (event.ctrlKey) {
