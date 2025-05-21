@@ -48,7 +48,7 @@ function createWindow(): void {
 
   mainWindow.loadFile(path.join(__dirname, "..", "index.html")); // Changed to point to root index.html
 
-//   mainWindow.webContents.openDevTools({ mode: "detach" });
+  // mainWindow.webContents.openDevTools({ mode: "detach" });
   const viewWidth = Math.floor(mainWindow.getBounds().width / websites.length);
   const { height } = mainWindow.getBounds();
 
@@ -85,18 +85,23 @@ function createWindow(): void {
     mainWindow.webContents.invalidate();
   });
 
+  let resizeTimeout: NodeJS.Timeout;
+
   mainWindow.on("resize", () => {
-    const { width, height } = mainWindow.getBounds();
-    const viewWidth = Math.floor(width / websites.length);
-    views.forEach((view, index) => {
-      view.setBounds({
-        x: index * viewWidth,
-        y: 0,
-        width: viewWidth,
-        height: height - 200,
+    clearTimeout(resizeTimeout);
+    resizeTimeout = setTimeout(() => {
+      const { width, height } = mainWindow.getBounds();
+      const viewWidth = Math.floor(width / websites.length);
+      views.forEach((view, index) => {
+        view.setBounds({
+          x: index * viewWidth,
+          y: 0,
+          width: viewWidth,
+          height: height - 200,
+        });
       });
-    });
-    updateZoomFactor();
+      updateZoomFactor();
+    }, 200);
   });
 }
 
