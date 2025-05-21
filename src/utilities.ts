@@ -1,6 +1,10 @@
-import { BrowserWindow, BrowserView, WebPreferences } from "electron"; // Added WebPreferences type
+import {
+  BrowserWindow,
+  WebPreferences,
+  WebContentsView,
+} from "electron"; // Added WebPreferences type
 
-interface CustomBrowserView extends BrowserView {
+interface CustomBrowserView extends WebContentsView {
   id?: string; // Make id optional as it's assigned after creation
 }
 
@@ -18,20 +22,19 @@ export function addBrowserView(
   url: string,
   websites: string[],
   views: CustomBrowserView[],
-  webPreferences: WebPreferences = {}
+  webPreferences: WebPreferences = {},
 ): CustomBrowserView {
-  const view: CustomBrowserView = new BrowserView({
+  const view: CustomBrowserView = new WebContentsView({
     webPreferences: {
       nodeIntegration: false,
       contextIsolation: true,
-      // offscreen: false, // offscreen is not a direct webPreferences option, but a BrowserView constructor option if needed elsewhere.
       devTools: true,
       ...webPreferences,
     },
   });
 
   view.id = url;
-  mainWindow.addBrowserView(view);
+  mainWindow.contentView.addChildView(view);
 
   const { width, height } = mainWindow.getBounds();
 
@@ -58,7 +61,6 @@ export function addBrowserView(
   view.webContents.loadURL(url);
 
   views.push(view);
-  mainWindow.setTopBrowserView(view);
   return view;
 }
 
@@ -66,12 +68,12 @@ export function removeBrowserView(
   mainWindow: BrowserWindow,
   viewToRemove: CustomBrowserView, // Changed to viewToRemove for clarity
   websites: string[],
-  views: CustomBrowserView[]
+  views: CustomBrowserView[],
 ): void {
   const viewIndex = views.indexOf(viewToRemove);
   if (viewIndex === -1) return;
 
-  mainWindow.removeBrowserView(viewToRemove);
+  mainWindow.contentView.removeChildView(viewToRemove);
 
   const urlIndex = websites.findIndex((url) => url === viewToRemove.id);
   if (urlIndex !== -1) {

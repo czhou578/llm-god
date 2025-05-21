@@ -6,17 +6,17 @@ const { BrowserView } = require("electron");
  * @returns {string} - The complete text response from ChatGPT
  */
 function extractChatGPTAnswer(chatGPTView) {
-    const currentURL = chatGPTView.webContents.getURL();
-    console.log('Current URL:', currentURL);
-    if (!currentURL.match('chatgpt.com')) {
-      console.log('Not on ChatGPT, skipping script injection');
-      return;
-    }  
+  const currentURL = chatGPTView.webContents.getURL();
+  console.log("Current URL:", currentURL);
+  if (!currentURL.match("chatgpt.com")) {
+    console.log("Not on ChatGPT, skipping script injection");
+    return;
+  }
 
-    console.log('Injecting script into ChatGPT view');
+  console.log("Injecting script into ChatGPT view");
 
-    // Split the response into individual events
-    const scriptToInject = `
+  // Split the response into individual events
+  const scriptToInject = `
     (function() {
       // Your script here
       /**
@@ -141,20 +141,18 @@ function extractChatGPTAnswer(chatGPTView) {
   `;
 
   // Inject the script
-  chatGPTView.webContents.executeJavaScript(scriptToInject)
-    .then(result => {
-      console.log('Script injected successfully');
+  chatGPTView.webContents
+    .executeJavaScript(scriptToInject)
+    .then((result) => {
+      console.log("Script injected successfully");
     })
-    .catch(err => {
-      console.error('Error injecting script:', err);
+    .catch((err) => {
+      console.error("Error injecting script:", err);
     });
 
   console.log("✅ ChatGPT answer extractor is now active");
-};
+}
 
 module.exports = {
   extractChatGPTAnswer,
-};  
-
-
-  
+};

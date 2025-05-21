@@ -5,17 +5,18 @@ import { BrowserView } from "electron";
  * @param chatGPTView - The browser view containing the ChatGPT response
  * @returns The complete text response from ChatGPT, or void if not on the correct page or script injection fails.
  */
-export function extractChatGPTAnswer(chatGPTView: BrowserView): void { // Return type changed to void as it doesn't directly return the answer
-    const currentURL = chatGPTView.webContents.getURL();
-    console.log('Current URL:', currentURL);
-    if (!currentURL.match('chatgpt.com')) {
-      console.log('Not on ChatGPT, skipping script injection');
-      return;
-    }
+export function extractChatGPTAnswer(chatGPTView: BrowserView): void {
+  // Return type changed to void as it doesn't directly return the answer
+  const currentURL = chatGPTView.webContents.getURL();
+  console.log("Current URL:", currentURL);
+  if (!currentURL.match("chatgpt.com")) {
+    console.log("Not on ChatGPT, skipping script injection");
+    return;
+  }
 
-    console.log('Injecting script into ChatGPT view');
+  console.log("Injecting script into ChatGPT view");
 
-    const scriptToInject = `
+  const scriptToInject = `
     (function() {
       // Your script here
       /**
@@ -102,12 +103,13 @@ export function extractChatGPTAnswer(chatGPTView: BrowserView): void { // Return
     })();
   `;
 
-  chatGPTView.webContents.executeJavaScript(scriptToInject)
-    .then(result => {
-      console.log('Script injected successfully');
+  chatGPTView.webContents
+    .executeJavaScript(scriptToInject)
+    .then((result) => {
+      console.log("Script injected successfully");
     })
-    .catch(err => {
-      console.error('Error injecting script:', err);
+    .catch((err) => {
+      console.error("Error injecting script:", err);
     });
 
   // This console log might be confusing as it runs before the script is actually confirmed to be active inside the webview.

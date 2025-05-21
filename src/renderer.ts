@@ -1,4 +1,3 @@
-// import { ipcRenderer } from "electron";
 const ipcRenderer = window.electron.ipcRenderer;
 
 export function logToWebPage(message: string): void {
@@ -29,10 +28,18 @@ export function closeGrokMessage(message: string): void {
   ipcRenderer.send("close-grok", message);
 }
 
-const textArea = document.getElementById("prompt-input") as HTMLTextAreaElement | null;
-const openClaudeButton = document.getElementById("showClaude") as HTMLButtonElement | null;
-const openGrokButton = document.getElementById("showGrok") as HTMLButtonElement | null;
-const openDeepSeekButton = document.getElementById("showDeepSeek") as HTMLButtonElement | null;
+const textArea = document.getElementById(
+  "prompt-input",
+) as HTMLTextAreaElement | null;
+const openClaudeButton = document.getElementById(
+  "showClaude",
+) as HTMLButtonElement | null;
+const openGrokButton = document.getElementById(
+  "showGrok",
+) as HTMLButtonElement | null;
+const openDeepSeekButton = document.getElementById(
+  "showDeepSeek",
+) as HTMLButtonElement | null;
 
 if (openClaudeButton) {
   openClaudeButton.addEventListener("click", (event: MouseEvent) => {
