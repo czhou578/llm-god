@@ -96,146 +96,156 @@ app.on("window-all-closed", () => {
     if (process.platform !== "darwin")
         app.quit();
 });
+// Define a mapping object for handling prompts
+const promptHandlers = {
+    chatgpt: (view, prompt) => {
+        view.webContents.executeJavaScript(`
+      (function() {
+        const inputElement = document.querySelector('#prompt-textarea > p');
+        if (inputElement) {
+          const inputEvent = new Event('input', { bubbles: true });
+          inputElement.innerText = \`${prompt}\`;
+          inputElement.dispatchEvent(inputEvent);
+        }
+      })();
+    `);
+    },
+    bard: (view, prompt) => {
+        view.webContents.executeJavaScript(`
+      var inputElement = document.querySelector(".ql-editor.textarea");
+      if (inputElement) {
+        const inputEvent = new Event('input', { bubbles: true });
+        inputElement.value = \`${prompt}\`;
+        inputElement.dispatchEvent(inputEvent);
+        inputElement.querySelector('p').textContent = \`${prompt}\`;
+      }
+    `);
+    },
+    perplexity: (view, prompt) => {
+        view.webContents.executeJavaScript(`
+      var inputElement = document.querySelector('textarea[placeholder*="Ask"]');
+      if (inputElement) {
+        var nativeTextAreaValueSetter = Object.getOwnPropertyDescriptor(window.HTMLTextAreaElement.prototype, "value").set;
+        nativeTextAreaValueSetter.call(inputElement, \`${prompt}\`);
+        var event = new Event('input', { bubbles: true });
+        inputElement.dispatchEvent(event);
+      }
+    `);
+    },
+    claude: (view, prompt) => {
+        view.webContents.executeJavaScript(`
+      var inputElement = document.querySelector('div.ProseMirror');
+      if (inputElement) {
+        inputElement.innerHTML = \`${prompt}\`;
+      }
+    `);
+    },
+    grok: (view, prompt) => {
+        view.webContents.executeJavaScript(`
+      var inputElement = document.querySelector('textarea');
+      if (inputElement) {
+        const span = inputElement.previousElementSibling;
+        if (span) {
+          span.classList.add("hidden");
+        }
+        var nativeTextAreaValueSetter = Object.getOwnPropertyDescriptor(window.HTMLTextAreaElement.prototype, "value").set;
+        nativeTextAreaValueSetter.call(inputElement, \`${prompt}\`);
+        const inputEvent = new Event('input', { bubbles: true });
+        inputElement.dispatchEvent(inputEvent);
+      }
+    `);
+    },
+    deepseek: (view, prompt) => {
+        view.webContents.executeJavaScript(`
+      var inputElement = document.querySelector('textarea');
+      if (inputElement) {
+        var nativeTextAreaValueSetter = Object.getOwnPropertyDescriptor(window.HTMLTextAreaElement.prototype, "value").set;
+        nativeTextAreaValueSetter.call(inputElement, \`${prompt}\`);
+        const inputEvent = new Event('input', { bubbles: true });
+        inputElement.dispatchEvent(inputEvent);
+      }
+    `);
+    },
+};
+// Handle "enter-prompt" IPC event
 ipcMain.on("enter-prompt", (event, prompt) => {
     views.forEach((view) => {
-        if (view.id.match("chatgpt")) {
-            view.webContents.executeJavaScript(`
-          (function() {
-    const inputElement = document.querySelector('#prompt-textarea > p');
-    if (inputElement) {
-      const inputEvent = new Event('input', { bubbles: true });
-      inputElement.innerText = \`${prompt}\`;
-      inputElement.dispatchEvent(inputEvent);
-    }
-  })();`);
-        }
-        else if (view.id.match("bard")) {
-            view.webContents.executeJavaScript(`{
-                var inputElement = document.querySelector(".ql-editor.textarea");
-                if (inputElement) {
-                  const inputEvent = new Event('input', { bubbles: true });
-                  inputElement.value = \`${prompt}\`;
-                  inputElement.dispatchEvent(inputEvent);
-                  inputElement.querySelector('p').textContent = \`${prompt}\`
-                }
-              }`);
-        }
-        else if (view.id.match("perplexity")) {
-            view.webContents.executeJavaScript(`
-                var inputElement = document.querySelector('textarea[placeholder*="Ask"]');
-        if (inputElement) {
-          var nativeTextAreaValueSetter = Object.getOwnPropertyDescriptor(window.HTMLTextAreaElement.prototype, "value").set;
-          nativeTextAreaValueSetter.call(inputElement, \`${prompt}\`);
-          var event = new Event('input', { bubbles: true});
-          inputElement.dispatchEvent(event);
-        }`);
-        }
-        else if (view.id.match("claude")) {
-            view.webContents.executeJavaScript(`{
-    var inputElement = document.querySelector('div.ProseMirror')
-		if (inputElement) {
-			inputElement.innerHTML = \`${prompt}\`
-		}
-	}`);
-        }
-        else if (view.id.match("grok")) {
-            view.webContents.executeJavaScript(`
-        var inputElement = document.querySelector('textarea');
-        if (inputElement) {
-          const span = inputElement.previousElementSibling;
-          if (span) {
-            span.classList.add("hidden");
-          }
-          var nativeTextAreaValueSetter = Object.getOwnPropertyDescriptor(window.HTMLTextAreaElement.prototype, "value").set;
-          nativeTextAreaValueSetter.call(inputElement, \`${prompt}\`);
-          const inputEvent = new Event('input', { bubbles: true });
-          inputElement.dispatchEvent(inputEvent);
-        }`);
-        }
-        else if (view.id.match("deepseek")) {
-            view.webContents.executeJavaScript(`
-        var inputElement = document.querySelector('textarea');
-        if (inputElement) {
-          var nativeTextAreaValueSetter = Object.getOwnPropertyDescriptor(window.HTMLTextAreaElement.prototype, "value").set;
-          nativeTextAreaValueSetter.call(inputElement, \`${prompt}\`);
-          const inputEvent = new Event('input', { bubbles: true });
-          inputElement.dispatchEvent(inputEvent);
-        }`);
+        const handlerKey = Object.keys(promptHandlers).find((key) => view.id.match(key));
+        if (handlerKey) {
+            promptHandlers[handlerKey](view, prompt);
         }
     });
 });
-ipcMain.on("send-prompt", (event, prompt) => {
-    views.forEach((view) => {
-        if (view.id.match("chatgpt")) {
-            view.webContents.executeJavaScript(`
-            var btn = document.querySelector('button[aria-label*="Send prompt"]');
-            if (btn) {
-                btn.focus();
-                btn.disabled = false;
-                btn.click();
-            }
-        `);
-        }
-        else if (view.id.match("bard")) {
-            view.webContents.executeJavaScript(`{
+const buttonClickHandlers = {
+    chatgpt: (view) => {
+        view.webContents.executeJavaScript(`
+      var btn = document.querySelector('button[aria-label*="Send prompt"]');
+      if (btn) {
+        btn.focus();
+        btn.disabled = false;
+        btn.click();
+      }
+    `);
+    },
+    bard: (view) => {
+        view.webContents.executeJavaScript(`
       var btn = document.querySelector("button[aria-label*='Send message']");
       if (btn) {
         btn.setAttribute("aria-disabled", "false");
         btn.focus();
         btn.click();
       }
-    }`);
-        }
-        else if (view.id.match("perplexity")) {
-            view.webContents.executeJavaScript(`
-                {
-        var buttons = Array.from(document.querySelectorAll('button.bg-super'));
-				if (buttons[0]) {
-					var buttonsWithSvgPath = buttons.filter(button => button.querySelector('svg path'));
-					var button = buttonsWithSvgPath[buttonsWithSvgPath.length - 1];
-					button.click();
-				}
+    `);
+    },
+    perplexity: (view) => {
+        view.webContents.executeJavaScript(`
+      var buttons = Array.from(document.querySelectorAll('button.bg-super'));
+      if (buttons[0]) {
+        var buttonsWithSvgPath = buttons.filter(button => button.querySelector('svg path'));
+        var button = buttonsWithSvgPath[buttonsWithSvgPath.length - 1];
+        button.click();
       }
-                `);
-        }
-        else if (view.id.match("claude")) {
-            view.webContents.executeJavaScript(`{
-		var btn = document.querySelector("button[aria-label*='Send message']");
-    if (!btn) var btn = document.querySelector('button:has(div svg)');
-    if (!btn) var btn = document.querySelector('button:has(svg)');
-		if (btn) {
-			btn.focus();
-			btn.disabled = false;
-			btn.click();
-		}
-  }`);
-        }
-        else if (view.id.match("grok")) {
-            view.webContents.executeJavaScript(`
-        {
-        var btn = document.querySelector('button[aria-label*="Submit"]');
-        if (btn) {
-            btn.focus();
-			      btn.disabled = false;
-            btn.click();
-          } else {
-            console.log("Element not found");
-          }
-      }`);
-        }
-        else if (view.id.match("deepseek")) {
-            view.webContents.executeJavaScript(`
-        {
-        var buttons = Array.from(document.querySelectorAll('div[role="button"]'));
-        var btn = buttons[2]
-        if (btn) {
-            btn.focus();
-            // btn.disabled = false; // 'disabled' might not be applicable for div role="button"
-            btn.click();
-          } else {
-            console.log("Element not found");
-          }
-    }`);
+    `);
+    },
+    claude: (view) => {
+        view.webContents.executeJavaScript(`
+      var btn = document.querySelector("button[aria-label*='Send message']");
+      if (!btn) var btn = document.querySelector('button:has(div svg)');
+      if (!btn) var btn = document.querySelector('button:has(svg)');
+      if (btn) {
+        btn.focus();
+        btn.disabled = false;
+        btn.click();
+      }
+    `);
+    },
+    grok: (view) => {
+        view.webContents.executeJavaScript(`
+      var btn = document.querySelector('button[aria-label*="Submit"]');
+      if (btn) {
+        btn.focus();
+        btn.disabled = false;
+        btn.click();
+      }
+    `);
+    },
+    deepseek: (view) => {
+        view.webContents.executeJavaScript(`
+      var buttons = Array.from(document.querySelectorAll('div[role="button"]'));
+      var btn = buttons[2];
+      if (btn) {
+        btn.focus();
+        btn.click();
+      }
+    `);
+    },
+};
+// Handle "send-prompt" IPC event
+ipcMain.on("send-prompt", (event) => {
+    views.forEach((view) => {
+        const handlerKey = Object.keys(buttonClickHandlers).find((key) => view.id.match(key));
+        if (handlerKey) {
+            buttonClickHandlers[handlerKey](view);
         }
     });
 });
