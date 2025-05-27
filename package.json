@@ -7,7 +7,6 @@
   "author": "Colin Zhou",
   "description": "Prompt multiple LLM's at the same time!",
   "scripts": {
-    "dev": "next dev",
     "build": "tsc",
     "start": "npm run build && electron .",
     "prettier": "prettier -w .",
@@ -32,6 +31,7 @@
     "@types/node": "^22.15.18",
     "electron": "^31.2.1",
     "electron-reload": "^2.0.0-alpha.1",
+    "electronmon": "^2.0.3",
     "jest": "^29.7.0",
     "typescript": "^5.8.3"
   }

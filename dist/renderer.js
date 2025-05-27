@@ -61,12 +61,8 @@ if (openDeepSeekButton) {
     });
 }
 if (textArea) {
-    let inputTimeout;
     textArea.addEventListener("input", (event) => {
-        clearTimeout(inputTimeout);
-        inputTimeout = setTimeout(() => {
-            logToWebPage(event.target.value);
-        }, 300);
+        logToWebPage(event.target.value);
     });
     textArea.addEventListener("keydown", (event) => {
         if (event.ctrlKey) {
