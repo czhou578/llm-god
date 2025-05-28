@@ -41,6 +41,10 @@ const openDeepSeekButton = document.getElementById(
   "showDeepSeek",
 ) as HTMLButtonElement | null;
 
+const promptDropdownButton = document.querySelector(
+  ".prompt-select",
+) as HTMLButtonElement | null;
+
 if (openClaudeButton) {
   openClaudeButton.addEventListener("click", (event: MouseEvent) => {
     if (openClaudeButton.textContent === "Show Claude") {
@@ -92,4 +96,25 @@ if (textArea) {
       }
     }
   });
+}
+
+if (promptDropdownButton) {
+  promptDropdownButton.addEventListener("click", (event: MouseEvent) => {
+    console.log("Prompt dropdown button clicked");
+    event.stopPropagation();
+    ipcRenderer.send('open-form-window');
+  });
+
+  // window.addEventListener("click", (event: MouseEvent) => {
+  //   const dropdownContent = document.querySelector(
+  //     ".prompt-dropdown-content",
+  //   ) as HTMLElement | null;
+  //   if (
+  //     dropdownContent &&
+  //     !dropdownContent.contains(event.target as Node) &&
+  //     !promptDropdownButton.contains(event.target as Node)
+  //   ) {
+  //     dropdownContent.classList.remove("show");
+  //   }
+  // });
 }

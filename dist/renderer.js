@@ -24,6 +24,7 @@ const textArea = document.getElementById("prompt-input");
 const openClaudeButton = document.getElementById("showClaude");
 const openGrokButton = document.getElementById("showGrok");
 const openDeepSeekButton = document.getElementById("showDeepSeek");
+const promptDropdownButton = document.querySelector(".prompt-select");
 if (openClaudeButton) {
     openClaudeButton.addEventListener("click", (event) => {
         if (openClaudeButton.textContent === "Show Claude") {
@@ -74,4 +75,23 @@ if (textArea) {
             }
         }
     });
+}
+if (promptDropdownButton) {
+    promptDropdownButton.addEventListener("click", (event) => {
+        console.log("Prompt dropdown button clicked");
+        event.stopPropagation();
+        ipcRenderer.send('open-form-window');
+    });
+    // window.addEventListener("click", (event: MouseEvent) => {
+    //   const dropdownContent = document.querySelector(
+    //     ".prompt-dropdown-content",
+    //   ) as HTMLElement | null;
+    //   if (
+    //     dropdownContent &&
+    //     !dropdownContent.contains(event.target as Node) &&
+    //     !promptDropdownButton.contains(event.target as Node)
+    //   ) {
+    //     dropdownContent.classList.remove("show");
+    //   }
+    // });
 }

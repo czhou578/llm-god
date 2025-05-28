@@ -10,6 +10,7 @@ if (require("electron-squirrel-startup"))
     app.quit();
 remote.initialize();
 let mainWindow;
+let formWindow; // Changed to WebContentsView
 const views = [];
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -81,6 +82,19 @@ function createWindow() {
         }, 200);
     });
 }
+function createFormWindow() {
+    formWindow = new BrowserWindow({
+        width: 400,
+        height: 300,
+        parent: mainWindow,
+        modal: true,
+        webPreferences: {
+            nodeIntegration: true,
+            contextIsolation: false,
+        },
+    });
+    formWindow.loadFile('form.html');
+}
 function updateZoomFactor() {
     views.forEach((view) => {
         view.webContents.setZoomFactor(1);
@@ -95,6 +109,9 @@ app.whenReady().then(() => {
 app.on("window-all-closed", () => {
     if (process.platform !== "darwin")
         app.quit();
+});
+ipcMain.on('open-form-window', () => {
+    createFormWindow();
 });
 ipcMain.on("enter-prompt", (event, prompt) => {
     views.forEach((view) => {
