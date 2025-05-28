@@ -84,16 +84,17 @@ function createWindow() {
 }
 function createFormWindow() {
     formWindow = new BrowserWindow({
-        width: 400,
-        height: 300,
+        width: 800,
+        height: 700,
         parent: mainWindow,
         modal: true,
         webPreferences: {
+            preload: path.join(__dirname, "form-preload.cjs"), // Adjusted to point to form preload script
             nodeIntegration: true,
             contextIsolation: false,
         },
     });
-    formWindow.loadFile('form.html');
+    formWindow.loadFile(path.join(__dirname, "..", "src", "form.html"));
 }
 function updateZoomFactor() {
     views.forEach((view) => {
