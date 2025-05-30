@@ -5,7 +5,9 @@ import electronLocalShortcut from "electron-localshortcut";
 import { addBrowserView, removeBrowserView } from "./utilities.js"; // Adjusted path
 import { createRequire } from "node:module"; // Import createRequire
 import { fileURLToPath } from "node:url"; // Import fileURLToPath
+import Store from "electron-store"; // Import electron-store
 const require = createRequire(import.meta.url);
+const store = new Store(); // Create an instance of electron-store
 if (require("electron-squirrel-startup"))
     app.quit();
 remote.initialize();
@@ -89,9 +91,9 @@ function createFormWindow() {
         parent: mainWindow,
         modal: true,
         webPreferences: {
-            preload: path.join(__dirname, "form-preload.cjs"), // Adjusted to point to form preload script
-            nodeIntegration: true,
-            contextIsolation: false,
+            preload: path.join(__dirname, "..", "dist", "form_preload.js"), // Use the same preload script
+            nodeIntegration: false,
+            contextIsolation: true,
         },
     });
     formWindow.loadFile(path.join(__dirname, "..", "src", "form.html"));
@@ -113,6 +115,18 @@ app.on("window-all-closed", () => {
 });
 ipcMain.on('open-form-window', () => {
     createFormWindow();
+});
+ipcMain.on('save-prompt', (event, promptValue) => {
+    console.log('Saving prompt:', promptValue);
+    const timestamp = new Date().getTime().toString();
+    store.set(timestamp, promptValue);
+    console.log('Prompt saved with key:', timestamp);
+    // Optionally, send confirmation back to renderer
+    event.reply('prompt-saved', { key: timestamp, value: promptValue });
+});
+// Add handler to get stored prompts
+ipcMain.handle('get-prompts', () => {
+    return store.store; // Returns all stored data
 });
 ipcMain.on("enter-prompt", (event, prompt) => {
     views.forEach((view) => {

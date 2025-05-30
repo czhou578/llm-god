@@ -97,17 +97,5 @@
             <button type="submit">Save Template</button>
         </form>
     </div>
-
-    <script>
-        const ipcRenderer = window.electron.ipcRenderer;
-
-        document.getElementById('form').addEventListener('submit', (e) => {
-            e.preventDefault();
-            const data = {
-                content: document.getElementById('template-content').value
-            };
-            ipcRenderer.send('form-submitted', data);
-        });
-    </script>
 </body>
 </html>
