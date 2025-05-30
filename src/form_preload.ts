@@ -1,20 +1,5 @@
 const { contextBridge, ipcRenderer} = require('electron');
 
-// Define the structure on the window object for TypeScript
-// declare global {
-//   interface Window {
-//     electron: {
-//       ipcRenderer: typeof ipcRenderer;
-//     };
-//   }
-// }
-
-// // Expose ipcRenderer to the window object.
-// // This is possible because contextIsolation is false in your mainWindow webPreferences.
-// window.electron = {
-//   ipcRenderer: ipcRenderer,
-// };
-
 contextBridge.exposeInMainWorld('electron', {
     ipcRenderer: {
         send: (channel: string, data: any) => {
