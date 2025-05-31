@@ -102,17 +102,19 @@ if (promptDropdownButton) {
   promptDropdownButton.addEventListener("click", (event: MouseEvent) => {
     console.log("Prompt dropdown button clicked");
     event.stopPropagation();
-    ipcRenderer.send('open-form-window');
-  });  
+    ipcRenderer.send("open-form-window");
+  });
 }
 
-ipcRenderer.on('inject-prompt', (event, selectedPrompt: string) => {
-    console.log('Injecting prompt into textarea:', selectedPrompt);
+ipcRenderer.on("inject-prompt", (event, selectedPrompt: string) => {
+  console.log("Injecting prompt into textarea:", selectedPrompt);
 
-    const promptInput = document.getElementById('prompt-input') as HTMLTextAreaElement;
-    if (promptInput) {
-        promptInput.value = selectedPrompt; // Inject the selected prompt into the textarea
-    } else {
-        console.error('Textarea not found');
-    }
+  const promptInput = document.getElementById(
+    "prompt-input",
+  ) as HTMLTextAreaElement;
+  if (promptInput) {
+    promptInput.value = selectedPrompt; // Inject the selected prompt into the textarea
+  } else {
+    console.error("Textarea not found");
+  }
 });
