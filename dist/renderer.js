@@ -95,3 +95,13 @@ if (promptDropdownButton) {
     //   }
     // });
 }
+ipcRenderer.on('inject-prompt', (event, selectedPrompt) => {
+    console.log('Injecting prompt into textarea:', selectedPrompt);
+    const promptInput = document.getElementById('prompt-input');
+    if (promptInput) {
+        promptInput.value = selectedPrompt; // Inject the selected prompt into the textarea
+    }
+    else {
+        console.error('Textarea not found');
+    }
+});

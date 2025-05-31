@@ -51,7 +51,7 @@ function createWindow(): void {
 
   mainWindow.loadFile(path.join(__dirname, "..", "index.html")); // Changed to point to root index.html
 
-  // mainWindow.webContents.openDevTools({ mode: "detach" });
+  mainWindow.webContents.openDevTools({ mode: "detach" });
   const viewWidth = Math.floor(mainWindow.getBounds().width / websites.length);
   const { height } = mainWindow.getBounds();
 
@@ -160,6 +160,46 @@ ipcMain.on('save-prompt', (event, promptValue: string) => {
 ipcMain.handle('get-prompts', () => {
     return store.store; // Returns all stored data
 });
+
+ipcMain.on('paste-prompt', (event: IpcMainEvent, prompt: string) => {
+  console.log('Pasting prompt:', prompt)
+  mainWindow.webContents.send('inject-prompt', prompt);
+
+  views.forEach((view: CustomBrowserView) => {
+    if (view.id.match("chatgpt")) {
+      view.webContents.executeJavaScript(`
+          (function() {
+    const inputElement = document.querySelector('#prompt-textarea > p');
+    if (inputElement) {
+      const inputEvent = new Event('input', { bubbles: true });
+      inputElement.innerText = \`${prompt}\`;
+      inputElement.dispatchEvent(inputEvent);
+    }
+  })();`);
+    } else if (view.id.match("bard")) {
+      view.webContents.executeJavaScript(`{
+                var inputElement = document.querySelector(".ql-editor.textarea");
+                if (inputElement) {
+                  const inputEvent = new Event('input', { bubbles: true });
+                  inputElement.value = \`${prompt}\`;
+                  inputElement.dispatchEvent(inputEvent);
+                  inputElement.querySelector('p').textContent = \`${prompt}\`
+                }
+              }`);
+    } else if (view.id.match("perplexity")) {
+      view.webContents.executeJavaScript(`
+                var inputElement = document.querySelector('textarea[placeholder*="Ask"]');
+        if (inputElement) {
+          var nativeTextAreaValueSetter = Object.getOwnPropertyDescriptor(window.HTMLTextAreaElement.prototype, "value").set;
+          nativeTextAreaValueSetter.call(inputElement, \`${prompt}\`);
+          var event = new Event('input', { bubbles: true});
+          inputElement.dispatchEvent(event);
+        }`);
+    } 
+
+  })
+
+})
 
 ipcMain.on("enter-prompt", (event: IpcMainEvent, prompt: string) => { // Added type for prompt
   views.forEach((view: CustomBrowserView) => {

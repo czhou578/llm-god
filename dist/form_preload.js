@@ -3,7 +3,7 @@ const { contextBridge, ipcRenderer } = require('electron');
 contextBridge.exposeInMainWorld('electron', {
     ipcRenderer: {
         send: (channel, data) => {
-            const validChannels = ['save-prompt', 'open-form-window', 'enter-prompt', 'send-prompt'];
+            const validChannels = ['save-prompt', 'open-form-window', 'enter-prompt', 'inject-prompt', 'send-prompt', 'paste-prompt', 'open-claude', 'close-claude', 'open-deepseek', 'close-deepseek', 'open-grok', 'close-grok'];
             if (validChannels.includes(channel)) {
                 ipcRenderer.send(channel, data);
             }

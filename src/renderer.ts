@@ -103,18 +103,16 @@ if (promptDropdownButton) {
     console.log("Prompt dropdown button clicked");
     event.stopPropagation();
     ipcRenderer.send('open-form-window');
-  });
-
-  // window.addEventListener("click", (event: MouseEvent) => {
-  //   const dropdownContent = document.querySelector(
-  //     ".prompt-dropdown-content",
-  //   ) as HTMLElement | null;
-  //   if (
-  //     dropdownContent &&
-  //     !dropdownContent.contains(event.target as Node) &&
-  //     !promptDropdownButton.contains(event.target as Node)
-  //   ) {
-  //     dropdownContent.classList.remove("show");
-  //   }
-  // });
+  });  
 }
+
+ipcRenderer.on('inject-prompt', (event, selectedPrompt: string) => {
+    console.log('Injecting prompt into textarea:', selectedPrompt);
+
+    const promptInput = document.getElementById('prompt-input') as HTMLTextAreaElement;
+    if (promptInput) {
+        promptInput.value = selectedPrompt; // Inject the selected prompt into the textarea
+    } else {
+        console.error('Textarea not found');
+    }
+});
