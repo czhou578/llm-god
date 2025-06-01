@@ -75,8 +75,8 @@
       }
 
       button {
-        background-color: #0078d7;
-        color: white;
+        background-color: #0078d7; /* Default background color */
+        color: white; /* Text color */
         padding: 12px;
         border: none;
         border-radius: 6px;
@@ -89,17 +89,32 @@
       }
 
       button:hover {
-        background-color: #006cbd;
+        background-color: #006cbd; /* Darker blue on hover */
       }
 
       button:active {
-        transform: scale(0.98);
+        transform: scale(0.98); /* Slightly shrink on click */
+      }
+
+      button:disabled {
+        background-color: #add8e6; /* Light blue when disabled */
+        color: #ffffff; /* Ensure text is readable */
+        cursor: not-allowed; /* Change cursor to indicate disabled state */
       }
 
       .prompt-table {
-        width: 100%; /* Adjust width to align with other elements */
+        max-height: 300px; /* Set maximum height */
+        overflow-y: auto; /* Add vertical scroll bar if content exceeds max height */
+        display: block;
+        width: 100%; /* Maintain full width */
         border-collapse: collapse;
-        margin-bottom: 20px;
+        overflow-x: hidden;
+      }
+
+      .prompt-table tr {
+        display: table; /* Ensure rows behave like table rows */
+        width: 100%; /* Ensure rows take full width */
+        table-layout: fixed; /* Fix the layout to prevent shrinking */
       }
 
       .prompt-table th,
@@ -107,6 +122,14 @@
         border: 1px solid #ddd;
         padding: 8px;
         text-align: left;
+      }
+
+      .prompt-table td {
+        width: 100%; /* Ensure cells take full width */
+        word-wrap: break-word; /* Wrap long text to prevent overflow */
+        text-align: left; /* Align text to the left */
+        padding: 8px; /* Add padding for better readability */
+        border: 1px solid #ddd; /* Add border for better visibility */
       }
 
       .prompt-table tr.selected {
@@ -136,7 +159,7 @@
             <td>Hello world</td>
           </tr>
         </table>
-        <button class="choose-prompt-button">Choose Prompt</button>
+        <button class="choose-prompt-button" disabled>Choose Prompt</button>
       </div>
       <h2 style="text-align: center">Create Template</h2>
       <form id="form">
@@ -146,7 +169,7 @@
           spellcheck="true"
           style="display: block; margin: 0 auto"
         ></textarea>
-        <button type="submit">Save Template</button>
+        <button type="submit" disabled>Save Template</button>
       </form>
     </div>
     <script src="../dist/save_prompt.js"></script>

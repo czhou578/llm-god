@@ -3,6 +3,34 @@ const ipcRenderer1 = window.electron.ipcRenderer;
 const form = document.getElementById("form");
 const templateContent = document.getElementById("template-content");
 let selectedRow = null;
+const saveTemplateButton = document.querySelector('button[type="submit"]');
+const choosePromptButton = document.querySelector(".choose-prompt-button");
+// Disable buttons initially
+saveTemplateButton.disabled = true;
+choosePromptButton.disabled = true;
+// Enable or disable the "Save Template" button based on textarea input
+templateContent.addEventListener("input", () => {
+  saveTemplateButton.disabled = templateContent.value.trim() === "";
+});
+// Enable or disable the "Choose Prompt" button based on table row selection
+const promptTable = document.querySelector(".prompt-table");
+promptTable.addEventListener("click", (event) => {
+  const target = event.target;
+  if (target.tagName === "TD") {
+    if (selectedRow) {
+      selectedRow.classList.remove("selected"); // Deselect previously selected row
+    }
+    selectedRow = target.parentElement;
+    selectedRow.classList.add("selected"); // Highlight the selected row
+    choosePromptButton.disabled = false; // Enable the button
+  }
+});
+// Disable "Choose Prompt" button if no row is selected
+choosePromptButton.addEventListener("click", () => {
+  if (!selectedRow) {
+    choosePromptButton.disabled = true;
+  }
+});
 form.addEventListener("submit", (e) => {
   e.preventDefault();
   console.log("Form submitted");
@@ -58,7 +86,6 @@ ipcRenderer1.invoke("get-prompts").then((prompts) => {
     promptTable.appendChild(row);
   }
 });
-const choosePromptButton = document.querySelector(".choose-prompt-button");
 choosePromptButton.addEventListener("click", () => {
   if (selectedRow) {
     const selectedPrompt = selectedRow.textContent?.trim();

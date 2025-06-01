@@ -6,6 +6,44 @@ const templateContent = document.getElementById(
 ) as HTMLTextAreaElement;
 let selectedRow: HTMLTableRowElement | null = null;
 
+const saveTemplateButton = document.querySelector(
+  'button[type="submit"]',
+) as HTMLButtonElement;
+const choosePromptButton = document.querySelector(
+  ".choose-prompt-button",
+) as HTMLButtonElement;
+
+// Disable buttons initially
+saveTemplateButton.disabled = true;
+choosePromptButton.disabled = true;
+
+// Enable or disable the "Save Template" button based on textarea input
+templateContent.addEventListener("input", () => {
+  saveTemplateButton.disabled = templateContent.value.trim() === "";
+});
+
+// Enable or disable the "Choose Prompt" button based on table row selection
+const promptTable = document.querySelector(".prompt-table") as HTMLTableElement;
+
+promptTable.addEventListener("click", (event) => {
+  const target = event.target as HTMLTableCellElement;
+  if (target.tagName === "TD") {
+    if (selectedRow) {
+      selectedRow.classList.remove("selected"); // Deselect previously selected row
+    }
+    selectedRow = target.parentElement as HTMLTableRowElement;
+    selectedRow.classList.add("selected"); // Highlight the selected row
+    choosePromptButton.disabled = false; // Enable the button
+  }
+});
+
+// Disable "Choose Prompt" button if no row is selected
+choosePromptButton.addEventListener("click", () => {
+  if (!selectedRow) {
+    choosePromptButton.disabled = true;
+  }
+});
+
 form.addEventListener("submit", (e) => {
   e.preventDefault();
   console.log("Form submitted");
@@ -74,10 +112,6 @@ ipcRenderer1.invoke("get-prompts").then((prompts: Record<string, string>) => {
     promptTable.appendChild(row);
   }
 });
-
-const choosePromptButton = document.querySelector(
-  ".choose-prompt-button",
-) as HTMLButtonElement;
 
 choosePromptButton.addEventListener("click", () => {
   if (selectedRow) {

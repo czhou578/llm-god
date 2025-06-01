@@ -118,8 +118,8 @@ function createWindow(): void {
 
 function createFormWindow() {
   formWindow = new BrowserWindow({
-    width: 800,
-    height: 700,
+    width: 900,
+    height: 800,
     parent: mainWindow,
     modal: true,
     webPreferences: {
