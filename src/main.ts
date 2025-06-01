@@ -12,6 +12,7 @@ import {
   addBrowserView,
   removeBrowserView,
   injectPromptIntoView,
+  sendPromptInView,
 } from "./utilities.js"; // Adjusted path
 import { createRequire } from "node:module"; // Import createRequire
 import { fileURLToPath } from "node:url"; // Import fileURLToPath
@@ -119,7 +120,7 @@ function createWindow(): void {
 function createFormWindow() {
   formWindow = new BrowserWindow({
     width: 900,
-    height: 800,
+    height: 900,
     parent: mainWindow,
     modal: true,
     webPreferences: {
@@ -195,73 +196,29 @@ ipcMain.on("enter-prompt", (_: IpcMainEvent, prompt: string) => {
 ipcMain.on("send-prompt", (_, prompt: string) => {
   // Added type for prompt (though unused here)
   views.forEach((view) => {
-    if (view.id.match("chatgpt")) {
-      view.webContents.executeJavaScript(`
-            var btn = document.querySelector('button[aria-label*="Send prompt"]');
-            if (btn) {
-                btn.focus();
-                btn.disabled = false;
-                btn.click();
-            }
-        `);
-    } else if (view.id.match("bard")) {
-      view.webContents.executeJavaScript(`{
-      var btn = document.querySelector("button[aria-label*='Send message']");
-      if (btn) {
-        btn.setAttribute("aria-disabled", "false");
-        btn.focus();
-        btn.click();
-      }
-    }`);
-    } else if (view.id.match("perplexity")) {
-      view.webContents.executeJavaScript(`
-                {
-        var buttons = Array.from(document.querySelectorAll('button.bg-super'));
-				if (buttons[0]) {
-					var buttonsWithSvgPath = buttons.filter(button => button.querySelector('svg path'));
-					var button = buttonsWithSvgPath[buttonsWithSvgPath.length - 1];
-					button.click();
-				}
-      }
-                `);
-    } else if (view.id.match("claude")) {
-      view.webContents.executeJavaScript(`{
-		var btn = document.querySelector("button[aria-label*='Send message']");
-    if (!btn) var btn = document.querySelector('button:has(div svg)');
-    if (!btn) var btn = document.querySelector('button:has(svg)');
-		if (btn) {
-			btn.focus();
-			btn.disabled = false;
-			btn.click();
-		}
-  }`);
-    } else if (view.id.match("grok")) {
-      view.webContents.executeJavaScript(`
-        {
-        var btn = document.querySelector('button[aria-label*="Submit"]');
-        if (btn) {
-            btn.focus();
-			      btn.disabled = false;
-            btn.click();
-          } else {
-            console.log("Element not found");
-          }
-      }`);
-    } else if (view.id.match("deepseek")) {
-      view.webContents.executeJavaScript(`
-        {
-        var buttons = Array.from(document.querySelectorAll('div[role="button"]'));
-        var btn = buttons[2]
-        if (btn) {
-            btn.focus();
-            // btn.disabled = false; // 'disabled' might not be applicable for div role="button"
-            btn.click();
-          } else {
-            console.log("Element not found");
-          }
-    }`);
-    }
+    sendPromptInView(view);
   });
+});
+
+ipcMain.on("delete-prompt-by-value", (event, value: string) => {
+  value = value.normalize("NFKC");
+  // Get all key-value pairs from the store
+  const allEntries = store.store; // `store.store` gives the entire object
+
+  // Find the key that matches the given value
+  const matchingKey = Object.keys(allEntries).find(
+    (key) => allEntries[key] === value,
+  );
+
+  if (matchingKey) {
+    // Delete the entry from the store
+    store.delete(matchingKey);
+    console.log(`Deleted entry with key: ${matchingKey} and value: ${value}`);
+    event.reply("prompt-deleted", { key: matchingKey, value }); // Optionally send confirmation back
+  } else {
+    console.error(`No matching entry found for value: ${value}`);
+    event.reply("prompt-not-found", value); // Optionally notify the renderer
+  }
 });
 
 ipcMain.on("open-perplexity", (_, prompt: string) => {

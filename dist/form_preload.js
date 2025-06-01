@@ -9,6 +9,7 @@ contextBridge.exposeInMainWorld("electron", {
         "enter-prompt",
         "inject-prompt",
         "send-prompt",
+        "delete-prompt-by-value",
         "paste-prompt",
         "close-form-window",
         "open-claude",

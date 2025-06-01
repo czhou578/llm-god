@@ -1,18 +1,15 @@
-import { app, BrowserWindow, ipcMain, WebContentsView } from "electron";
+import { app, BrowserWindow, ipcMain, WebContentsView, } from "electron";
 import * as remote from "@electron/remote/main/index.js";
 import path from "path";
 import electronLocalShortcut from "electron-localshortcut";
-import {
-  addBrowserView,
-  removeBrowserView,
-  injectPromptIntoView,
-} from "./utilities.js"; // Adjusted path
+import { addBrowserView, removeBrowserView, injectPromptIntoView, sendPromptInView, } from "./utilities.js"; // Adjusted path
 import { createRequire } from "node:module"; // Import createRequire
 import { fileURLToPath } from "node:url"; // Import fileURLToPath
 import Store from "electron-store"; // Import electron-store
 const require = createRequire(import.meta.url);
 const store = new Store(); // Create an instance of electron-store
-if (require("electron-squirrel-startup")) app.quit();
+if (require("electron-squirrel-startup"))
+    app.quit();
 remote.initialize();
 let mainWindow;
 let formWindow; // Allow formWindow to be null
@@ -21,271 +18,224 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 // require("electron-reload")(path.join(__dirname, "."));
 const websites = [
-  "https://chatgpt.com/",
-  "https://bard.google.com",
-  "https://www.perplexity.ai/",
+    "https://chatgpt.com/",
+    "https://bard.google.com",
+    "https://www.perplexity.ai/",
 ];
 function createWindow() {
-  mainWindow = new BrowserWindow({
-    width: 2000,
-    height: 1000,
-    center: true,
-    backgroundColor: "#000000",
-    webPreferences: {
-      preload: path.join(__dirname, "preload.cjs"), // This will point to dist/preload.js at runtime
-      nodeIntegration: true,
-      contextIsolation: false,
-      offscreen: false,
-    },
-  });
-  remote.enable(mainWindow.webContents);
-  mainWindow.loadFile(path.join(__dirname, "..", "index.html")); // Changed to point to root index.html
-  mainWindow.webContents.openDevTools({ mode: "detach" });
-  const viewWidth = Math.floor(mainWindow.getBounds().width / websites.length);
-  const { height } = mainWindow.getBounds();
-  websites.forEach((url, index) => {
-    const view = new WebContentsView({
-      webPreferences: {
-        nodeIntegration: false,
-        contextIsolation: true,
-      },
-    }); // Cast to CustomBrowserView
-    view.id = `${url}`;
-    mainWindow.contentView.addChildView(view);
-    view.setBounds({
-      x: index * viewWidth,
-      y: 0,
-      width: viewWidth,
-      height: height - 200,
+    mainWindow = new BrowserWindow({
+        width: 2000,
+        height: 1000,
+        center: true,
+        backgroundColor: "#000000",
+        webPreferences: {
+            preload: path.join(__dirname, "preload.cjs"), // This will point to dist/preload.js at runtime
+            nodeIntegration: true,
+            contextIsolation: false,
+            offscreen: false,
+        },
     });
-    // view.webContents.openDevTools({ mode: "detach" });
-    view.webContents.setZoomFactor(1);
-    view.webContents.loadURL(url);
-    views.push(view);
-  });
-  mainWindow.on("enter-full-screen", () => {
-    updateZoomFactor();
-  });
-  mainWindow.on("focus", () => {
-    mainWindow.webContents.invalidate();
-  });
-  let resizeTimeout;
-  mainWindow.on("resize", () => {
-    clearTimeout(resizeTimeout);
-    resizeTimeout = setTimeout(() => {
-      const { width, height } = mainWindow.getBounds();
-      const viewWidth = Math.floor(width / websites.length);
-      views.forEach((view, index) => {
+    remote.enable(mainWindow.webContents);
+    mainWindow.loadFile(path.join(__dirname, "..", "index.html")); // Changed to point to root index.html
+    mainWindow.webContents.openDevTools({ mode: "detach" });
+    const viewWidth = Math.floor(mainWindow.getBounds().width / websites.length);
+    const { height } = mainWindow.getBounds();
+    websites.forEach((url, index) => {
+        const view = new WebContentsView({
+            webPreferences: {
+                nodeIntegration: false,
+                contextIsolation: true,
+            },
+        }); // Cast to CustomBrowserView
+        view.id = `${url}`;
+        mainWindow.contentView.addChildView(view);
         view.setBounds({
-          x: index * viewWidth,
-          y: 0,
-          width: viewWidth,
-          height: height - 200,
+            x: index * viewWidth,
+            y: 0,
+            width: viewWidth,
+            height: height - 200,
         });
-      });
-      updateZoomFactor();
-    }, 200);
-  });
+        // view.webContents.openDevTools({ mode: "detach" });
+        view.webContents.setZoomFactor(1);
+        view.webContents.loadURL(url);
+        views.push(view);
+    });
+    mainWindow.on("enter-full-screen", () => {
+        updateZoomFactor();
+    });
+    mainWindow.on("focus", () => {
+        mainWindow.webContents.invalidate();
+    });
+    let resizeTimeout;
+    mainWindow.on("resize", () => {
+        clearTimeout(resizeTimeout);
+        resizeTimeout = setTimeout(() => {
+            const { width, height } = mainWindow.getBounds();
+            const viewWidth = Math.floor(width / websites.length);
+            views.forEach((view, index) => {
+                view.setBounds({
+                    x: index * viewWidth,
+                    y: 0,
+                    width: viewWidth,
+                    height: height - 200,
+                });
+            });
+            updateZoomFactor();
+        }, 200);
+    });
 }
 function createFormWindow() {
-  formWindow = new BrowserWindow({
-    width: 900,
-    height: 800,
-    parent: mainWindow,
-    modal: true,
-    webPreferences: {
-      preload: path.join(__dirname, "..", "dist", "form_preload.js"), // Use the same preload script
-      nodeIntegration: false,
-      contextIsolation: true,
-    },
-  });
-  formWindow.loadFile(path.join(__dirname, "..", "src", "form.html"));
+    formWindow = new BrowserWindow({
+        width: 900,
+        height: 900,
+        parent: mainWindow,
+        modal: true,
+        webPreferences: {
+            preload: path.join(__dirname, "..", "dist", "form_preload.js"), // Use the same preload script
+            nodeIntegration: false,
+            contextIsolation: true,
+        },
+    });
+    formWindow.loadFile(path.join(__dirname, "..", "src", "form.html"));
 }
 function updateZoomFactor() {
-  views.forEach((view) => {
-    view.webContents.setZoomFactor(1);
-  });
+    views.forEach((view) => {
+        view.webContents.setZoomFactor(1);
+    });
 }
 app.whenReady().then(createWindow);
 app.whenReady().then(() => {
-  electronLocalShortcut.register(mainWindow, "Ctrl+W", () => {
-    app.quit();
-  });
+    electronLocalShortcut.register(mainWindow, "Ctrl+W", () => {
+        app.quit();
+    });
 });
 app.on("window-all-closed", () => {
-  if (process.platform !== "darwin") app.quit();
+    if (process.platform !== "darwin")
+        app.quit();
 });
 ipcMain.on("open-form-window", () => {
-  createFormWindow();
+    createFormWindow();
 });
 ipcMain.on("close-form-window", () => {
-  if (formWindow) {
-    console.log("Closing form window...");
-    formWindow.close();
-    formWindow = null; // Clear the reference
-  }
+    if (formWindow) {
+        console.log("Closing form window...");
+        formWindow.close();
+        formWindow = null; // Clear the reference
+    }
 });
 ipcMain.on("save-prompt", (event, promptValue) => {
-  console.log("Saving prompt:", promptValue);
-  const timestamp = new Date().getTime().toString();
-  store.set(timestamp, promptValue);
-  console.log("Prompt saved with key:", timestamp);
-  // Optionally, send confirmation back to renderer
-  event.reply("prompt-saved", { key: timestamp, value: promptValue });
+    console.log("Saving prompt:", promptValue);
+    const timestamp = new Date().getTime().toString();
+    store.set(timestamp, promptValue);
+    console.log("Prompt saved with key:", timestamp);
+    // Optionally, send confirmation back to renderer
+    event.reply("prompt-saved", { key: timestamp, value: promptValue });
 });
 // Add handler to get stored prompts
 ipcMain.handle("get-prompts", () => {
-  return store.store; // Returns all stored data
+    return store.store; // Returns all stored data
 });
 ipcMain.on("paste-prompt", (_, prompt) => {
-  console.log("Pasting prompt:", prompt);
-  mainWindow.webContents.send("inject-prompt", prompt);
-  views.forEach((view) => {
-    injectPromptIntoView(view, prompt);
-  });
+    console.log("Pasting prompt:", prompt);
+    mainWindow.webContents.send("inject-prompt", prompt);
+    views.forEach((view) => {
+        injectPromptIntoView(view, prompt);
+    });
 });
 ipcMain.on("enter-prompt", (_, prompt) => {
-  // Added type for prompt
-  views.forEach((view) => {
-    injectPromptIntoView(view, prompt);
-  });
+    // Added type for prompt
+    views.forEach((view) => {
+        injectPromptIntoView(view, prompt);
+    });
 });
 ipcMain.on("send-prompt", (_, prompt) => {
-  // Added type for prompt (though unused here)
-  views.forEach((view) => {
-    if (view.id.match("chatgpt")) {
-      view.webContents.executeJavaScript(`
-            var btn = document.querySelector('button[aria-label*="Send prompt"]');
-            if (btn) {
-                btn.focus();
-                btn.disabled = false;
-                btn.click();
-            }
-        `);
-    } else if (view.id.match("bard")) {
-      view.webContents.executeJavaScript(`{
-      var btn = document.querySelector("button[aria-label*='Send message']");
-      if (btn) {
-        btn.setAttribute("aria-disabled", "false");
-        btn.focus();
-        btn.click();
-      }
-    }`);
-    } else if (view.id.match("perplexity")) {
-      view.webContents.executeJavaScript(`
-                {
-        var buttons = Array.from(document.querySelectorAll('button.bg-super'));
-				if (buttons[0]) {
-					var buttonsWithSvgPath = buttons.filter(button => button.querySelector('svg path'));
-					var button = buttonsWithSvgPath[buttonsWithSvgPath.length - 1];
-					button.click();
-				}
-      }
-                `);
-    } else if (view.id.match("claude")) {
-      view.webContents.executeJavaScript(`{
-		var btn = document.querySelector("button[aria-label*='Send message']");
-    if (!btn) var btn = document.querySelector('button:has(div svg)');
-    if (!btn) var btn = document.querySelector('button:has(svg)');
-		if (btn) {
-			btn.focus();
-			btn.disabled = false;
-			btn.click();
-		}
-  }`);
-    } else if (view.id.match("grok")) {
-      view.webContents.executeJavaScript(`
-        {
-        var btn = document.querySelector('button[aria-label*="Submit"]');
-        if (btn) {
-            btn.focus();
-			      btn.disabled = false;
-            btn.click();
-          } else {
-            console.log("Element not found");
-          }
-      }`);
-    } else if (view.id.match("deepseek")) {
-      view.webContents.executeJavaScript(`
-        {
-        var buttons = Array.from(document.querySelectorAll('div[role="button"]'));
-        var btn = buttons[2]
-        if (btn) {
-            btn.focus();
-            // btn.disabled = false; // 'disabled' might not be applicable for div role="button"
-            btn.click();
-          } else {
-            console.log("Element not found");
-          }
-    }`);
+    // Added type for prompt (though unused here)
+    views.forEach((view) => {
+        sendPromptInView(view);
+    });
+});
+ipcMain.on("delete-prompt-by-value", (event, value) => {
+    value = value.normalize("NFKC");
+    // Get all key-value pairs from the store
+    const allEntries = store.store; // `store.store` gives the entire object
+    // Find the key that matches the given value
+    const matchingKey = Object.keys(allEntries).find((key) => allEntries[key] === value);
+    if (matchingKey) {
+        // Delete the entry from the store
+        store.delete(matchingKey);
+        console.log(`Deleted entry with key: ${matchingKey} and value: ${value}`);
+        event.reply("prompt-deleted", { key: matchingKey, value }); // Optionally send confirmation back
     }
-  });
+    else {
+        console.error(`No matching entry found for value: ${value}`);
+        event.reply("prompt-not-found", value); // Optionally notify the renderer
+    }
 });
 ipcMain.on("open-perplexity", (_, prompt) => {
-  if (prompt === "open perplexity now") {
-    console.log("Opening Perplexity");
-    let url = "https://www.perplexity.ai/";
-    addBrowserView(mainWindow, url, websites, views);
-  }
+    if (prompt === "open perplexity now") {
+        console.log("Opening Perplexity");
+        let url = "https://www.perplexity.ai/";
+        addBrowserView(mainWindow, url, websites, views);
+    }
 });
 ipcMain.on("close-perplexity", (_, prompt) => {
-  if (prompt === "close perplexity now") {
-    console.log("Closing Perplexity");
-    const perplexityView = views.find((view) => view.id.match("perplexity"));
-    if (perplexityView) {
-      // Add check if view exists
-      removeBrowserView(mainWindow, perplexityView, websites, views);
+    if (prompt === "close perplexity now") {
+        console.log("Closing Perplexity");
+        const perplexityView = views.find((view) => view.id.match("perplexity"));
+        if (perplexityView) {
+            // Add check if view exists
+            removeBrowserView(mainWindow, perplexityView, websites, views);
+        }
     }
-  }
 });
 ipcMain.on("open-claude", (_, prompt) => {
-  if (prompt === "open claude now") {
-    console.log("Opening Claude");
-    let url = "https://claude.ai/chats/";
-    addBrowserView(mainWindow, url, websites, views);
-  }
+    if (prompt === "open claude now") {
+        console.log("Opening Claude");
+        let url = "https://claude.ai/chats/";
+        addBrowserView(mainWindow, url, websites, views);
+    }
 });
 ipcMain.on("close-claude", (_, prompt) => {
-  if (prompt === "close claude now") {
-    console.log("Closing Claude");
-    const claudeView = views.find((view) => view.id.match("claude"));
-    if (claudeView) {
-      // Add check
-      removeBrowserView(mainWindow, claudeView, websites, views);
+    if (prompt === "close claude now") {
+        console.log("Closing Claude");
+        const claudeView = views.find((view) => view.id.match("claude"));
+        if (claudeView) {
+            // Add check
+            removeBrowserView(mainWindow, claudeView, websites, views);
+        }
     }
-  }
 });
 ipcMain.on("open-grok", (_, prompt) => {
-  if (prompt === "open grok now") {
-    console.log("Opening Grok");
-    let url = "https://grok.com/";
-    addBrowserView(mainWindow, url, websites, views);
-  }
+    if (prompt === "open grok now") {
+        console.log("Opening Grok");
+        let url = "https://grok.com/";
+        addBrowserView(mainWindow, url, websites, views);
+    }
 });
 ipcMain.on("close-grok", (_, prompt) => {
-  if (prompt === "close grok now") {
-    console.log("Closing Grok");
-    const grokView = views.find((view) => view.id.match("grok"));
-    if (grokView) {
-      // Add check
-      removeBrowserView(mainWindow, grokView, websites, views);
+    if (prompt === "close grok now") {
+        console.log("Closing Grok");
+        const grokView = views.find((view) => view.id.match("grok"));
+        if (grokView) {
+            // Add check
+            removeBrowserView(mainWindow, grokView, websites, views);
+        }
     }
-  }
 });
 ipcMain.on("open-deepseek", (_, prompt) => {
-  if (prompt === "open deepseek now") {
-    console.log("Opening DeepSeek");
-    let url = "https://chat.deepseek.com/";
-    addBrowserView(mainWindow, url, websites, views);
-  }
+    if (prompt === "open deepseek now") {
+        console.log("Opening DeepSeek");
+        let url = "https://chat.deepseek.com/";
+        addBrowserView(mainWindow, url, websites, views);
+    }
 });
 ipcMain.on("close-deepseek", (_, prompt) => {
-  if (prompt === "close deepseek now") {
-    console.log("Closing Deepseek");
-    const deepseekView = views.find((view) => view.id.match("deepseek"));
-    if (deepseekView) {
-      // Add check
-      removeBrowserView(mainWindow, deepseekView, websites, views);
+    if (prompt === "close deepseek now") {
+        console.log("Closing Deepseek");
+        const deepseekView = views.find((view) => view.id.match("deepseek"));
+        if (deepseekView) {
+            // Add check
+            removeBrowserView(mainWindow, deepseekView, websites, views);
+        }
     }
-  }
 });
