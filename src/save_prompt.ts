@@ -37,18 +37,13 @@ promptTable.addEventListener("click", (event) => {
     choosePromptButton.disabled = false; // Enable the button
   }
 
-  //   if (target.classList.contains("edit-button")) {
-  //     const row = target.closest("tr") as HTMLTableRowElement;
-  //     const promptText = row.querySelector("td")?.textContent?.trim();
-  //     if (promptText) {
-  //       console.log(`Editing prompt: ${promptText}`);
-  //       // Add your edit logic here (e.g., populate the textarea with the prompt)
-  //       const templateContent = document.getElementById(
-  //         "template-content",
-  //       ) as HTMLTextAreaElement;
-  //       templateContent.value = promptText;
-  //     }
-  //   }
+  if (target.classList.contains("edit-button")) {
+    const row = target.closest("tr");
+    const promptText = row!.querySelector("td")?.textContent?.trim();
+    if (promptText) {
+      ipcRenderer1.send("open-edit-view", promptText); // Send the prompt to the main process
+    }
+  }
 
   if (target.classList.contains("delete-button")) {
     const row = target.closest("tr") as HTMLTableRowElement;

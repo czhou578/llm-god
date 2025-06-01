@@ -202,5 +202,20 @@
       </form>
     </div>
     <script src="../dist/save_prompt.js"></script>
+    <!-- <script>
+      const { ipcRenderer } = window.electron;
+
+      document.querySelector(".prompt-table").addEventListener("click", (event) => {
+        const target = event.target;
+
+        if (target.classList.contains("edit-button")) {
+          const row = target.closest("tr");
+          const promptText = row.querySelector("td")?.textContent?.trim();
+          if (promptText) {
+            ipcRenderer.send("open-edit-view", promptText); // Send the prompt to the main process
+          }
+        }
+      });
+    </script> -->
   </body>
 </html>

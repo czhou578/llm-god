@@ -296,3 +296,33 @@ ipcMain.on("close-deepseek", (_, prompt: string) => {
     }
   }
 });
+
+ipcMain.on("open-edit-view", (_, prompt: string) => {
+  console.log("Opening edit view for prompt:", prompt);
+
+  const editWindow = new BrowserWindow({
+    width: 400,
+    height: 500,
+    parent: formWindow || mainWindow, // Use mainWindow as fallback if formWindow is null
+    modal: true, // Make it a modal window
+    webPreferences: {
+      preload: path.join(__dirname, "..", "dist", "form_preload.js"), // Use the same preload script
+      nodeIntegration: false,
+      contextIsolation: true,
+    },
+  });
+
+  editWindow.loadFile(path.join(__dirname, "..", "src", "edit_prompt.html"));
+
+  // Optionally, inject the prompt into the textarea
+  editWindow.webContents.once("did-finish-load", () => {
+    editWindow.webContents.executeJavaScript(`
+      const textarea = document.getElementById('template-content');
+      if (textarea) {
+        textarea.value = \`${prompt}\`;
+      }
+    `);
+  });
+
+  console.log("Edit window created.");
+});

@@ -12,6 +12,7 @@ contextBridge.exposeInMainWorld("electron", {
         "delete-prompt-by-value",
         "paste-prompt",
         "close-form-window",
+        "open-edit-view",
         "open-claude",
         "close-claude",
         "open-deepseek",
