@@ -61,6 +61,18 @@ npm install
 npm run start
 ```
 
+When developing, instead of running the command above, I like to have two terminals open. One terminal should run the command:
+
+```
+npx tsc --watch
+```
+
+and the other terminal should run the command:
+
+```
+npx electronmon dist/main.js
+```
+
 4. To check if the build works properly, run the following command in the root folder
 
 ```

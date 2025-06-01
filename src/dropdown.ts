@@ -1,5 +1,4 @@
 document.addEventListener("DOMContentLoaded", () => {
-
   const dropdownButton = document.getElementById(
     "dropdown-button",
   ) as HTMLButtonElement | null;

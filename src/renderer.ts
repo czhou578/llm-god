@@ -41,6 +41,10 @@ const openDeepSeekButton = document.getElementById(
   "showDeepSeek",
 ) as HTMLButtonElement | null;
 
+const promptDropdownButton = document.querySelector(
+  ".prompt-select",
+) as HTMLButtonElement | null;
+
 if (openClaudeButton) {
   openClaudeButton.addEventListener("click", (event: MouseEvent) => {
     if (openClaudeButton.textContent === "Show Claude") {
@@ -93,3 +97,24 @@ if (textArea) {
     }
   });
 }
+
+if (promptDropdownButton) {
+  promptDropdownButton.addEventListener("click", (event: MouseEvent) => {
+    console.log("Prompt dropdown button clicked");
+    event.stopPropagation();
+    ipcRenderer.send("open-form-window");
+  });
+}
+
+ipcRenderer.on("inject-prompt", (event, selectedPrompt: string) => {
+  console.log("Injecting prompt into textarea:", selectedPrompt);
+
+  const promptInput = document.getElementById(
+    "prompt-input",
+  ) as HTMLTextAreaElement;
+  if (promptInput) {
+    promptInput.value = selectedPrompt; // Inject the selected prompt into the textarea
+  } else {
+    console.error("Textarea not found");
+  }
+});

@@ -4,15 +4,15 @@
  * @returns The complete text response from ChatGPT, or void if not on the correct page or script injection fails.
  */
 export function extractChatGPTAnswer(chatGPTView) {
-    // Return type changed to void as it doesn't directly return the answer
-    const currentURL = chatGPTView.webContents.getURL();
-    console.log("Current URL:", currentURL);
-    if (!currentURL.match("chatgpt.com")) {
-        console.log("Not on ChatGPT, skipping script injection");
-        return;
-    }
-    console.log("Injecting script into ChatGPT view");
-    const scriptToInject = `
+  // Return type changed to void as it doesn't directly return the answer
+  const currentURL = chatGPTView.webContents.getURL();
+  console.log("Current URL:", currentURL);
+  if (!currentURL.match("chatgpt.com")) {
+    console.log("Not on ChatGPT, skipping script injection");
+    return;
+  }
+  console.log("Injecting script into ChatGPT view");
+  const scriptToInject = `
     (function() {
       // Your script here
       /**
@@ -98,14 +98,14 @@ export function extractChatGPTAnswer(chatGPTView) {
       console.log("✅ ChatGPT answer extractor is now active");
     })();
   `;
-    chatGPTView.webContents
-        .executeJavaScript(scriptToInject)
-        .then((result) => {
-        console.log("Script injected successfully");
+  chatGPTView.webContents
+    .executeJavaScript(scriptToInject)
+    .then((result) => {
+      console.log("Script injected successfully");
     })
-        .catch((err) => {
-        console.error("Error injecting script:", err);
+    .catch((err) => {
+      console.error("Error injecting script:", err);
     });
-    // This console log might be confusing as it runs before the script is actually confirmed to be active inside the webview.
-    // console.log("✅ ChatGPT answer extractor is now active"); // Consider removing or placing in .then()
+  // This console log might be confusing as it runs before the script is actually confirmed to be active inside the webview.
+  // console.log("✅ ChatGPT answer extractor is now active"); // Consider removing or placing in .then()
 }

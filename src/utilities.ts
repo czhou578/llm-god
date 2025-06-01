@@ -1,8 +1,4 @@
-import {
-  BrowserWindow,
-  WebPreferences,
-  WebContentsView,
-} from "electron"; // Added WebPreferences type
+import { BrowserWindow, WebPreferences, WebContentsView } from "electron"; // Added WebPreferences type
 
 interface CustomBrowserView extends WebContentsView {
   id?: string; // Make id optional as it's assigned after creation
@@ -95,4 +91,81 @@ export function removeBrowserView(
       height: height - 200,
     });
   });
+}
+
+export function injectPromptIntoView(
+  view: CustomBrowserView,
+  prompt: string,
+): void {
+  if (view.id && view.id.match("chatgpt")) {
+    view.webContents.executeJavaScript(`
+            (function() {
+                const inputElement = document.querySelector('#prompt-textarea > p');
+                if (inputElement) {
+                    const inputEvent = new Event('input', { bubbles: true });
+                    inputElement.innerText = \`${prompt}\`;
+                    inputElement.dispatchEvent(inputEvent);
+                }
+            })();
+        `);
+  } else if (view.id && view.id.match("bard")) {
+    view.webContents.executeJavaScript(`
+            {
+                var inputElement = document.querySelector(".ql-editor.textarea");
+                if (inputElement) {
+                    const inputEvent = new Event('input', { bubbles: true });
+                    inputElement.value = \`${prompt}\`;
+                    inputElement.dispatchEvent(inputEvent);
+                    inputElement.querySelector('p').textContent = \`${prompt}\`;
+                }
+            }
+        `);
+  } else if (view.id && view.id.match("perplexity")) {
+    view.webContents.executeJavaScript(`
+            var inputElement = document.querySelector('textarea[placeholder*="Ask"]');
+            if (inputElement) {
+                var nativeTextAreaValueSetter = Object.getOwnPropertyDescriptor(window.HTMLTextAreaElement.prototype, "value").set;
+                nativeTextAreaValueSetter.call(inputElement, \`${prompt}\`);
+                var event = new Event('input', { bubbles: true });
+                inputElement.dispatchEvent(event);
+            }
+        `);
+  } else if (view.id && view.id.match("claude")) {
+    view.webContents.executeJavaScript(`
+            {
+                var inputElement = document.querySelector('div.ProseMirror');
+                if (inputElement) {
+                    inputElement.innerHTML = \`${prompt}\`;
+                }
+            }
+        `);
+  } else if (view.id && view.id.match("grok")) {
+    view.webContents.executeJavaScript(`
+            {
+                var inputElement = document.querySelector('textarea');
+                if (inputElement) {
+                    const span = inputElement.previousElementSibling;
+                    if (span) {
+                        span.classList.add("hidden");
+                    }
+                    var nativeTextAreaValueSetter = Object.getOwnPropertyDescriptor(window.HTMLTextAreaElement.prototype, "value").set;
+                    nativeTextAreaValueSetter.call(inputElement, \`${prompt}\`);
+                    const inputEvent = new Event('input', { bubbles: true });
+                    inputElement.dispatchEvent(inputEvent);
+                }
+            }
+        `);
+  } else if (view.id && view.id.match("deepseek")) {
+    view.webContents.executeJavaScript(`
+            {
+                var inputElement = document.querySelector('textarea');
+                if (inputElement) {
+                    var nativeTextAreaValueSetter = Object.getOwnPropertyDescriptor(window.HTMLTextAreaElement.prototype, "value").set;
+                    nativeTextAreaValueSetter.call(inputElement, \`${prompt}\`);
+                    const inputEvent = new Event('input', { bubbles: true });
+                    inputElement.dispatchEvent(inputEvent);
+                }
+            }
+        `);
+  }
 }
