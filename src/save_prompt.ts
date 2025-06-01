@@ -13,6 +13,14 @@ const choosePromptButton = document.querySelector(
   ".choose-prompt-button",
 ) as HTMLButtonElement;
 
+function replaceEmojis(string: string): string {
+  // Remove emojis and other non-printable characters
+  return string.replace(
+    /[\u{1F600}-\u{1F64F}\u{1F300}-\u{1F5FF}\u{1F680}-\u{1F6FF}\u{1F700}-\u{1F77F}\u{1F780}-\u{1F7FF}\u{1F800}-\u{1F8FF}\u{1F900}-\u{1F9FF}\u{1FA00}-\u{1FA6F}\u{1FA70}-\u{1FAFF}\u{2600}-\u{26FF}\u{2700}-\u{27BF}\u200D\uFE0F]/gu,
+    "",
+  );
+}
+
 // Disable buttons initially
 saveTemplateButton.disabled = true;
 choosePromptButton.disabled = true;
@@ -25,7 +33,7 @@ templateContent.addEventListener("input", () => {
 // Enable or disable the "Choose Prompt" button based on table row selection
 const promptTable = document.querySelector(".prompt-table") as HTMLTableElement;
 
-promptTable.addEventListener("click", (event) => {
+promptTable.addEventListener("click", async (event) => {
   const target = event.target as HTMLTableCellElement;
 
   if (target.tagName === "TD") {
@@ -39,9 +47,19 @@ promptTable.addEventListener("click", (event) => {
 
   if (target.classList.contains("edit-button")) {
     const row = target.closest("tr");
-    const promptText = row!.querySelector("td")?.textContent?.trim();
+    let promptText = row!.querySelector("td")?.textContent?.trim().normalize("NFKC");
+    promptText = replaceEmojis(promptText!); // Normalize and remove emojis
+
     if (promptText) {
-      ipcRenderer1.send("open-edit-view", promptText); // Send the prompt to the main process
+      console.log(`Invoking get-key-by-value with promptText: "${promptText}"`); // Log the value being passed
+      const key = await ipcRenderer1.invoke("get-key-by-value", promptText);
+      if (key) {
+        console.log(`Editing row key: ${key}`);
+        ipcRenderer1.send("row-selected", key); // Send the key to the main process
+        ipcRenderer1.send("open-edit-view", promptText); // Send the prompt to the main process
+      } else {
+        console.error(`No key found for value: "${promptText}"`);
+      }
     }
   }
 
@@ -174,14 +192,13 @@ ipcRenderer1.invoke("get-prompts").then((prompts: Record<string, string>) => {
   }
 });
 
+// Handle the "Choose Prompt" button click
 choosePromptButton.addEventListener("click", () => {
   if (selectedRow) {
     const selectedPrompt = selectedRow.textContent?.trim();
     if (selectedPrompt) {
       ipcRenderer1.send("paste-prompt", selectedPrompt); // Send the selected prompt to the main process
-      console.log(`sent prompt: ${selectedPrompt}`);
       ipcRenderer1.send("close-form-window"); // Send an event to close the form window
-      console.log("Form window closed");
     }
   } else {
     console.log("No row selected");

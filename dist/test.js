@@ -4,65 +4,66 @@
  * @returns The extracted text response
  */
 export function extractGeminiResponse(rawResponse) {
-  try {
-    const match = rawResponse.match(/\\["wrb\\.fr",null,"(.*?)"\\]\\]$/);
-    if (!match) {
-      return "Could not parse the response format";
-    }
-    let innerJsonStr = match[1];
-    innerJsonStr = innerJsonStr
-      .replace(/\\\\\\\\/g, "\\\\")
-      .replace(/\\\\"/g, '"');
-    const parsedData = JSON.parse(innerJsonStr);
-    if (Array.isArray(parsedData) && parsedData.length > 3) {
-      const responseContainer = parsedData[3];
-      if (Array.isArray(responseContainer) && responseContainer.length > 0) {
-        for (const item of responseContainer) {
-          if (Array.isArray(item) && item.length > 1) {
-            if (Array.isArray(item[1]) && item[1].length > 0) {
-              const textParts = item[1][0];
-              if (typeof textParts === "string") {
-                return textParts;
-              }
+    try {
+        const match = rawResponse.match(/\\["wrb\\.fr",null,"(.*?)"\\]\\]$/);
+        if (!match) {
+            return "Could not parse the response format";
+        }
+        let innerJsonStr = match[1];
+        innerJsonStr = innerJsonStr
+            .replace(/\\\\\\\\/g, "\\\\")
+            .replace(/\\\\"/g, '"');
+        const parsedData = JSON.parse(innerJsonStr);
+        if (Array.isArray(parsedData) && parsedData.length > 3) {
+            const responseContainer = parsedData[3];
+            if (Array.isArray(responseContainer) && responseContainer.length > 0) {
+                for (const item of responseContainer) {
+                    if (Array.isArray(item) && item.length > 1) {
+                        if (Array.isArray(item[1]) && item[1].length > 0) {
+                            const textParts = item[1][0];
+                            if (typeof textParts === "string") {
+                                return textParts;
+                            }
+                        }
+                    }
+                }
             }
-          }
         }
-      }
-    }
-    function findTextInNestedStructure(data) {
-      if (typeof data === "string" && data.length > 50) {
-        return data;
-      }
-      if (Array.isArray(data)) {
-        for (const item of data) {
-          const result = findTextInNestedStructure(item);
-          if (result) {
-            return result;
-          }
-        }
-      }
-      if (data !== null && typeof data === "object") {
-        for (const key in data) {
-          if (Object.prototype.hasOwnProperty.call(data, key)) {
-            // Added hasOwnProperty check
-            const result = findTextInNestedStructure(data[key]);
-            if (result) {
-              return result;
+        function findTextInNestedStructure(data) {
+            if (typeof data === "string" && data.length > 50) {
+                return data;
             }
-          }
+            if (Array.isArray(data)) {
+                for (const item of data) {
+                    const result = findTextInNestedStructure(item);
+                    if (result) {
+                        return result;
+                    }
+                }
+            }
+            if (data !== null && typeof data === "object") {
+                for (const key in data) {
+                    if (Object.prototype.hasOwnProperty.call(data, key)) {
+                        // Added hasOwnProperty check
+                        const result = findTextInNestedStructure(data[key]);
+                        if (result) {
+                            return result;
+                        }
+                    }
+                }
+            }
+            return null;
         }
-      }
-      return null;
+        const textResult = findTextInNestedStructure(parsedData);
+        if (textResult) {
+            return textResult;
+        }
+        return `Could not extract response text. Full parsed data: ${JSON.stringify(parsedData)}`;
     }
-    const textResult = findTextInNestedStructure(parsedData);
-    if (textResult) {
-      return textResult;
+    catch (error) {
+        // Typed error
+        return `Error extracting response: ${error.message}`;
     }
-    return `Could not extract response text. Full parsed data: ${JSON.stringify(parsedData)}`;
-  } catch (error) {
-    // Typed error
-    return `Error extracting response: ${error.message}`;
-  }
 }
 // Example usage (optional, can be removed or kept for testing this file directly)
 /*

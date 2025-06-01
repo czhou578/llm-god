@@ -9,6 +9,7 @@ contextBridge.exposeInMainWorld("electron", {
         "enter-prompt",
         "inject-prompt",
         "send-prompt",
+        "row-selected",
         "delete-prompt-by-value",
         "paste-prompt",
         "close-form-window",
@@ -25,7 +26,7 @@ contextBridge.exposeInMainWorld("electron", {
       }
     },
     invoke: (channel: string, data?: any) => {
-      const validChannels = ["get-prompts"];
+      const validChannels = ["get-prompts", "get-key-by-value"];
       if (validChannels.includes(channel)) {
         return ipcRenderer.invoke(channel, data);
       }

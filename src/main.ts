@@ -299,11 +299,12 @@ ipcMain.on("close-deepseek", (_, prompt: string) => {
 
 ipcMain.on("open-edit-view", (_, prompt: string) => {
   console.log("Opening edit view for prompt:", prompt);
+  prompt = prompt.normalize("NFKC");
 
   const editWindow = new BrowserWindow({
-    width: 400,
-    height: 500,
-    parent: formWindow || mainWindow, // Use mainWindow as fallback if formWindow is null
+    width: 500,
+    height: 600,
+    parent: formWindow || mainWindow, // Use mainWindow as a fallback if formWindow is null
     modal: true, // Make it a modal window
     webPreferences: {
       preload: path.join(__dirname, "..", "dist", "form_preload.js"), // Use the same preload script
@@ -325,4 +326,42 @@ ipcMain.on("open-edit-view", (_, prompt: string) => {
   });
 
   console.log("Edit window created.");
+});
+
+ipcMain.on("update-prompt", (event, { key, value }: { key: string; value: string }) => {
+  if (store.has(key)) {
+    store.set(key, value);
+    console.log(`Updated prompt with key "${key}" to: "${value}"`);
+    event.reply("prompt-updated", { key, value });
+  } else {
+    console.error(`No entry found for key: "${key}"`);
+    event.reply("prompt-update-failed", key);
+  }
+});
+
+ipcMain.on("row-selected", (event, key: string) => {
+  console.log(`Row selected with key: ${key}`);
+  event.sender.send("row-selected", key); // Relay the event to the renderer process
+});
+
+// Add handler to fetch the key from the store based on the value.
+ipcMain.handle("get-key-by-value", (_, value: string) => {
+  console.log(`Handler invoked with value: "${value}"`); // Log the input value
+  value = value.normalize("NFKC"); // Normalize the value for consistency
+  const allEntries = store.store; // Get all key-value pairs from the store
+
+  console.log("Store contents:", allEntries); // Log the store contents
+
+  // Find the key that matches the given value
+  const matchingKey = Object.keys(allEntries).find(
+    (key) => allEntries[key] === value,
+  );
+
+  if (matchingKey) {
+    console.log(`Found key "${matchingKey}" for value: "${value}"`);
+    return matchingKey;
+  } else {
+    console.error(`No matching key found for value: "${value}"`);
+    return null;
+  }
 });

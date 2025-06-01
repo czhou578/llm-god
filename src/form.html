@@ -208,11 +208,11 @@
       document.querySelector(".prompt-table").addEventListener("click", (event) => {
         const target = event.target;
 
-        if (target.classList.contains("edit-button")) {
+        if (target.tagName === "TD") {
           const row = target.closest("tr");
-          const promptText = row.querySelector("td")?.textContent?.trim();
-          if (promptText) {
-            ipcRenderer.send("open-edit-view", promptText); // Send the prompt to the main process
+          const key = row.dataset.key; // Assume each row has a data-key attribute
+          if (key) {
+            ipcRenderer.send("row-selected", key); // Send the key to the renderer process
           }
         }
       });
