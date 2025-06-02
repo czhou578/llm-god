@@ -1,5 +1,6 @@
 "use strict";
 const { contextBridge, ipcRenderer } = require("electron");
+console.log("Preload script loaded!");
 contextBridge.exposeInMainWorld("electron", {
     ipcRenderer: {
         send: (channel, data) => {
@@ -9,9 +10,11 @@ contextBridge.exposeInMainWorld("electron", {
                 "enter-prompt",
                 "inject-prompt",
                 "send-prompt",
-                "row-selected",
                 "delete-prompt-by-value",
+                "row-selected",
                 "paste-prompt",
+                "update-prompt",
+                "edit-prompt-ready",
                 "close-form-window",
                 "open-edit-view",
                 "open-claude",
@@ -32,7 +35,7 @@ contextBridge.exposeInMainWorld("electron", {
             }
         },
         on: (channel, func) => {
-            const validChannels = ["prompt-saved"];
+            const validChannels = ["prompt-saved", "on-selected", "row-selected"];
             if (validChannels.includes(channel)) {
                 ipcRenderer.on(channel, (_, ...args) => func(...args));
             }

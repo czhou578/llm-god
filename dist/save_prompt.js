@@ -33,7 +33,7 @@ promptTable.addEventListener("click", async (event) => {
         let promptText = row.querySelector("td")?.textContent?.trim().normalize("NFKC");
         promptText = replaceEmojis(promptText); // Normalize and remove emojis
         if (promptText) {
-            console.log(`Invoking get-key-by-value with promptText: "${promptText}"`); // Log the value being passed
+            console.log(`Invoking get-key-by-value with promptText: "${promptText}"`);
             const key = await ipcRenderer1.invoke("get-key-by-value", promptText);
             if (key) {
                 console.log(`Editing row key: ${key}`);

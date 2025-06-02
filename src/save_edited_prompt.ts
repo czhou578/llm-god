@@ -1,5 +1,5 @@
 const edit_ipcRenderer = window.electron.ipcRenderer;
-
+edit_ipcRenderer.send("edit-prompt-ready"); // Open the edit view when this script is loaded
 let selectedKey: string | null = null; // Store the key of the selected row
 
 const edit_form = document.getElementById("form") as HTMLFormElement;
@@ -10,32 +10,29 @@ const savePromptButton = document.querySelector(
   'button[type="submit"]',
 ) as HTMLButtonElement;
 
-// Disable the save button initially
-// savePromptButton.disabled = true;
-
-// Enable the save button when the textarea has content
-// edit_templateContent.addEventListener("input", () => {
-//   savePromptButton.disabled = templateContent.value.trim() === "";
-// });
 
 // Listen for row selection and save the key
-edit_ipcRenderer.on("row-selected", (_, key: string) => {
-  selectedKey = key;
-  console.log(`Selected key: ${selectedKey}`);
+edit_ipcRenderer.on("row-selected", (key: string) => {
+    if (!key) {
+        console.error("Received empty key in row-selected event.");
+        return;
+    }
+    selectedKey = key;
+    console.log(`Selected key received in save_edited_prompt: ${selectedKey}`);
 });
 
-// Handle form submission to save the edited prompt
-form.addEventListener("submit", (e) => {
-  e.preventDefault();
+
+// Add event listener to savePromptButton
+savePromptButton.addEventListener("click", (e) => {
+    e.preventDefault();
 
   const editedPrompt = edit_templateContent.value.trim();
-
-    console.log("Saving edited prompt:", editedPrompt);
-    console.log("Selected key for saving:", selectedKey);
+  console.log(`Edited prompt: "${editedPrompt}"`);
+    console.log(`Selected key: ${selectedKey}`);
 
   if (editedPrompt && selectedKey) {
     edit_ipcRenderer.send("update-prompt", { key: selectedKey, value: editedPrompt });
-    console.log(`Updated prompt with key "${selectedKey}" to: "${editedPrompt}"`);
+    console.log(`Sent update-prompt message with key "${selectedKey}" and value "${editedPrompt}"`);
   } else {
     console.error("No key selected or prompt is empty.");
   }

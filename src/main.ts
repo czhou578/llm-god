@@ -31,6 +31,7 @@ remote.initialize();
 
 let mainWindow: BrowserWindow;
 let formWindow: BrowserWindow | null; // Allow formWindow to be null
+let pendingRowSelectedKey: string | null = null; // Store the key of the selected row for later use
 
 const views: CustomBrowserView[] = [];
 
@@ -164,12 +165,12 @@ ipcMain.on("close-form-window", () => {
 
 ipcMain.on("save-prompt", (event, promptValue: string) => {
   console.log("Saving prompt:", promptValue);
+  
   const timestamp = new Date().getTime().toString();
   store.set(timestamp, promptValue);
+
   console.log("Prompt saved with key:", timestamp);
 
-  // Optionally, send confirmation back to renderer
-  event.reply("prompt-saved", { key: timestamp, value: promptValue });
 });
 
 // Add handler to get stored prompts
@@ -211,13 +212,11 @@ ipcMain.on("delete-prompt-by-value", (event, value: string) => {
   );
 
   if (matchingKey) {
-    // Delete the entry from the store
     store.delete(matchingKey);
     console.log(`Deleted entry with key: ${matchingKey} and value: ${value}`);
-    event.reply("prompt-deleted", { key: matchingKey, value }); // Optionally send confirmation back
+
   } else {
     console.error(`No matching entry found for value: ${value}`);
-    event.reply("prompt-not-found", value); // Optionally notify the renderer
   }
 });
 
@@ -234,7 +233,6 @@ ipcMain.on("close-perplexity", (_, prompt: string) => {
     console.log("Closing Perplexity");
     const perplexityView = views.find((view) => view.id.match("perplexity"));
     if (perplexityView) {
-      // Add check if view exists
       removeBrowserView(mainWindow, perplexityView, websites, views);
     }
   }
@@ -253,7 +251,6 @@ ipcMain.on("close-claude", (_, prompt: string) => {
     console.log("Closing Claude");
     const claudeView = views.find((view) => view.id.match("claude"));
     if (claudeView) {
-      // Add check
       removeBrowserView(mainWindow, claudeView, websites, views);
     }
   }
@@ -272,7 +269,6 @@ ipcMain.on("close-grok", (_, prompt: string) => {
     console.log("Closing Grok");
     const grokView = views.find((view) => view.id.match("grok"));
     if (grokView) {
-      // Add check
       removeBrowserView(mainWindow, grokView, websites, views);
     }
   }
@@ -291,7 +287,6 @@ ipcMain.on("close-deepseek", (_, prompt: string) => {
     console.log("Closing Deepseek");
     const deepseekView = views.find((view) => view.id.match("deepseek"));
     if (deepseekView) {
-      // Add check
       removeBrowserView(mainWindow, deepseekView, websites, views);
     }
   }
@@ -314,7 +309,7 @@ ipcMain.on("open-edit-view", (_, prompt: string) => {
   });
 
   editWindow.loadFile(path.join(__dirname, "..", "src", "edit_prompt.html"));
-
+  editWindow.webContents.openDevTools({ mode: "detach" });
   // Optionally, inject the prompt into the textarea
   editWindow.webContents.once("did-finish-load", () => {
     editWindow.webContents.executeJavaScript(`
@@ -323,30 +318,39 @@ ipcMain.on("open-edit-view", (_, prompt: string) => {
         textarea.value = \`${prompt}\`;
       }
     `);
+
   });
 
   console.log("Edit window created.");
+});
+
+ipcMain.on("edit-prompt-ready", (event) => {
+  if (pendingRowSelectedKey) {
+    event.sender.send("row-selected", pendingRowSelectedKey);
+    console.log(`Sent row-selected message to edit_prompt.html with key: ${pendingRowSelectedKey} (on renderer ready)`);
+    pendingRowSelectedKey = null;
+  } else {
+    console.log("edit-prompt-ready received, but no pending key to send.");
+  }
 });
 
 ipcMain.on("update-prompt", (event, { key, value }: { key: string; value: string }) => {
   if (store.has(key)) {
     store.set(key, value);
     console.log(`Updated prompt with key "${key}" to: "${value}"`);
-    event.reply("prompt-updated", { key, value });
+
   } else {
     console.error(`No entry found for key: "${key}"`);
-    event.reply("prompt-update-failed", key);
   }
 });
 
 ipcMain.on("row-selected", (event, key: string) => {
   console.log(`Row selected with key: ${key}`);
-  event.sender.send("row-selected", key); // Relay the event to the renderer process
+  pendingRowSelectedKey = key;
 });
 
 // Add handler to fetch the key from the store based on the value.
 ipcMain.handle("get-key-by-value", (_, value: string) => {
-  console.log(`Handler invoked with value: "${value}"`); // Log the input value
   value = value.normalize("NFKC"); // Normalize the value for consistency
   const allEntries = store.store; // Get all key-value pairs from the store
 
@@ -360,6 +364,7 @@ ipcMain.handle("get-key-by-value", (_, value: string) => {
   if (matchingKey) {
     console.log(`Found key "${matchingKey}" for value: "${value}"`);
     return matchingKey;
+
   } else {
     console.error(`No matching key found for value: "${value}"`);
     return null;
