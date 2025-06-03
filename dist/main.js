@@ -38,7 +38,7 @@ function createWindow() {
     });
     remote.enable(mainWindow.webContents);
     mainWindow.loadFile(path.join(__dirname, "..", "index.html")); // Changed to point to root index.html
-    mainWindow.webContents.openDevTools({ mode: "detach" });
+    // mainWindow.webContents.openDevTools({ mode: "detach" });
     const viewWidth = Math.floor(mainWindow.getBounds().width / websites.length);
     const { height } = mainWindow.getBounds();
     websites.forEach((url, index) => {
@@ -246,7 +246,6 @@ ipcMain.on("open-edit-view", (_, prompt) => {
         },
     });
     editWindow.loadFile(path.join(__dirname, "..", "src", "edit_prompt.html"));
-    editWindow.webContents.openDevTools({ mode: "detach" });
     // Optionally, inject the prompt into the textarea
     editWindow.webContents.once("did-finish-load", () => {
         editWindow.webContents.executeJavaScript(`
@@ -295,5 +294,11 @@ ipcMain.handle("get-key-by-value", (_, value) => {
     else {
         console.error(`No matching key found for value: "${value}"`);
         return null;
+    }
+});
+ipcMain.on("close-edit-window", (event) => {
+    const win = BrowserWindow.fromWebContents(event.sender);
+    if (win) {
+        win.close();
     }
 });

@@ -1,6 +1,5 @@
 "use strict";
 const { contextBridge, ipcRenderer } = require("electron");
-console.log("Preload script loaded!");
 contextBridge.exposeInMainWorld("electron", {
     ipcRenderer: {
         send: (channel, data) => {
@@ -17,6 +16,7 @@ contextBridge.exposeInMainWorld("electron", {
                 "edit-prompt-ready",
                 "close-form-window",
                 "open-edit-view",
+                "close-edit-window",
                 "open-claude",
                 "close-claude",
                 "open-deepseek",

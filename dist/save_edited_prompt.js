@@ -23,6 +23,7 @@ savePromptButton.addEventListener("click", (e) => {
     if (editedPrompt && selectedKey) {
         edit_ipcRenderer.send("update-prompt", { key: selectedKey, value: editedPrompt });
         console.log(`Sent update-prompt message with key "${selectedKey}" and value "${editedPrompt}"`);
+        edit_ipcRenderer.send("close-edit-window"); // <--- Add this line
     }
     else {
         console.error("No key selected or prompt is empty.");

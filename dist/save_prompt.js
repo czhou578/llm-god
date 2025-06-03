@@ -30,7 +30,10 @@ promptTable.addEventListener("click", async (event) => {
     }
     if (target.classList.contains("edit-button")) {
         const row = target.closest("tr");
-        let promptText = row.querySelector("td")?.textContent?.trim().normalize("NFKC");
+        let promptText = row
+            .querySelector("td")
+            ?.textContent?.trim()
+            .normalize("NFKC");
         promptText = replaceEmojis(promptText); // Normalize and remove emojis
         if (promptText) {
             console.log(`Invoking get-key-by-value with promptText: "${promptText}"`);
