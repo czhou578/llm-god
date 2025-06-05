@@ -202,20 +202,5 @@
       </form>
     </div>
     <script src="../dist/save_prompt.js"></script>
-    <!-- <script>
-      const { ipcRenderer } = window.electron;
-
-      document.querySelector(".prompt-table").addEventListener("click", (event) => {
-        const target = event.target;
-
-        if (target.tagName === "TD") {
-          const row = target.closest("tr");
-          const key = row.dataset.key; // Assume each row has a data-key attribute
-          if (key) {
-            ipcRenderer.send("row-selected", key); // Send the key to the renderer process
-          }
-        }
-      });
-    </script> -->
   </body>
 </html>

@@ -6,10 +6,7 @@ import {
   addBrowserView,
   removeBrowserView,
   injectPromptIntoView,
-<<<<<<< HEAD
   sendPromptInView,
-=======
->>>>>>> 2e7534e3c76de91b9f9e78aa7efcc5f887493d02
 } from "./utilities.js"; // Adjusted path
 import { createRequire } from "node:module"; // Import createRequire
 import { fileURLToPath } from "node:url"; // Import fileURLToPath
@@ -20,10 +17,7 @@ if (require("electron-squirrel-startup")) app.quit();
 remote.initialize();
 let mainWindow;
 let formWindow; // Allow formWindow to be null
-<<<<<<< HEAD
 let pendingRowSelectedKey = null; // Store the key of the selected row for later use
-=======
->>>>>>> 2e7534e3c76de91b9f9e78aa7efcc5f887493d02
 const views = [];
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -48,11 +42,7 @@ function createWindow() {
   });
   remote.enable(mainWindow.webContents);
   mainWindow.loadFile(path.join(__dirname, "..", "index.html")); // Changed to point to root index.html
-<<<<<<< HEAD
-  // mainWindow.webContents.openDevTools({ mode: "detach" });
-=======
   mainWindow.webContents.openDevTools({ mode: "detach" });
->>>>>>> 2e7534e3c76de91b9f9e78aa7efcc5f887493d02
   const viewWidth = Math.floor(mainWindow.getBounds().width / websites.length);
   const { height } = mainWindow.getBounds();
   websites.forEach((url, index) => {
@@ -102,11 +92,7 @@ function createWindow() {
 function createFormWindow() {
   formWindow = new BrowserWindow({
     width: 900,
-<<<<<<< HEAD
     height: 900,
-=======
-    height: 800,
->>>>>>> 2e7534e3c76de91b9f9e78aa7efcc5f887493d02
     parent: mainWindow,
     modal: true,
     webPreferences: {
@@ -133,7 +119,6 @@ app.on("window-all-closed", () => {
 });
 ipcMain.on("open-form-window", () => {
   createFormWindow();
-<<<<<<< HEAD
 });
 ipcMain.on("close-form-window", () => {
   if (formWindow) {
@@ -326,177 +311,6 @@ ipcMain.on("close-edit-window", (event) => {
     // Notify the form window to refresh the table
     if (formWindow && !formWindow.isDestroyed()) {
       formWindow.webContents.send("refresh-prompt-table");
-=======
-});
-ipcMain.on("close-form-window", () => {
-  if (formWindow) {
-    console.log("Closing form window...");
-    formWindow.close();
-    formWindow = null; // Clear the reference
-  }
-});
-ipcMain.on("save-prompt", (event, promptValue) => {
-  console.log("Saving prompt:", promptValue);
-  const timestamp = new Date().getTime().toString();
-  store.set(timestamp, promptValue);
-  console.log("Prompt saved with key:", timestamp);
-  // Optionally, send confirmation back to renderer
-  event.reply("prompt-saved", { key: timestamp, value: promptValue });
-});
-// Add handler to get stored prompts
-ipcMain.handle("get-prompts", () => {
-  return store.store; // Returns all stored data
-});
-ipcMain.on("paste-prompt", (_, prompt) => {
-  console.log("Pasting prompt:", prompt);
-  mainWindow.webContents.send("inject-prompt", prompt);
-  views.forEach((view) => {
-    injectPromptIntoView(view, prompt);
-  });
-});
-ipcMain.on("enter-prompt", (_, prompt) => {
-  // Added type for prompt
-  views.forEach((view) => {
-    injectPromptIntoView(view, prompt);
-  });
-});
-ipcMain.on("send-prompt", (_, prompt) => {
-  // Added type for prompt (though unused here)
-  views.forEach((view) => {
-    if (view.id.match("chatgpt")) {
-      view.webContents.executeJavaScript(`
-            var btn = document.querySelector('button[aria-label*="Send prompt"]');
-            if (btn) {
-                btn.focus();
-                btn.disabled = false;
-                btn.click();
-            }
-        `);
-    } else if (view.id.match("bard")) {
-      view.webContents.executeJavaScript(`{
-      var btn = document.querySelector("button[aria-label*='Send message']");
-      if (btn) {
-        btn.setAttribute("aria-disabled", "false");
-        btn.focus();
-        btn.click();
-      }
-    }`);
-    } else if (view.id.match("perplexity")) {
-      view.webContents.executeJavaScript(`
-                {
-        var buttons = Array.from(document.querySelectorAll('button.bg-super'));
-				if (buttons[0]) {
-					var buttonsWithSvgPath = buttons.filter(button => button.querySelector('svg path'));
-					var button = buttonsWithSvgPath[buttonsWithSvgPath.length - 1];
-					button.click();
-				}
-      }
-                `);
-    } else if (view.id.match("claude")) {
-      view.webContents.executeJavaScript(`{
-		var btn = document.querySelector("button[aria-label*='Send message']");
-    if (!btn) var btn = document.querySelector('button:has(div svg)');
-    if (!btn) var btn = document.querySelector('button:has(svg)');
-		if (btn) {
-			btn.focus();
-			btn.disabled = false;
-			btn.click();
-		}
-  }`);
-    } else if (view.id.match("grok")) {
-      view.webContents.executeJavaScript(`
-        {
-        var btn = document.querySelector('button[aria-label*="Submit"]');
-        if (btn) {
-            btn.focus();
-			      btn.disabled = false;
-            btn.click();
-          } else {
-            console.log("Element not found");
-          }
-      }`);
-    } else if (view.id.match("deepseek")) {
-      view.webContents.executeJavaScript(`
-        {
-        var buttons = Array.from(document.querySelectorAll('div[role="button"]'));
-        var btn = buttons[2]
-        if (btn) {
-            btn.focus();
-            // btn.disabled = false; // 'disabled' might not be applicable for div role="button"
-            btn.click();
-          } else {
-            console.log("Element not found");
-          }
-    }`);
-    }
-  });
-});
-ipcMain.on("open-perplexity", (_, prompt) => {
-  if (prompt === "open perplexity now") {
-    console.log("Opening Perplexity");
-    let url = "https://www.perplexity.ai/";
-    addBrowserView(mainWindow, url, websites, views);
-  }
-});
-ipcMain.on("close-perplexity", (_, prompt) => {
-  if (prompt === "close perplexity now") {
-    console.log("Closing Perplexity");
-    const perplexityView = views.find((view) => view.id.match("perplexity"));
-    if (perplexityView) {
-      // Add check if view exists
-      removeBrowserView(mainWindow, perplexityView, websites, views);
-    }
-  }
-});
-ipcMain.on("open-claude", (_, prompt) => {
-  if (prompt === "open claude now") {
-    console.log("Opening Claude");
-    let url = "https://claude.ai/chats/";
-    addBrowserView(mainWindow, url, websites, views);
-  }
-});
-ipcMain.on("close-claude", (_, prompt) => {
-  if (prompt === "close claude now") {
-    console.log("Closing Claude");
-    const claudeView = views.find((view) => view.id.match("claude"));
-    if (claudeView) {
-      // Add check
-      removeBrowserView(mainWindow, claudeView, websites, views);
-    }
-  }
-});
-ipcMain.on("open-grok", (_, prompt) => {
-  if (prompt === "open grok now") {
-    console.log("Opening Grok");
-    let url = "https://grok.com/";
-    addBrowserView(mainWindow, url, websites, views);
-  }
-});
-ipcMain.on("close-grok", (_, prompt) => {
-  if (prompt === "close grok now") {
-    console.log("Closing Grok");
-    const grokView = views.find((view) => view.id.match("grok"));
-    if (grokView) {
-      // Add check
-      removeBrowserView(mainWindow, grokView, websites, views);
-    }
-  }
-});
-ipcMain.on("open-deepseek", (_, prompt) => {
-  if (prompt === "open deepseek now") {
-    console.log("Opening DeepSeek");
-    let url = "https://chat.deepseek.com/";
-    addBrowserView(mainWindow, url, websites, views);
-  }
-});
-ipcMain.on("close-deepseek", (_, prompt) => {
-  if (prompt === "close deepseek now") {
-    console.log("Closing Deepseek");
-    const deepseekView = views.find((view) => view.id.match("deepseek"));
-    if (deepseekView) {
-      // Add check
-      removeBrowserView(mainWindow, deepseekView, websites, views);
->>>>>>> 2e7534e3c76de91b9f9e78aa7efcc5f887493d02
     }
   }
 });
