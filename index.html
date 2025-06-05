@@ -28,8 +28,8 @@
         background-color: #f0f0f0;
         height: auto;
         padding: 10px;
-        min-height: 100px; /* Ensure a minimum height */
-        max-height: 30%; /* Prevent it from taking too much space */
+        min-height: 120px; /* Ensure a minimum height */
+        max-height: 40%; /* Prevent it from taking too much space */
         position: relative; /* Add this to create a new stacking context */
         align-items: flex-start; /* Align children to the top */
       }
@@ -40,14 +40,14 @@
         font-family: "Times New Roman", Times, serif;
         line-height: 1.5;
         width: 88%;
-        height: 98%;
+        height: 100%;
       }
 
       /* Group dropdown and prompt-picker vertically */
       .button-group {
         display: flex;
         flex-direction: column;
-        align-items: flex-end; /* Align to the right */
+        align-items: flex-start; /* Align to the right */
         width: 10%;
         margin-left: auto;
         margin-right: 10px;
@@ -56,7 +56,6 @@
 
       .dropdown,
       .prompt-picker {
-        margin-top: 13%;
         width: 100%;
         position: relative;
       }
@@ -88,7 +87,7 @@
         border: 2px solid #0078d7;
         border-radius: 8px;
         padding: 4px;
-        max-height: 120px;
+        max-height: 110px;
         overflow-y: auto;
         z-index: 1000; /* Ensure it's above other elements */
       }

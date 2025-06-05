@@ -30,7 +30,7 @@ const websites = [
 function createWindow() {
   mainWindow = new BrowserWindow({
     width: 2000,
-    height: 1000,
+    height: 1100,
     center: true,
     backgroundColor: "#000000",
     webPreferences: {
@@ -42,7 +42,7 @@ function createWindow() {
   });
   remote.enable(mainWindow.webContents);
   mainWindow.loadFile(path.join(__dirname, "..", "index.html")); // Changed to point to root index.html
-  mainWindow.webContents.openDevTools({ mode: "detach" });
+  // mainWindow.webContents.openDevTools({ mode: "detach" });
   const viewWidth = Math.floor(mainWindow.getBounds().width / websites.length);
   const { height } = mainWindow.getBounds();
   websites.forEach((url, index) => {
@@ -58,7 +58,7 @@ function createWindow() {
       x: index * viewWidth,
       y: 0,
       width: viewWidth,
-      height: height - 200,
+      height: height - 235,
     });
     // view.webContents.openDevTools({ mode: "detach" });
     view.webContents.setZoomFactor(1);
