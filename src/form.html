@@ -125,11 +125,44 @@
       }
 
       .prompt-table td {
+        position: relative; /* Position relative to contain the action buttons */
         width: 100%; /* Ensure cells take full width */
         word-wrap: break-word; /* Wrap long text to prevent overflow */
         text-align: left; /* Align text to the left */
         padding: 8px; /* Add padding for better readability */
         border: 1px solid #ddd; /* Add border for better visibility */
+      }
+
+      .row-actions {
+        position: absolute;
+        top: 50%;
+        right: 8px;
+        transform: translateY(-50%);
+        display: none; /* Hidden by default */
+        gap: 5px; /* Add spacing between buttons */
+      }
+
+      .prompt-table tr:hover .row-actions {
+        display: flex; /* Show the buttons when the row is hovered */
+      }
+
+      .edit-button,
+      .delete-button {
+        background: none;
+        border: none;
+        cursor: pointer;
+        font-size: 16px;
+        padding: 4px;
+        border-radius: 4px;
+        transition: background-color 0.3s ease;
+      }
+
+      .edit-button:hover {
+        background-color: #e0f7fa; /* Light blue background on hover */
+      }
+
+      .delete-button:hover {
+        background-color: #ffebee; /* Light red background on hover */
       }
 
       .prompt-table tr.selected {
@@ -154,11 +187,7 @@
     <div class="form-container">
       <h2>Existing Prompts</h2>
       <div id="prompt-picker" class="prompt-picker">
-        <table class="prompt-table">
-          <tr>
-            <td>Hello world</td>
-          </tr>
-        </table>
+        <table class="prompt-table"></table>
         <button class="choose-prompt-button" disabled>Choose Prompt</button>
       </div>
       <h2 style="text-align: center">Create Template</h2>

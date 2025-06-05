@@ -146,3 +146,71 @@ export function injectPromptIntoView(view, prompt) {
         `);
   }
 }
+export function sendPromptInView(view) {
+  if (view.id && view.id.match("chatgpt")) {
+    view.webContents.executeJavaScript(`
+            var btn = document.querySelector('button[aria-label*="Send prompt"]');
+            if (btn) {
+                btn.focus();
+                btn.disabled = false;
+                btn.click();
+            }
+        `);
+  } else if (view.id && view.id.match("bard")) {
+    view.webContents.executeJavaScript(`{
+      var btn = document.querySelector("button[aria-label*='Send message']");
+      if (btn) {
+        btn.setAttribute("aria-disabled", "false");
+        btn.focus();
+        btn.click();
+      }
+    }`);
+  } else if (view.id && view.id.match("perplexity")) {
+    view.webContents.executeJavaScript(`
+                {
+        var buttons = Array.from(document.querySelectorAll('button.bg-super'));
+        if (buttons[0]) {
+          var buttonsWithSvgPath = buttons.filter(button => button.querySelector('svg path'));
+          var button = buttonsWithSvgPath[buttonsWithSvgPath.length - 1];
+          button.click();
+        }
+      }
+                `);
+  } else if (view.id && view.id.match("claude")) {
+    view.webContents.executeJavaScript(`{
+    var btn = document.querySelector("button[aria-label*='Send message']");
+    if (!btn) var btn = document.querySelector('button:has(div svg)');
+    if (!btn) var btn = document.querySelector('button:has(svg)');
+    if (btn) {
+      btn.focus();
+      btn.disabled = false;
+      btn.click();
+    }
+  }`);
+  } else if (view.id && view.id.match("grok")) {
+    view.webContents.executeJavaScript(`
+        {
+        var btn = document.querySelector('button[aria-label*="Submit"]');
+        if (btn) {
+            btn.focus();
+            btn.disabled = false;
+            btn.click();
+          } else {
+            console.log("Element not found");
+          }
+      }`);
+  } else if (view.id && view.id.match("deepseek")) {
+    view.webContents.executeJavaScript(`
+        {
+        var buttons = Array.from(document.querySelectorAll('div[role="button"]'));
+        var btn = buttons[2]
+        if (btn) {
+            btn.focus();
+            // btn.disabled = false; // 'disabled' might not be applicable for div role="button"
+            btn.click();
+          } else {
+            console.log("Element not found");
+          }
+    }`);
+  }
+}

@@ -12,6 +12,7 @@ import {
   addBrowserView,
   removeBrowserView,
   injectPromptIntoView,
+  sendPromptInView,
 } from "./utilities.js"; // Adjusted path
 import { createRequire } from "node:module"; // Import createRequire
 import { fileURLToPath } from "node:url"; // Import fileURLToPath
@@ -30,6 +31,7 @@ remote.initialize();
 
 let mainWindow: BrowserWindow;
 let formWindow: BrowserWindow | null; // Allow formWindow to be null
+let pendingRowSelectedKey: string | null = null; // Store the key of the selected row for later use
 
 const views: CustomBrowserView[] = [];
 
@@ -47,7 +49,7 @@ const websites: string[] = [
 function createWindow(): void {
   mainWindow = new BrowserWindow({
     width: 2000,
-    height: 1000,
+    height: 1100,
     center: true,
     backgroundColor: "#000000",
     webPreferences: {
@@ -61,7 +63,7 @@ function createWindow(): void {
 
   mainWindow.loadFile(path.join(__dirname, "..", "index.html")); // Changed to point to root index.html
 
-  mainWindow.webContents.openDevTools({ mode: "detach" });
+  // mainWindow.webContents.openDevTools({ mode: "detach" });
   const viewWidth = Math.floor(mainWindow.getBounds().width / websites.length);
   const { height } = mainWindow.getBounds();
 
@@ -79,7 +81,7 @@ function createWindow(): void {
       x: index * viewWidth,
       y: 0,
       width: viewWidth,
-      height: height - 200,
+      height: height - 235,
     });
     // view.webContents.openDevTools({ mode: "detach" });
     view.webContents.setZoomFactor(1);
@@ -119,7 +121,7 @@ function createWindow(): void {
 function createFormWindow() {
   formWindow = new BrowserWindow({
     width: 900,
-    height: 800,
+    height: 900,
     parent: mainWindow,
     modal: true,
     webPreferences: {
@@ -155,20 +157,16 @@ ipcMain.on("open-form-window", () => {
 
 ipcMain.on("close-form-window", () => {
   if (formWindow) {
-    console.log("Closing form window...");
     formWindow.close();
     formWindow = null; // Clear the reference
   }
 });
 
 ipcMain.on("save-prompt", (event, promptValue: string) => {
-  console.log("Saving prompt:", promptValue);
   const timestamp = new Date().getTime().toString();
   store.set(timestamp, promptValue);
-  console.log("Prompt saved with key:", timestamp);
 
-  // Optionally, send confirmation back to renderer
-  event.reply("prompt-saved", { key: timestamp, value: promptValue });
+  console.log("Prompt saved with key:", timestamp);
 });
 
 // Add handler to get stored prompts
@@ -177,7 +175,6 @@ ipcMain.handle("get-prompts", () => {
 });
 
 ipcMain.on("paste-prompt", (_: IpcMainEvent, prompt: string) => {
-  console.log("Pasting prompt:", prompt);
   mainWindow.webContents.send("inject-prompt", prompt);
 
   views.forEach((view: CustomBrowserView) => {
@@ -195,73 +192,26 @@ ipcMain.on("enter-prompt", (_: IpcMainEvent, prompt: string) => {
 ipcMain.on("send-prompt", (_, prompt: string) => {
   // Added type for prompt (though unused here)
   views.forEach((view) => {
-    if (view.id.match("chatgpt")) {
-      view.webContents.executeJavaScript(`
-            var btn = document.querySelector('button[aria-label*="Send prompt"]');
-            if (btn) {
-                btn.focus();
-                btn.disabled = false;
-                btn.click();
-            }
-        `);
-    } else if (view.id.match("bard")) {
-      view.webContents.executeJavaScript(`{
-      var btn = document.querySelector("button[aria-label*='Send message']");
-      if (btn) {
-        btn.setAttribute("aria-disabled", "false");
-        btn.focus();
-        btn.click();
-      }
-    }`);
-    } else if (view.id.match("perplexity")) {
-      view.webContents.executeJavaScript(`
-                {
-        var buttons = Array.from(document.querySelectorAll('button.bg-super'));
-				if (buttons[0]) {
-					var buttonsWithSvgPath = buttons.filter(button => button.querySelector('svg path'));
-					var button = buttonsWithSvgPath[buttonsWithSvgPath.length - 1];
-					button.click();
-				}
-      }
-                `);
-    } else if (view.id.match("claude")) {
-      view.webContents.executeJavaScript(`{
-		var btn = document.querySelector("button[aria-label*='Send message']");
-    if (!btn) var btn = document.querySelector('button:has(div svg)');
-    if (!btn) var btn = document.querySelector('button:has(svg)');
-		if (btn) {
-			btn.focus();
-			btn.disabled = false;
-			btn.click();
-		}
-  }`);
-    } else if (view.id.match("grok")) {
-      view.webContents.executeJavaScript(`
-        {
-        var btn = document.querySelector('button[aria-label*="Submit"]');
-        if (btn) {
-            btn.focus();
-			      btn.disabled = false;
-            btn.click();
-          } else {
-            console.log("Element not found");
-          }
-      }`);
-    } else if (view.id.match("deepseek")) {
-      view.webContents.executeJavaScript(`
-        {
-        var buttons = Array.from(document.querySelectorAll('div[role="button"]'));
-        var btn = buttons[2]
-        if (btn) {
-            btn.focus();
-            // btn.disabled = false; // 'disabled' might not be applicable for div role="button"
-            btn.click();
-          } else {
-            console.log("Element not found");
-          }
-    }`);
-    }
+    sendPromptInView(view);
   });
+});
+
+ipcMain.on("delete-prompt-by-value", (event, value: string) => {
+  value = value.normalize("NFKC");
+  // Get all key-value pairs from the store
+  const allEntries = store.store; // `store.store` gives the entire object
+
+  // Find the key that matches the given value
+  const matchingKey = Object.keys(allEntries).find(
+    (key) => allEntries[key] === value,
+  );
+
+  if (matchingKey) {
+    store.delete(matchingKey);
+    console.log(`Deleted entry with key: ${matchingKey} and value: ${value}`);
+  } else {
+    console.error(`No matching entry found for value: ${value}`);
+  }
 });
 
 ipcMain.on("open-perplexity", (_, prompt: string) => {
@@ -277,7 +227,6 @@ ipcMain.on("close-perplexity", (_, prompt: string) => {
     console.log("Closing Perplexity");
     const perplexityView = views.find((view) => view.id.match("perplexity"));
     if (perplexityView) {
-      // Add check if view exists
       removeBrowserView(mainWindow, perplexityView, websites, views);
     }
   }
@@ -296,7 +245,6 @@ ipcMain.on("close-claude", (_, prompt: string) => {
     console.log("Closing Claude");
     const claudeView = views.find((view) => view.id.match("claude"));
     if (claudeView) {
-      // Add check
       removeBrowserView(mainWindow, claudeView, websites, views);
     }
   }
@@ -315,7 +263,6 @@ ipcMain.on("close-grok", (_, prompt: string) => {
     console.log("Closing Grok");
     const grokView = views.find((view) => view.id.match("grok"));
     if (grokView) {
-      // Add check
       removeBrowserView(mainWindow, grokView, websites, views);
     }
   }
@@ -334,8 +281,106 @@ ipcMain.on("close-deepseek", (_, prompt: string) => {
     console.log("Closing Deepseek");
     const deepseekView = views.find((view) => view.id.match("deepseek"));
     if (deepseekView) {
-      // Add check
       removeBrowserView(mainWindow, deepseekView, websites, views);
+    }
+  }
+});
+
+ipcMain.on("open-edit-view", (_, prompt: string) => {
+  console.log("Opening edit view for prompt:", prompt);
+  prompt = prompt.normalize("NFKC");
+
+  const editWindow = new BrowserWindow({
+    width: 500,
+    height: 600,
+    parent: formWindow || mainWindow, // Use mainWindow as a fallback if formWindow is null
+    modal: true, // Make it a modal window
+    webPreferences: {
+      preload: path.join(__dirname, "..", "dist", "form_preload.js"), // Use the same preload script
+      nodeIntegration: false,
+      contextIsolation: true,
+    },
+  });
+
+  editWindow.loadFile(path.join(__dirname, "..", "src", "edit_prompt.html"));
+  // Optionally, inject the prompt into the textarea
+  editWindow.webContents.once("did-finish-load", () => {
+    editWindow.webContents.executeJavaScript(`
+      const textarea = document.getElementById('template-content');
+      if (textarea) {
+        textarea.value = \`${prompt}\`;
+      }
+    `);
+  });
+
+  console.log("Edit window created.");
+});
+
+ipcMain.on("edit-prompt-ready", (event) => {
+  if (pendingRowSelectedKey) {
+    event.sender.send("row-selected", pendingRowSelectedKey);
+    console.log(
+      `Sent row-selected message to edit_prompt.html with key: ${pendingRowSelectedKey} (on renderer ready)`,
+    );
+    pendingRowSelectedKey = null;
+  } else {
+    console.log("edit-prompt-ready received, but no pending key to send.");
+  }
+});
+
+ipcMain.on(
+  "update-prompt",
+  (_, { key, value }: { key: string; value: string }) => {
+    if (store.has(key)) {
+      store.set(key, value);
+      console.log(`Updated prompt with key "${key}" to: "${value}"`);
+    } else {
+      console.error(`No entry found for key: "${key}"`);
+    }
+  },
+);
+
+ipcMain.on("row-selected", (_, key: string) => {
+  console.log(`Row selected with key: ${key}`);
+  pendingRowSelectedKey = key;
+});
+
+// Add handler to fetch the key from the store based on the value.
+ipcMain.handle("get-key-by-value", (_, value: string) => {
+  value = value.normalize("NFKC"); // Normalize the value for consistency
+  const allEntries = store.store; // Get all key-value pairs from the store
+
+  console.log("Store contents:", allEntries); // Log the store contents
+
+  // Find the key that matches the given value
+  const matchingKey = Object.keys(allEntries).find(
+    (key) => allEntries[key] === value,
+  );
+
+  if (matchingKey) {
+    console.log(`Found key "${matchingKey}" for value: "${value}"`);
+    return matchingKey;
+  } else {
+    console.error(`No matching key found for value: "${value}"`);
+    return null;
+  }
+});
+
+ipcMain.on("close-edit-window", (event) => {
+  const win = BrowserWindow.fromWebContents(event.sender);
+  if (win) {
+    win.close();
+  }
+});
+
+ipcMain.on("close-edit-window", (event) => {
+  const win = BrowserWindow.fromWebContents(event.sender);
+  if (win) {
+    win.close();
+
+    // Notify the form window to refresh the table
+    if (formWindow && !formWindow.isDestroyed()) {
+      formWindow.webContents.send("refresh-prompt-table");
     }
   }
 });
