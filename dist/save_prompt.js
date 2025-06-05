@@ -5,6 +5,7 @@ const templateContent = document.getElementById("template-content");
 let selectedRow = null;
 const saveTemplateButton = document.querySelector('button[type="submit"]');
 const choosePromptButton = document.querySelector(".choose-prompt-button");
+<<<<<<< HEAD
 function replaceEmojis(string) {
   // Remove emojis and other non-printable characters
   return string.replace(
@@ -12,6 +13,8 @@ function replaceEmojis(string) {
     "",
   );
 }
+=======
+>>>>>>> 2e7534e3c76de91b9f9e78aa7efcc5f887493d02
 // Disable buttons initially
 saveTemplateButton.disabled = true;
 choosePromptButton.disabled = true;
@@ -21,7 +24,11 @@ templateContent.addEventListener("input", () => {
 });
 // Enable or disable the "Choose Prompt" button based on table row selection
 const promptTable = document.querySelector(".prompt-table");
+<<<<<<< HEAD
 promptTable.addEventListener("click", async (event) => {
+=======
+promptTable.addEventListener("click", (event) => {
+>>>>>>> 2e7534e3c76de91b9f9e78aa7efcc5f887493d02
   const target = event.target;
   if (target.tagName === "TD") {
     if (selectedRow) {
@@ -31,6 +38,7 @@ promptTable.addEventListener("click", async (event) => {
     selectedRow.classList.add("selected"); // Highlight the selected row
     choosePromptButton.disabled = false; // Enable the button
   }
+<<<<<<< HEAD
   if (target.classList.contains("edit-button")) {
     const row = target.closest("tr");
     let promptText = row
@@ -130,6 +138,8 @@ ipcRenderer1.on("prompt-deleted", (_, { key, value }) => {
 });
 ipcRenderer1.on("prompt-not-found", (_, value) => {
   console.error(`No matching entry found for value: "${value}"`);
+=======
+>>>>>>> 2e7534e3c76de91b9f9e78aa7efcc5f887493d02
 });
 // Disable "Choose Prompt" button if no row is selected
 choosePromptButton.addEventListener("click", () => {
@@ -166,17 +176,52 @@ form.addEventListener("submit", (e) => {
     console.log("Text area is empty. Nothing to save.");
   }
 });
+<<<<<<< HEAD
 // Replace the existing invoke listener with this simplified version
 ipcRenderer1.invoke("get-prompts").then((prompts) => {
   buildPromptTable(prompts);
 });
 // Handle the "Choose Prompt" button click
+=======
+// Fetch stored prompts and populate the table
+ipcRenderer1.invoke("get-prompts").then((prompts) => {
+  const promptTable = document.querySelector(".prompt-table");
+  if (!promptTable) {
+    console.error("Prompt table not found");
+    return;
+  }
+  // Clear existing rows (if any)
+  promptTable.innerHTML = "";
+  // Add each prompt as a new row
+  for (const [key, value] of Object.entries(prompts)) {
+    const row = document.createElement("tr");
+    const cell = document.createElement("td");
+    cell.textContent = value; // Display the prompt value
+    row.appendChild(cell);
+    // Add click event to select the row
+    row.addEventListener("click", () => {
+      if (selectedRow) {
+        selectedRow.classList.remove("selected"); // Deselect previously selected row
+      }
+      selectedRow = row;
+      row.classList.add("selected"); // Highlight the selected row
+    });
+    promptTable.appendChild(row);
+  }
+});
+>>>>>>> 2e7534e3c76de91b9f9e78aa7efcc5f887493d02
 choosePromptButton.addEventListener("click", () => {
   if (selectedRow) {
     const selectedPrompt = selectedRow.textContent?.trim();
     if (selectedPrompt) {
       ipcRenderer1.send("paste-prompt", selectedPrompt); // Send the selected prompt to the main process
+<<<<<<< HEAD
       ipcRenderer1.send("close-form-window"); // Send an event to close the form window
+=======
+      console.log(`sent prompt: ${selectedPrompt}`);
+      ipcRenderer1.send("close-form-window"); // Send an event to close the form window
+      console.log("Form window closed");
+>>>>>>> 2e7534e3c76de91b9f9e78aa7efcc5f887493d02
     }
   } else {
     console.log("No row selected");

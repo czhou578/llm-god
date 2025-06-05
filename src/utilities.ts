@@ -169,6 +169,7 @@ export function injectPromptIntoView(
         `);
   }
 }
+<<<<<<< HEAD
 
 export function sendPromptInView(view: CustomBrowserView) {
   if (view.id && view.id.match("chatgpt")) {
@@ -238,3 +239,5 @@ export function sendPromptInView(view: CustomBrowserView) {
     }`);
   }
 }
+=======
+>>>>>>> 2e7534e3c76de91b9f9e78aa7efcc5f887493d02
