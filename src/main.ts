@@ -157,15 +157,12 @@ ipcMain.on("open-form-window", () => {
 
 ipcMain.on("close-form-window", () => {
   if (formWindow) {
-    console.log("Closing form window...");
     formWindow.close();
     formWindow = null; // Clear the reference
   }
 });
 
 ipcMain.on("save-prompt", (event, promptValue: string) => {
-  console.log("Saving prompt:", promptValue);
-
   const timestamp = new Date().getTime().toString();
   store.set(timestamp, promptValue);
 
@@ -178,7 +175,6 @@ ipcMain.handle("get-prompts", () => {
 });
 
 ipcMain.on("paste-prompt", (_: IpcMainEvent, prompt: string) => {
-  console.log("Pasting prompt:", prompt);
   mainWindow.webContents.send("inject-prompt", prompt);
 
   views.forEach((view: CustomBrowserView) => {
@@ -334,7 +330,7 @@ ipcMain.on("edit-prompt-ready", (event) => {
 
 ipcMain.on(
   "update-prompt",
-  (event, { key, value }: { key: string; value: string }) => {
+  (_, { key, value }: { key: string; value: string }) => {
     if (store.has(key)) {
       store.set(key, value);
       console.log(`Updated prompt with key "${key}" to: "${value}"`);
@@ -344,7 +340,7 @@ ipcMain.on(
   },
 );
 
-ipcMain.on("row-selected", (event, key: string) => {
+ipcMain.on("row-selected", (_, key: string) => {
   console.log(`Row selected with key: ${key}`);
   pendingRowSelectedKey = key;
 });
@@ -374,5 +370,17 @@ ipcMain.on("close-edit-window", (event) => {
   const win = BrowserWindow.fromWebContents(event.sender);
   if (win) {
     win.close();
+  }
+});
+
+ipcMain.on("close-edit-window", (event) => {
+  const win = BrowserWindow.fromWebContents(event.sender);
+  if (win) {
+    win.close();
+
+    // Notify the form window to refresh the table
+    if (formWindow && !formWindow.isDestroyed()) {
+      formWindow.webContents.send("refresh-prompt-table");
+    }
   }
 });

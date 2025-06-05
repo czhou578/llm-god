@@ -35,7 +35,12 @@ contextBridge.exposeInMainWorld("electron", {
       }
     },
     on: (channel: string, func: (...args: any[]) => void) => {
-      const validChannels = ["prompt-saved", "on-selected", "row-selected"];
+      const validChannels = [
+        "prompt-saved",
+        "on-selected",
+        "row-selected",
+        "refresh-prompt-table",
+      ];
       if (validChannels.includes(channel)) {
         ipcRenderer.on(channel, (_: any, ...args: any) => func(...args));
       }

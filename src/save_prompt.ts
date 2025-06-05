@@ -91,6 +91,73 @@ promptTable.addEventListener("click", async (event) => {
   }
 });
 
+// Extract the table building logic into a reusable function
+function buildPromptTable(prompts: Record<string, string>) {
+  const promptTable = document.querySelector(".prompt-table");
+
+  if (!promptTable) {
+    console.error("Prompt table not found");
+    return;
+  }
+
+  // Clear existing rows
+  promptTable.innerHTML = "";
+
+  // Add each prompt as a new row
+  for (const [key, value] of Object.entries(prompts)) {
+    const row = document.createElement("tr");
+    const cell = document.createElement("td");
+
+    const row_action_div = document.createElement("div");
+    row_action_div.className = "row-actions";
+
+    const deleteButton = document.createElement("button");
+    deleteButton.textContent = "🗑️";
+    deleteButton.className = "delete-button";
+    deleteButton.title = "Delete";
+
+    const editButton = document.createElement("button");
+    editButton.textContent = "✏️";
+    editButton.className = "edit-button";
+    editButton.title = "Edit";
+
+    row_action_div.appendChild(deleteButton);
+    row_action_div.appendChild(editButton);
+    cell.textContent = value;
+    row.appendChild(cell);
+    cell.appendChild(row_action_div);
+
+    // Add click event to select the row
+    row.addEventListener("click", () => {
+      if (selectedRow) {
+        selectedRow.classList.remove("selected");
+      }
+      selectedRow = row;
+      row.classList.add("selected");
+    });
+
+    promptTable.appendChild(row);
+  }
+}
+
+// Simplified refresh function
+async function refreshPromptTable() {
+  console.log("Refreshing prompt table after edit...");
+
+  try {
+    const prompts: Record<string, string> =
+      await ipcRenderer1.invoke("get-prompts");
+    buildPromptTable(prompts);
+  } catch (error) {
+    console.error("Failed to refresh prompt table:", error);
+  }
+}
+
+// Update your existing refresh listener
+ipcRenderer1.on("refresh-prompt-table", () => {
+  refreshPromptTable();
+});
+
 // Listen for confirmation from the main process
 ipcRenderer1.on("prompt-deleted", (_, { key, value }) => {
   console.log(
@@ -146,53 +213,9 @@ form.addEventListener("submit", (e) => {
   }
 });
 
-// Fetch stored prompts and populate the table
+// Replace the existing invoke listener with this simplified version
 ipcRenderer1.invoke("get-prompts").then((prompts: Record<string, string>) => {
-  const promptTable = document.querySelector(".prompt-table");
-
-  if (!promptTable) {
-    console.error("Prompt table not found");
-    return;
-  }
-
-  // Clear existing rows (if any)
-  promptTable.innerHTML = "";
-
-  // Add each prompt as a new row
-  for (const [key, value] of Object.entries(prompts)) {
-    const row = document.createElement("tr");
-    const cell = document.createElement("td");
-
-    const row_action_div = document.createElement("div");
-    row_action_div.className = "row-actions";
-
-    const deleteButton = document.createElement("button");
-    deleteButton.textContent = "🗑️";
-    deleteButton.className = "delete-button";
-    deleteButton.title = "Delete";
-
-    const editButton = document.createElement("button");
-    editButton.textContent = "✏️";
-    editButton.className = "edit-button";
-    editButton.title = "Edit";
-
-    row_action_div.appendChild(deleteButton);
-    row_action_div.appendChild(editButton);
-    cell.textContent = value; // Display the prompt value
-    row.appendChild(cell);
-    cell.appendChild(row_action_div);
-
-    // Add click event to select the row
-    row.addEventListener("click", () => {
-      if (selectedRow) {
-        selectedRow.classList.remove("selected"); // Deselect previously selected row
-      }
-      selectedRow = row;
-      row.classList.add("selected"); // Highlight the selected row
-    });
-
-    promptTable.appendChild(row);
-  }
+  buildPromptTable(prompts);
 });
 
 // Handle the "Choose Prompt" button click
