@@ -4,6 +4,16 @@ interface CustomBrowserView extends WebContentsView {
   id?: string; // Make id optional as it's assigned after creation
 }
 
+function removeAllEmojis(text: string): string {
+  return text
+    .normalize("NFC")
+    .replace(
+      /[\u{1F600}-\u{1F64F}\u{1F300}-\u{1F5FF}\u{1F680}-\u{1F6FF}\u{1F700}-\u{1F77F}\u{1F780}-\u{1F7FF}\u{1F800}-\u{1F8FF}\u{1F900}-\u{1F9FF}\u{1FA00}-\u{1FA6F}\u{1FA70}-\u{1FAFF}\u{2600}-\u{26FF}\u{2700}-\u{27BF}\u200D\uFE0F]/gu,
+      "",
+    )
+    .replace(/[^\P{C}\n\t\r ]+/gu, "");
+}
+
 /**
  * Creates and configures a new BrowserView for the main window
  * @param mainWindow - The main Electron window
@@ -97,6 +107,8 @@ export function injectPromptIntoView(
   view: CustomBrowserView,
   prompt: string,
 ): void {
+  prompt = removeAllEmojis(prompt); // Normalize and remove emojis
+
   if (view.id && view.id.match("chatgpt")) {
     view.webContents.executeJavaScript(`
             (function() {

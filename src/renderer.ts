@@ -107,13 +107,20 @@ if (promptDropdownButton) {
 }
 
 ipcRenderer.on("inject-prompt", (event, selectedPrompt: string) => {
-  console.log("Injecting prompt into textarea:", selectedPrompt);
+  let filtered_selectedPrompt = selectedPrompt
+    .normalize("NFKC")
+    .replace(
+      /[\u{1F600}-\u{1F64F}\u{1F300}-\u{1F5FF}\u{1F680}-\u{1F6FF}\u{1F700}-\u{1F77F}\u{1F780}-\u{1F7FF}\u{1F800}-\u{1F8FF}\u{1F900}-\u{1F9FF}\u{1FA00}-\u{1FA6F}\u{1FA70}-\u{1FAFF}\u{2600}-\u{26FF}\u{2700}-\u{27BF}\u200D\uFE0F]/gu,
+      "",
+    )
+    .replace(/[^\P{C}\n\t\r ]+/gu, ""); // Replace emojis in the selected prompt
 
+  console.log(`Injecting prompt: "${filtered_selectedPrompt}"`);
   const promptInput = document.getElementById(
     "prompt-input",
   ) as HTMLTextAreaElement;
   if (promptInput) {
-    promptInput.value = selectedPrompt; // Inject the selected prompt into the textarea
+    promptInput.value = filtered_selectedPrompt; // Inject the selected prompt into the textarea
   } else {
     console.error("Textarea not found");
   }

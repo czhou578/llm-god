@@ -131,6 +131,8 @@ function createFormWindow() {
     },
   });
 
+  // formWindow.webContents.openDevTools({ mode: "detach" });
+
   formWindow.loadFile(path.join(__dirname, "..", "src", "form.html"));
 }
 
@@ -184,6 +186,7 @@ ipcMain.on("paste-prompt", (_: IpcMainEvent, prompt: string) => {
 
 ipcMain.on("enter-prompt", (_: IpcMainEvent, prompt: string) => {
   // Added type for prompt
+  console.log("Entering prompt:", prompt);
   views.forEach((view: CustomBrowserView) => {
     injectPromptIntoView(view, prompt);
   });

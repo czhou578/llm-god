@@ -1,4 +1,10 @@
 import { WebContentsView } from "electron"; // Added WebPreferences type
+function removeAllEmojis(text) {
+    return text
+        .normalize("NFC")
+        .replace(/[\u{1F600}-\u{1F64F}\u{1F300}-\u{1F5FF}\u{1F680}-\u{1F6FF}\u{1F700}-\u{1F77F}\u{1F780}-\u{1F7FF}\u{1F800}-\u{1F8FF}\u{1F900}-\u{1F9FF}\u{1FA00}-\u{1FA6F}\u{1FA70}-\u{1FAFF}\u{2600}-\u{26FF}\u{2700}-\u{27BF}\u200D\uFE0F]/gu, "")
+        .replace(/[^\P{C}\n\t\r ]+/gu, "");
+}
 /**
  * Creates and configures a new BrowserView for the main window
  * @param mainWindow - The main Electron window
@@ -8,74 +14,67 @@ import { WebContentsView } from "electron"; // Added WebPreferences type
  * @param webPreferences - Optional web preferences for the BrowserView
  * @returns The newly created BrowserView
  */
-export function addBrowserView(
-  mainWindow,
-  url,
-  websites,
-  views,
-  webPreferences = {},
-) {
-  const view = new WebContentsView({
-    webPreferences: {
-      nodeIntegration: false,
-      contextIsolation: true,
-      devTools: true,
-      ...webPreferences,
-    },
-  });
-  view.id = url;
-  mainWindow.contentView.addChildView(view);
-  const { width, height } = mainWindow.getBounds();
-  websites.push(url);
-  const viewWidth = Math.floor(width / websites.length);
-  views.forEach((v, index) => {
-    v.setBounds({
-      x: index * viewWidth,
-      y: 0,
-      width: viewWidth,
-      height: height - 200,
+export function addBrowserView(mainWindow, url, websites, views, webPreferences = {}) {
+    const view = new WebContentsView({
+        webPreferences: {
+            nodeIntegration: false,
+            contextIsolation: true,
+            devTools: true,
+            ...webPreferences,
+        },
     });
-  });
-  view.setBounds({
-    x: (websites.length - 1) * viewWidth,
-    y: 0,
-    width: viewWidth,
-    height: height - 200,
-  });
-  view.webContents.setZoomFactor(1.5);
-  view.webContents.loadURL(url);
-  views.push(view);
-  return view;
+    view.id = url;
+    mainWindow.contentView.addChildView(view);
+    const { width, height } = mainWindow.getBounds();
+    websites.push(url);
+    const viewWidth = Math.floor(width / websites.length);
+    views.forEach((v, index) => {
+        v.setBounds({
+            x: index * viewWidth,
+            y: 0,
+            width: viewWidth,
+            height: height - 200,
+        });
+    });
+    view.setBounds({
+        x: (websites.length - 1) * viewWidth,
+        y: 0,
+        width: viewWidth,
+        height: height - 200,
+    });
+    view.webContents.setZoomFactor(1.5);
+    view.webContents.loadURL(url);
+    views.push(view);
+    return view;
 }
-export function removeBrowserView(
-  mainWindow,
-  viewToRemove, // Changed to viewToRemove for clarity
-  websites,
-  views,
-) {
-  const viewIndex = views.indexOf(viewToRemove);
-  if (viewIndex === -1) return;
-  mainWindow.contentView.removeChildView(viewToRemove);
-  const urlIndex = websites.findIndex((url) => url === viewToRemove.id);
-  if (urlIndex !== -1) {
-    websites.splice(urlIndex, 1);
-  }
-  views.splice(viewIndex, 1);
-  if (views.length === 0) return;
-  const { width, height } = mainWindow.getBounds();
-  const viewWidth = Math.floor(width / views.length);
-  views.forEach((v, index) => {
-    v.setBounds({
-      x: index * viewWidth,
-      y: 0,
-      width: viewWidth,
-      height: height - 200,
+export function removeBrowserView(mainWindow, viewToRemove, // Changed to viewToRemove for clarity
+websites, views) {
+    const viewIndex = views.indexOf(viewToRemove);
+    if (viewIndex === -1)
+        return;
+    mainWindow.contentView.removeChildView(viewToRemove);
+    const urlIndex = websites.findIndex((url) => url === viewToRemove.id);
+    if (urlIndex !== -1) {
+        websites.splice(urlIndex, 1);
+    }
+    views.splice(viewIndex, 1);
+    if (views.length === 0)
+        return;
+    const { width, height } = mainWindow.getBounds();
+    const viewWidth = Math.floor(width / views.length);
+    views.forEach((v, index) => {
+        v.setBounds({
+            x: index * viewWidth,
+            y: 0,
+            width: viewWidth,
+            height: height - 200,
+        });
     });
-  });
 }
 export function injectPromptIntoView(view, prompt) {
-  if (view.id && view.id.match("chatgpt")) {
-    view.webContents.executeJavaScript(`
+    prompt = removeAllEmojis(prompt); // Normalize and remove emojis
+    if (view.id && view.id.match("chatgpt")) {
+        view.webContents.executeJavaScript(`
             (function() {
                 const inputElement = document.querySelector('#prompt-textarea > p');
                 if (inputElement) {
@@ -85,8 +84,9 @@ export function injectPromptIntoView(view, prompt) {
                 }
             })();
         `);
-  } else if (view.id && view.id.match("bard")) {
-    view.webContents.executeJavaScript(`
+    }
+    else if (view.id && view.id.match("bard")) {
+        view.webContents.executeJavaScript(`
             {
                 var inputElement = document.querySelector(".ql-editor.textarea");
                 if (inputElement) {
@@ -97,8 +97,9 @@ export function injectPromptIntoView(view, prompt) {
                 }
             }
         `);
-  } else if (view.id && view.id.match("perplexity")) {
-    view.webContents.executeJavaScript(`
+    }
+    else if (view.id && view.id.match("perplexity")) {
+        view.webContents.executeJavaScript(`
             var inputElement = document.querySelector('textarea[placeholder*="Ask"]');
             if (inputElement) {
                 var nativeTextAreaValueSetter = Object.getOwnPropertyDescriptor(window.HTMLTextAreaElement.prototype, "value").set;
@@ -107,8 +108,9 @@ export function injectPromptIntoView(view, prompt) {
                 inputElement.dispatchEvent(event);
             }
         `);
-  } else if (view.id && view.id.match("claude")) {
-    view.webContents.executeJavaScript(`
+    }
+    else if (view.id && view.id.match("claude")) {
+        view.webContents.executeJavaScript(`
             {
                 var inputElement = document.querySelector('div.ProseMirror');
                 if (inputElement) {
@@ -116,8 +118,9 @@ export function injectPromptIntoView(view, prompt) {
                 }
             }
         `);
-  } else if (view.id && view.id.match("grok")) {
-    view.webContents.executeJavaScript(`
+    }
+    else if (view.id && view.id.match("grok")) {
+        view.webContents.executeJavaScript(`
             {
                 var inputElement = document.querySelector('textarea');
                 if (inputElement) {
@@ -132,8 +135,9 @@ export function injectPromptIntoView(view, prompt) {
                 }
             }
         `);
-  } else if (view.id && view.id.match("deepseek")) {
-    view.webContents.executeJavaScript(`
+    }
+    else if (view.id && view.id.match("deepseek")) {
+        view.webContents.executeJavaScript(`
             {
                 var inputElement = document.querySelector('textarea');
                 if (inputElement) {
@@ -144,11 +148,11 @@ export function injectPromptIntoView(view, prompt) {
                 }
             }
         `);
-  }
+    }
 }
 export function sendPromptInView(view) {
-  if (view.id && view.id.match("chatgpt")) {
-    view.webContents.executeJavaScript(`
+    if (view.id && view.id.match("chatgpt")) {
+        view.webContents.executeJavaScript(`
             var btn = document.querySelector('button[aria-label*="Send prompt"]');
             if (btn) {
                 btn.focus();
@@ -156,8 +160,9 @@ export function sendPromptInView(view) {
                 btn.click();
             }
         `);
-  } else if (view.id && view.id.match("bard")) {
-    view.webContents.executeJavaScript(`{
+    }
+    else if (view.id && view.id.match("bard")) {
+        view.webContents.executeJavaScript(`{
       var btn = document.querySelector("button[aria-label*='Send message']");
       if (btn) {
         btn.setAttribute("aria-disabled", "false");
@@ -165,8 +170,9 @@ export function sendPromptInView(view) {
         btn.click();
       }
     }`);
-  } else if (view.id && view.id.match("perplexity")) {
-    view.webContents.executeJavaScript(`
+    }
+    else if (view.id && view.id.match("perplexity")) {
+        view.webContents.executeJavaScript(`
                 {
         var buttons = Array.from(document.querySelectorAll('button.bg-super'));
         if (buttons[0]) {
@@ -176,8 +182,9 @@ export function sendPromptInView(view) {
         }
       }
                 `);
-  } else if (view.id && view.id.match("claude")) {
-    view.webContents.executeJavaScript(`{
+    }
+    else if (view.id && view.id.match("claude")) {
+        view.webContents.executeJavaScript(`{
     var btn = document.querySelector("button[aria-label*='Send message']");
     if (!btn) var btn = document.querySelector('button:has(div svg)');
     if (!btn) var btn = document.querySelector('button:has(svg)');
@@ -187,8 +194,9 @@ export function sendPromptInView(view) {
       btn.click();
     }
   }`);
-  } else if (view.id && view.id.match("grok")) {
-    view.webContents.executeJavaScript(`
+    }
+    else if (view.id && view.id.match("grok")) {
+        view.webContents.executeJavaScript(`
         {
         var btn = document.querySelector('button[aria-label*="Submit"]');
         if (btn) {
@@ -199,8 +207,9 @@ export function sendPromptInView(view) {
             console.log("Element not found");
           }
       }`);
-  } else if (view.id && view.id.match("deepseek")) {
-    view.webContents.executeJavaScript(`
+    }
+    else if (view.id && view.id.match("deepseek")) {
+        view.webContents.executeJavaScript(`
         {
         var buttons = Array.from(document.querySelectorAll('div[role="button"]'));
         var btn = buttons[2]
@@ -212,5 +221,5 @@ export function sendPromptInView(view) {
             console.log("Element not found");
           }
     }`);
-  }
+    }
 }
