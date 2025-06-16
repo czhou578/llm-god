@@ -43,7 +43,8 @@ const __dirname = path.dirname(__filename);
 const websites: string[] = [
   "https://chatgpt.com/",
   "https://bard.google.com",
-  "https://www.perplexity.ai/",
+  // "https://www.perplexity.ai/",
+  "https://lmarena.ai/?mode=direct"
 ];
 
 function createWindow(): void {
@@ -83,7 +84,7 @@ function createWindow(): void {
       width: viewWidth,
       height: height - 235,
     });
-    // view.webContents.openDevTools({ mode: "detach" });
+    view.webContents.openDevTools({ mode: "detach" });
     view.webContents.setZoomFactor(1);
     view.webContents.loadURL(url);
 
