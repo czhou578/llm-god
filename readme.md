@@ -11,13 +11,14 @@ Currently, the following LLM web interfaces are supported:
 - ChatGPT
 - Google Gemini
 - Anthropic Claude
+- LMArena
 - Perplexity
 - X.ai Grok
 - DeepSeek
 
 ## Downloading the App for Personal Use
 
-Go to the Releases section, and download the .exe. It is going to say that Microsoft has flagged this as untrusted. Windows codesigning has not
+Go to the Releases section, and download the Setup.exe. It is going to say that Microsoft has flagged this as untrusted. Windows codesigning has not
 been done yet, so for now, ignore the warning and proceed to installation.
 
 The app should open immediately after you bypass the warning and you can add the desktop shortcut to your computer!
@@ -95,3 +96,4 @@ Please check out the Issues tab for existing issues to tackle, and feel free to 
 ## Updates
 
 5/17: Migrated to using TypeScript across the app.
+6/15: Added support for LMArena and also for adding custom prompts that can be saved.
