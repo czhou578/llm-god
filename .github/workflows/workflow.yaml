@@ -77,6 +77,6 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: ./out/make/squirrel.windows/x64/*.nupkg # Path to the .nupkg file
+          asset_path: ./out/make/squirrel.windows/x64/llm-god-0.1.0-full.nupkg # Path to the .nupkg file
           asset_name: llm-god.nupkg # Replace with your app's name
           asset_content_type: application/octet-stream
