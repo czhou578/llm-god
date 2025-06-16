@@ -56,7 +56,7 @@ function createWindow() {
             width: viewWidth,
             height: height - 235,
         });
-        view.webContents.openDevTools({ mode: "detach" });
+        // view.webContents.openDevTools({ mode: "detach" });
         view.webContents.setZoomFactor(1);
         view.webContents.loadURL(url);
         views.push(view);
