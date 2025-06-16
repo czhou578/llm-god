@@ -11,5 +11,5 @@ module.exports = {
       name: "@electron-forge/maker-squirrel",
     },
   ],
-  files: ["**/*", "!*.log", ],
+  files: ["**/*", "!*.log"],
 };

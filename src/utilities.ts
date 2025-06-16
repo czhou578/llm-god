@@ -178,7 +178,8 @@ export function injectPromptIntoView(
                     inputElement.dispatchEvent(inputEvent);
                 }
         }
-    `)}
+    `);
+  }
 }
 
 export function sendPromptInView(view: CustomBrowserView) {
@@ -241,7 +242,6 @@ export function sendPromptInView(view: CustomBrowserView) {
         var btn = buttons[2]
         if (btn) {
             btn.focus();
-            // btn.disabled = false; // 'disabled' might not be applicable for div role="button"
             btn.click();
           } else {
             console.log("Element not found");

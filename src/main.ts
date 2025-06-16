@@ -43,8 +43,7 @@ const __dirname = path.dirname(__filename);
 const websites: string[] = [
   "https://chatgpt.com/",
   "https://bard.google.com",
-  // "https://www.perplexity.ai/",
-  "https://lmarena.ai/?mode=direct"
+  "https://www.perplexity.ai/",
 ];
 
 function createWindow(): void {
@@ -221,7 +220,7 @@ ipcMain.on("open-lm-arena", (_, prompt: string) => {
     let url = "https://lmarena.ai/?mode=direct";
     addBrowserView(mainWindow, url, websites, views);
   }
-})
+});
 
 ipcMain.on("close-lm-arena", (_, prompt: string) => {
   if (prompt === "close lm arena now") {

@@ -21,8 +21,7 @@ const __dirname = path.dirname(__filename);
 const websites = [
     "https://chatgpt.com/",
     "https://bard.google.com",
-    // "https://www.perplexity.ai/",
-    "https://lmarena.ai/?mode=direct"
+    "https://www.perplexity.ai/",
 ];
 function createWindow() {
     mainWindow = new BrowserWindow({

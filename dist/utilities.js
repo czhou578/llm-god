@@ -221,7 +221,6 @@ export function sendPromptInView(view) {
         var btn = buttons[2]
         if (btn) {
             btn.focus();
-            // btn.disabled = false; // 'disabled' might not be applicable for div role="button"
             btn.click();
           } else {
             console.log("Element not found");
