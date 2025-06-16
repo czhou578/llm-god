@@ -40,7 +40,7 @@ jobs:
         run: npm run make
         env:
           # Optional: If electron-forge needs GitHub token for publishing
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       # Step 7: Upload the built artifact
       - name: Upload artifact
@@ -52,7 +52,7 @@ jobs:
       - name: Create GitHub Release
         uses: actions/create-release@v1
         env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           tag_name: ${{ github.run_number }} # Use the workflow run number as the tag
           release_name: "Release ${{ github.run_number }}"
@@ -62,7 +62,7 @@ jobs:
       - name: Upload Setup.exe
         uses: actions/upload-release-asset@v1
         env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
           asset_path: ./out/make/squirrel.windows/x64/Setup.exe # Path to the Setup.exe file
@@ -73,7 +73,7 @@ jobs:
       - name: Upload .nupkg File
         uses: actions/upload-release-asset@v1
         env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
           asset_path: ./out/make/squirrel.windows/x64/*.nupkg # Path to the .nupkg file
