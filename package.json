@@ -1,5 +1,5 @@
 {
-  "name": "app",
+  "name": "llm-god",
   "version": "0.1.0",
   "private": true,
   "type": "module",
@@ -25,8 +25,8 @@
   },
   "devDependencies": {
     "@electron-forge/cli": "^7.4.0",
-    "@electron-forge/maker-squirrel": "^7.4.0",
     "@electron-forge/maker-appx": "^7.4.0",
+    "@electron-forge/maker-squirrel": "^7.8.1",
     "@types/electron": "^1.4.38",
     "@types/electron-localshortcut": "^3.1.3",
     "@types/node": "^22.15.18",
