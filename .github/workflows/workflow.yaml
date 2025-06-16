@@ -66,8 +66,8 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: ./out/make/squirrel.windows/x64/Setup.exe # Path to the Setup.exe file
-          asset_name: Setup.exe
+          asset_path: ./out/make/squirrel.windows/x64/llm-god-setup.exe # Path to the Setup.exe file
+          asset_name: llm-god-setup.exe
           asset_content_type: application/octet-stream
 
       # Step 7: Upload the .nupkg file to the release
@@ -78,5 +78,5 @@ jobs:
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
           asset_path: ./out/make/squirrel.windows/x64/*.nupkg # Path to the .nupkg file
-          asset_name: YourAppName.nupkg # Replace with your app's name
+          asset_name: llm-god.nupkg # Replace with your app's name
           asset_content_type: application/octet-stream
