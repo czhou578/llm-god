@@ -2,7 +2,7 @@ name: Build and Release
 
 on:
   push:
-    branches: [master, release-action]
+    branches: [master]
     tags:
       - "v*.*.*" # Trigger on tags like v1.0.0 for releases
   pull_request:
