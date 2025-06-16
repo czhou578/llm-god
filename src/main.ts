@@ -214,20 +214,20 @@ ipcMain.on("delete-prompt-by-value", (event, value: string) => {
   }
 });
 
-ipcMain.on("open-perplexity", (_, prompt: string) => {
-  if (prompt === "open perplexity now") {
-    console.log("Opening Perplexity");
-    let url = "https://www.perplexity.ai/";
+ipcMain.on("open-lm-arena", (_, prompt: string) => {
+  if (prompt === "open lm arena now") {
+    console.log("Opening LMArena");
+    let url = "https://lmarena.ai/?mode=direct";
     addBrowserView(mainWindow, url, websites, views);
   }
 });
 
-ipcMain.on("close-perplexity", (_, prompt: string) => {
-  if (prompt === "close perplexity now") {
-    console.log("Closing Perplexity");
-    const perplexityView = views.find((view) => view.id.match("perplexity"));
-    if (perplexityView) {
-      removeBrowserView(mainWindow, perplexityView, websites, views);
+ipcMain.on("close-lm-arena", (_, prompt: string) => {
+  if (prompt === "close lm arena now") {
+    console.log("Closing LMArena");
+    const lmArenaView = views.find((view) => view.id.match("lmarena"));
+    if (lmArenaView) {
+      removeBrowserView(mainWindow, lmArenaView, websites, views);
     }
   }
 });

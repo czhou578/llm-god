@@ -167,6 +167,18 @@ export function injectPromptIntoView(
                 }
             }
         `);
+  } else if (view.id && view.id.match("lmarena")) {
+    view.webContents.executeJavaScript(`
+            {
+                var inputElement = document.querySelector('textarea');
+                if (inputElement) {
+                    var nativeTextAreaValueSetter = Object.getOwnPropertyDescriptor(window.HTMLTextAreaElement.prototype, "value").set;
+                    nativeTextAreaValueSetter.call(inputElement, \`${prompt}\`);
+                    const inputEvent = new Event('input', { bubbles: true });
+                    inputElement.dispatchEvent(inputEvent);
+                }
+        }
+    `);
   }
 }
 
@@ -230,7 +242,18 @@ export function sendPromptInView(view: CustomBrowserView) {
         var btn = buttons[2]
         if (btn) {
             btn.focus();
-            // btn.disabled = false; // 'disabled' might not be applicable for div role="button"
+            btn.click();
+          } else {
+            console.log("Element not found");
+          }
+    }`);
+  } else if (view.id && view.id.match("lmarena")) {
+    view.webContents.executeJavaScript(`
+        {
+        var btn = document.querySelector('button[type="submit"]');
+        if (btn) {
+            btn.focus();
+            btn.disabled = false;
             btn.click();
           } else {
             console.log("Element not found");
