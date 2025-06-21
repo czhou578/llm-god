@@ -28,9 +28,10 @@
         background-color: #f0f0f0;
         height: auto;
         padding: 10px;
-        min-height: 100px; /* Ensure a minimum height */
-        max-height: 30%; /* Prevent it from taking too much space */
+        min-height: 120px; /* Ensure a minimum height */
+        max-height: 40%; /* Prevent it from taking too much space */
         position: relative; /* Add this to create a new stacking context */
+        align-items: flex-start; /* Align children to the top */
       }
 
       #prompt-input {
@@ -39,39 +40,56 @@
         font-family: "Times New Roman", Times, serif;
         line-height: 1.5;
         width: 88%;
-        height: 98%;
+        height: 100%;
       }
 
-      .dropdown {
-        position: relative;
+      /* Group dropdown and prompt-picker vertically */
+      .button-group {
+        display: flex;
+        flex-direction: column;
+        align-items: flex-start; /* Align to the right */
         width: 10%;
         margin-left: auto;
         margin-right: 10px;
+        gap: 10px; /* Space between buttons */
       }
 
-      #dropdown-button {
-        height: 50px;
+      .dropdown,
+      .prompt-picker {
         width: 100%;
+        position: relative;
+      }
+
+      #dropdown-button,
+      .prompt-select {
+        width: 100%;
+        height: 50px;
         font-size: 18px;
-        cursor: pointer;
-        background-color: #f0f0f0;
-        border: 1px solid #ccc;
+        padding: 10px;
+        border: 2px solid #ccc;
         border-radius: 4px;
+        background-color: #f0f0f0;
+        cursor: pointer;
+        box-sizing: border-box;
+        display: block;
+        text-align: center;
+        font-weight: bold;
       }
 
       .dropdown-content {
         display: none;
         position: absolute;
-        top: 30%; /* Changed to appear directly below button */
-        left: 0;
-        width: 100%;
+        top: 100%;
+        left: 5%;
+        width: 90%; /* Half the width of the button */
         background-color: #f9f9f9;
         box-shadow: 0px 8px 16px 0px rgba(0, 0, 0, 0.2);
-        border: 3px solid #0078d7;
+        border: 2px solid #0078d7;
         border-radius: 8px;
         padding: 4px;
-        max-height: 120px;
-        overflow-y: scroll;
+        max-height: 110px;
+        overflow-y: auto;
+        z-index: 1000; /* Ensure it's above other elements */
       }
 
       .dropdown-item {
@@ -87,15 +105,22 @@
         box-sizing: border-box;
         margin: 0;
         margin-bottom: 5px;
-        font-size: 18px;
+        font-size: 16px;
       }
 
       .dropdown-item:hover {
         background-color: #ddd;
       }
 
+      /* Remove any margins that might affect layout */
+      .prompt-picker {
+        margin: 0;
+      }
+
+      /* Ensure the dropdown doesn't affect layout when shown */
       .show {
         display: block;
+        position: absolute;
       }
     </style>
     <script>
@@ -108,13 +133,19 @@
 
   <body>
     <div id="prompt-area">
-      <textarea id="prompt-input" rows="3"></textarea>
-      <div class="dropdown">
-        <button id="dropdown-button">Show Models ▼</button>
-        <div class="dropdown-content">
-          <div class="dropdown-item" id="showClaude">Show Claude</div>
-          <div class="dropdown-item" id="showGrok">Show Grok</div>
-          <div class="dropdown-item" id="showDeepSeek">Show DeepSeek</div>
+      <textarea id="prompt-input" rows="3" placeholder="Press Ctrl + Enter to send prompt"></textarea>
+      <div class="button-group">
+        <div class="dropdown">
+          <button id="dropdown-button">Show Models ▼</button>
+          <div class="dropdown-content">
+            <div class="dropdown-item" id="showLMArena">Show LMArena</div>
+            <div class="dropdown-item" id="showClaude">Show Claude</div>
+            <div class="dropdown-item" id="showGrok">Show Grok</div>
+            <div class="dropdown-item" id="showDeepSeek">Show DeepSeek</div>
+          </div>
+        </div>
+        <div class="prompt-picker">
+          <button class="prompt-select">Select Prompts</button>
         </div>
       </div>
     </div>

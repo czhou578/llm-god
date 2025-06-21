@@ -2,7 +2,10 @@
 
 ## Screenshot
 
-![Screenshot](./image.png)
+
+![image](https://github.com/user-attachments/assets/edb2c89f-2cf9-422f-860f-33d6524c074e)
+
+
 
 This is a desktop app for Windows machines only (currently) that allows users to simultaneously prompt multiple LLM's at once in one environment. I use this app every day, for coding or non coding purposes. It has saved me countless hours of copypasting and is just so much more efficient.
 
@@ -11,13 +14,14 @@ Currently, the following LLM web interfaces are supported:
 - ChatGPT
 - Google Gemini
 - Anthropic Claude
+- LMArena
 - Perplexity
 - X.ai Grok
 - DeepSeek
 
 ## Downloading the App for Personal Use
 
-Go to the Releases section, and download the .exe. It is going to say that Microsoft has flagged this as untrusted. Windows codesigning has not
+Go to the Releases section, and download the Setup.exe. It is going to say that Microsoft has flagged this as untrusted. Windows codesigning has not
 been done yet, so for now, ignore the warning and proceed to installation.
 
 The app should open immediately after you bypass the warning and you can add the desktop shortcut to your computer!
@@ -61,6 +65,18 @@ npm install
 npm run start
 ```
 
+When developing, instead of running the command above, I like to have two terminals open. One terminal should run the command:
+
+```
+npx tsc --watch
+```
+
+and the other terminal should run the command:
+
+```
+npx electronmon dist/main.js
+```
+
 4. To check if the build works properly, run the following command in the root folder
 
 ```
@@ -83,3 +99,4 @@ Please check out the Issues tab for existing issues to tackle, and feel free to 
 ## Updates
 
 5/17: Migrated to using TypeScript across the app.
+6/15: Added support for LMArena and also for adding custom prompts that can be saved.

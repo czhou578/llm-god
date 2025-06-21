@@ -1,5 +1,5 @@
 {
-  "name": "app",
+  "name": "llm-god",
   "version": "0.1.0",
   "private": true,
   "type": "module",
@@ -7,7 +7,6 @@
   "author": "Colin Zhou",
   "description": "Prompt multiple LLM's at the same time!",
   "scripts": {
-    "dev": "next dev",
     "build": "tsc",
     "start": "npm run build && electron .",
     "prettier": "prettier -w .",
@@ -20,18 +19,20 @@
     "@electron/remote": "^2.1.2",
     "electron-localshortcut": "^3.2.1",
     "electron-squirrel-startup": "^1.0.1",
-    "electron-store": "^10.0.0",
+    "electron-store": "^8.2.0",
     "jest-environment-jsdom": "^29.7.0",
     "prettier": "^3.3.3"
   },
   "devDependencies": {
     "@electron-forge/cli": "^7.4.0",
-    "@electron-forge/maker-squirrel": "^7.4.0",
+    "@electron-forge/maker-appx": "^7.4.0",
+    "@electron-forge/maker-squirrel": "^7.8.1",
     "@types/electron": "^1.4.38",
     "@types/electron-localshortcut": "^3.1.3",
     "@types/node": "^22.15.18",
     "electron": "^31.2.1",
     "electron-reload": "^2.0.0-alpha.1",
+    "electronmon": "^2.0.3",
     "jest": "^29.7.0",
     "typescript": "^5.8.3"
   }

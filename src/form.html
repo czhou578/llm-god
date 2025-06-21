@@ -1,0 +1,206 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <title>Prompt Templates</title>
+    <style>
+      body {
+        font-family: "Segoe UI", Arial, sans-serif;
+        background-color: #f0f0f0;
+        margin: 0;
+        padding: 0;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
+        width: 100vw;
+        overflow-x: hidden; /* Remove horizontal scrollbar */
+      }
+
+      .form-container {
+        background-color: white;
+        padding: 25px;
+        border-radius: 8px;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        width: 100%;
+        height: 100%; /* Cover entire modal window */
+        max-width: none; /* Remove max-width constraint */
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: flex-start; /* Align items to the top */
+      }
+
+      h1 {
+        color: #333;
+        margin-bottom: 20px;
+        font-size: 24px;
+        text-align: center;
+      }
+
+      h2 {
+        color: #333;
+        margin-bottom: 15px;
+        font-size: 20px;
+        text-align: center;
+      }
+
+      form,
+      #prompt-picker {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 15px;
+        width: 90%;
+      }
+
+      textarea {
+        width: 100%;
+        min-height: 200px;
+        padding: 12px;
+        border: 2px solid #e0e0e0;
+        border-radius: 6px;
+        font-size: 16px;
+        transition: border-color 0.3s ease;
+        resize: vertical;
+        font-family: "Segoe UI", Arial, sans-serif;
+        line-height: 1.5;
+        margin: 15px 0;
+      }
+
+      textarea:focus {
+        outline: none;
+        border-color: #0078d7;
+        box-shadow: 0 0 0 1px #0078d7;
+      }
+
+      button {
+        background-color: #0078d7; /* Default background color */
+        color: white; /* Text color */
+        padding: 12px;
+        border: none;
+        border-radius: 6px;
+        font-size: 16px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: background-color 0.3s ease;
+        width: 50%; /* Make button width proportional */
+        min-width: 120px; /* Ensure minimum width */
+      }
+
+      button:hover {
+        background-color: #006cbd; /* Darker blue on hover */
+      }
+
+      button:active {
+        transform: scale(0.98); /* Slightly shrink on click */
+      }
+
+      button:disabled {
+        background-color: #add8e6; /* Light blue when disabled */
+        color: #ffffff; /* Ensure text is readable */
+        cursor: not-allowed; /* Change cursor to indicate disabled state */
+      }
+
+      .prompt-table {
+        max-height: 300px; /* Set maximum height */
+        overflow-y: auto; /* Add vertical scroll bar if content exceeds max height */
+        display: block;
+        width: 100%; /* Maintain full width */
+        border-collapse: collapse;
+        overflow-x: hidden;
+      }
+
+      .prompt-table tr {
+        display: table; /* Ensure rows behave like table rows */
+        width: 100%; /* Ensure rows take full width */
+        table-layout: fixed; /* Fix the layout to prevent shrinking */
+      }
+
+      .prompt-table th,
+      .prompt-table td {
+        border: 1px solid #ddd;
+        padding: 8px;
+        text-align: left;
+      }
+
+      .prompt-table td {
+        position: relative; /* Position relative to contain the action buttons */
+        width: 100%; /* Ensure cells take full width */
+        word-wrap: break-word; /* Wrap long text to prevent overflow */
+        text-align: left; /* Align text to the left */
+        padding: 8px; /* Add padding for better readability */
+        border: 1px solid #ddd; /* Add border for better visibility */
+      }
+
+      .row-actions {
+        position: absolute;
+        top: 50%;
+        right: 8px;
+        transform: translateY(-50%);
+        display: none; /* Hidden by default */
+        gap: 5px; /* Add spacing between buttons */
+      }
+
+      .prompt-table tr:hover .row-actions {
+        display: flex; /* Show the buttons when the row is hovered */
+      }
+
+      .edit-button,
+      .delete-button {
+        background: none;
+        border: none;
+        cursor: pointer;
+        font-size: 16px;
+        padding: 4px;
+        border-radius: 4px;
+        transition: background-color 0.3s ease;
+      }
+
+      .edit-button:hover {
+        background-color: #e0f7fa; /* Light blue background on hover */
+      }
+
+      .delete-button:hover {
+        background-color: #ffebee; /* Light red background on hover */
+      }
+
+      .prompt-table tr.selected {
+        background-color: #d1e7fd; /* Highlight color for selected row */
+      }
+
+      .prompt-table tr:hover {
+        background-color: #f1f1f1;
+        cursor: pointer;
+      }
+
+      .choose-prompt-button:hover {
+        background-color: #218838;
+      }
+
+      .choose-prompt-button:active {
+        transform: scale(0.98);
+      }
+    </style>
+  </head>
+  <body>
+    <div class="form-container">
+      <h2>Existing Prompts</h2>
+      <div id="prompt-picker" class="prompt-picker">
+        <table class="prompt-table"></table>
+        <button class="choose-prompt-button" disabled>Choose Prompt</button>
+      </div>
+      <h2 style="text-align: center">Create Prompt Template</h2>
+      <form id="form">
+        <textarea
+          id="template-content"
+          placeholder="Enter your favorite prompt template here..."
+          spellcheck="true"
+          style="display: block; margin: 0 auto"
+        ></textarea>
+        <button type="submit" disabled>Save Template</button>
+      </form>
+    </div>
+    <script src="../dist/save_prompt.js"></script>
+  </body>
+</html>

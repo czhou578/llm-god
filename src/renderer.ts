@@ -28,6 +28,14 @@ export function closeGrokMessage(message: string): void {
   ipcRenderer.send("close-grok", message);
 }
 
+export function openLMArena(message: string): void {
+  ipcRenderer.send("open-lm-arena", message);
+}
+
+export function closeLMArena(message: string): void {
+  ipcRenderer.send("close-lm-arena", message);
+}
+
 const textArea = document.getElementById(
   "prompt-input",
 ) as HTMLTextAreaElement | null;
@@ -39,6 +47,14 @@ const openGrokButton = document.getElementById(
 ) as HTMLButtonElement | null;
 const openDeepSeekButton = document.getElementById(
   "showDeepSeek",
+) as HTMLButtonElement | null;
+
+const openLMArenaButton = document.getElementById(
+  "showLMArena",
+) as HTMLButtonElement | null;
+
+const promptDropdownButton = document.querySelector(
+  ".prompt-select",
 ) as HTMLButtonElement | null;
 
 if (openClaudeButton) {
@@ -77,6 +93,18 @@ if (openDeepSeekButton) {
   });
 }
 
+if (openLMArenaButton) {
+  openLMArenaButton.addEventListener("click", (event: MouseEvent) => {
+    if (openLMArenaButton.textContent === "Show LMArena") {
+      openLMArena("open lm arena now");
+      openLMArenaButton.textContent = "Hide LMArena";
+    } else {
+      closeLMArena("close lm arena now");
+      openLMArenaButton.textContent = "Show LMArena";
+    }
+  });
+}
+
 if (textArea) {
   textArea.addEventListener("input", (event: Event) => {
     logToWebPage((event.target as HTMLTextAreaElement).value);
@@ -93,3 +121,24 @@ if (textArea) {
     }
   });
 }
+
+if (promptDropdownButton) {
+  promptDropdownButton.addEventListener("click", (event: MouseEvent) => {
+    console.log("Prompt dropdown button clicked");
+    event.stopPropagation();
+    ipcRenderer.send("open-form-window");
+  });
+}
+
+ipcRenderer.on("inject-prompt", (event, selectedPrompt: string) => {
+  console.log("Injecting prompt into textarea:", selectedPrompt);
+
+  const promptInput = document.getElementById(
+    "prompt-input",
+  ) as HTMLTextAreaElement;
+  if (promptInput) {
+    promptInput.value = selectedPrompt; // Inject the selected prompt into the textarea
+  } else {
+    console.error("Textarea not found");
+  }
+});
