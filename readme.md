@@ -2,10 +2,7 @@
 
 ## Screenshot
 
-
 ![image](https://github.com/user-attachments/assets/edb2c89f-2cf9-422f-860f-33d6524c074e)
-
-
 
 This is a desktop app for Windows machines only (currently) that allows users to simultaneously prompt multiple LLM's at once in one environment. I use this app every day, for coding or non coding purposes. It has saved me countless hours of copypasting and is just so much more efficient.
 

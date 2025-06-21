@@ -125,12 +125,12 @@ function createFormWindow() {
     parent: mainWindow,
     modal: true,
     webPreferences: {
-      preload: path.join(__dirname, "..", "dist", "form_preload.js"), // Use the same preload script
+      preload: path.join(__dirname, "..", "dist", "form_preload.cjs"), // Use the same preload script
       nodeIntegration: false,
       contextIsolation: true,
     },
   });
-
+  formWindow.webContents.openDevTools({ mode: "detach" });
   formWindow.loadFile(path.join(__dirname, "..", "src", "form.html"));
 }
 

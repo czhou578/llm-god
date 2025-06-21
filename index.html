@@ -3,9 +3,9 @@
   <head>
     <meta charset="utf-8" />
     <meta
-    http-equiv="Content-Security-Policy"
-    content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline';"
-  />
+      http-equiv="Content-Security-Policy"
+      content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline';"
+    />
     <title>Multi-LLM Interface</title>
     <style>
       * {
@@ -133,7 +133,11 @@
 
   <body>
     <div id="prompt-area">
-      <textarea id="prompt-input" rows="3" placeholder="Press Ctrl + Enter to send prompt"></textarea>
+      <textarea
+        id="prompt-input"
+        rows="3"
+        placeholder="Press Ctrl + Enter to send prompt"
+      ></textarea>
       <div class="button-group">
         <div class="dropdown">
           <button id="dropdown-button">Show Models ▼</button>
