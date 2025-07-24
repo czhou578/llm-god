@@ -12,8 +12,10 @@ if (require("electron-squirrel-startup"))
     app.quit();
 remote.initialize();
 let mainWindow;
+let overlayWindow;
 let formWindow; // Allow formWindow to be null
 let pendingRowSelectedKey = null; // Store the key of the selected row for later use
+let isInitialSetupComplete = false;
 const views = [];
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -29,6 +31,7 @@ function createWindow() {
         height: 1100,
         center: true,
         backgroundColor: "#000000",
+        show: false, // Start hidden to prevent visual flash
         webPreferences: {
             preload: path.join(__dirname, "preload.cjs"), // This will point to dist/preload.js at runtime
             nodeIntegration: true,
@@ -37,6 +40,31 @@ function createWindow() {
         },
     });
     remote.enable(mainWindow.webContents);
+    // Create the overlay window immediately, but keep it hidden.
+    overlayWindow = new BrowserWindow({
+        parent: mainWindow,
+        frame: false,
+        transparent: true,
+        alwaysOnTop: true,
+        show: false, // Keep it hidden initially
+        focusable: false,
+        webPreferences: {
+            nodeIntegration: true,
+            contextIsolation: false,
+        },
+    });
+    overlayWindow.loadFile(path.join(__dirname, "..", "src", "overlay.html"));
+    // Use 'ready-to-show' to display windows gracefully.
+    mainWindow.once("ready-to-show", () => {
+        mainWindow.show();
+        // Now that the main window is visible, match the overlay's size and show it.
+        overlayWindow.setBounds(mainWindow.getBounds());
+        overlayWindow.show();
+        // Mark initial setup as complete after a short delay
+        setTimeout(() => {
+            isInitialSetupComplete = true;
+        }, 500);
+    });
     mainWindow.loadFile(path.join(__dirname, "..", "index.html")); // Changed to point to root index.html
     // mainWindow.webContents.openDevTools({ mode: "detach" });
     const viewWidth = Math.floor(mainWindow.getBounds().width / websites.length);
@@ -62,28 +90,42 @@ function createWindow() {
         views.push(view);
     });
     mainWindow.on("enter-full-screen", () => {
+        overlayWindow.show();
         updateZoomFactor();
     });
+    mainWindow.on("blur", () => {
+        // Only hide the overlay if the initial setup is done
+        if (overlayWindow && isInitialSetupComplete) {
+            overlayWindow.hide();
+        }
+    });
     mainWindow.on("focus", () => {
-        mainWindow.webContents.invalidate();
+        if (overlayWindow) {
+            overlayWindow.show();
+        }
     });
     let resizeTimeout;
     mainWindow.on("resize", () => {
         clearTimeout(resizeTimeout);
         resizeTimeout = setTimeout(() => {
-            const { width, height } = mainWindow.getBounds();
-            const viewWidth = Math.floor(width / websites.length);
+            const bounds = mainWindow.getBounds();
+            // Also resize the overlay to match the main window
+            if (overlayWindow) {
+                overlayWindow.setBounds(bounds);
+            }
+            const viewWidth = Math.floor(bounds.width / websites.length);
             views.forEach((view, index) => {
                 view.setBounds({
                     x: index * viewWidth,
                     y: 0,
                     width: viewWidth,
-                    height: height - 200,
+                    height: bounds.height - 200,
                 });
             });
             updateZoomFactor();
         }, 200);
     });
+    // This logic has been moved up and placed inside the 'ready-to-show' event.
 }
 function createFormWindow() {
     formWindow = new BrowserWindow({
