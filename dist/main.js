@@ -48,6 +48,7 @@ function createWindow() {
         alwaysOnTop: true,
         show: false, // Keep it hidden initially
         focusable: false,
+        skipTaskbar: true,
         webPreferences: {
             nodeIntegration: true,
             contextIsolation: false,
