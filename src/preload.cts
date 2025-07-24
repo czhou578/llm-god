@@ -1,20 +1,95 @@
-import { ipcRenderer } from "electron"; // Use import for .cts, it will be compiled to require
+// Use require for compatibility with all Electron contexts
+const { contextBridge, ipcRenderer } = require("electron");
 
 // Define the structure on the window object for TypeScript
 declare global {
   interface Window {
     electron: {
       ipcRenderer: typeof ipcRenderer;
+      view_ipcRenderer?: any;
     };
   }
 }
 
-// Expose ipcRenderer to the window object.
-// This is possible because contextIsolation is false in your mainWindow webPreferences.
-window.electron = {
-  ipcRenderer: ipcRenderer,
-};
+// Simple check: if contextBridge exists and we can't directly access window,
+// we're in context isolation mode
+const canAccessWindow = (() => {
+  try {
+    return typeof window !== 'undefined';
+  } catch (e) {
+    return false;
+  }
+})();
 
-window.addEventListener("DOMContentLoaded", () => {
-  document.body.style.backgroundColor = "black";
-});
+const hasContextBridge = typeof contextBridge !== 'undefined';
+
+if (hasContextBridge && canAccessWindow) {
+  // We're in context isolation mode (secure contexts)
+  // Default to form functionality, let the URL detection happen at runtime
+  contextBridge.exposeInMainWorld("electron", {
+    ipcRenderer: {
+      send: (channel: string, data: any) => {
+        const validChannels = [
+          "save-prompt",
+          "open-form-window",
+          "enter-prompt",
+          "inject-prompt",
+          "send-prompt",
+          "delete-prompt-by-value",
+          "row-selected",
+          "paste-prompt",
+          "update-prompt",
+          "edit-prompt-ready",
+          "close-form-window",
+          "open-edit-view",
+          "close-edit-window",
+          "open-claude",
+          "close-claude",
+          "open-deepseek",
+          "close-deepseek",
+          "open-grok",
+          "close-grok",
+          "content-copied", // Add this for view contexts too
+        ];
+        if (validChannels.includes(channel)) {
+          ipcRenderer.send(channel, data);
+        }
+      },
+      invoke: (channel: string, data?: any) => {
+        const validChannels = ["get-prompts", "get-key-by-value"];
+        if (validChannels.includes(channel)) {
+          return ipcRenderer.invoke(channel, data);
+        }
+      },
+      on: (channel: string, func: (...args: any[]) => void) => {
+        const validChannels = [
+          "prompt-saved",
+          "on-selected",
+          "row-selected",
+          "refresh-prompt-table",
+        ];
+        if (validChannels.includes(channel)) {
+          ipcRenderer.on(channel, (_: any, ...args: any) => func(...args));
+        }
+      },
+    },
+    // Also expose view_ipcRenderer for external sites
+    view_ipcRenderer: {
+      send: (channel: string, data?: any) => {
+        const validChannels = ["content-copied"];
+        if (validChannels.includes(channel)) {
+          ipcRenderer.send(channel, data);
+        }
+      },
+    },
+  });
+} else {
+  // We're in non-isolated context (main window)
+  window.electron = {
+    ipcRenderer: ipcRenderer,
+  };
+
+  window.addEventListener("DOMContentLoaded", () => {
+    document.body.style.backgroundColor = "black";
+  });
+}

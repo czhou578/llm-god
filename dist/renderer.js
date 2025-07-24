@@ -102,7 +102,7 @@ if (promptDropdownButton) {
         ipcRenderer.send("open-form-window");
     });
 }
-ipcRenderer.on("inject-prompt", (event, selectedPrompt) => {
+ipcRenderer.on("inject-prompt", (_, selectedPrompt) => {
     console.log("Injecting prompt into textarea:", selectedPrompt);
     const promptInput = document.getElementById("prompt-input");
     if (promptInput) {

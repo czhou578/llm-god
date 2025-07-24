@@ -130,7 +130,7 @@ if (promptDropdownButton) {
   });
 }
 
-ipcRenderer.on("inject-prompt", (event, selectedPrompt: string) => {
+ipcRenderer.on("inject-prompt", (_: any, selectedPrompt: string) => {
   console.log("Injecting prompt into textarea:", selectedPrompt);
 
   const promptInput = document.getElementById(

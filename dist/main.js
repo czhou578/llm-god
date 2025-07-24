@@ -1,4 +1,4 @@
-import { app, BrowserWindow, ipcMain, WebContentsView, } from "electron";
+import { app, BrowserWindow, ipcMain, WebContentsView, clipboard, } from "electron";
 import * as remote from "@electron/remote/main/index.js";
 import path from "path";
 import electronLocalShortcut from "electron-localshortcut";
@@ -34,42 +34,42 @@ function createWindow() {
         backgroundColor: "#000000",
         show: false, // Start hidden to prevent visual flash
         webPreferences: {
-            preload: path.join(__dirname, "preload.cjs"), // This will point to dist/preload.js at runtime
+            preload: path.join(__dirname, "..", "dist", "preload.cjs"), // Correct path to compiled preload
             nodeIntegration: true,
-            contextIsolation: false,
+            contextIsolation: true,
             offscreen: false,
         },
     });
     remote.enable(mainWindow.webContents);
     // Create the overlay window immediately, but keep it hidden.
-    overlayWindow = new BrowserWindow({
-        parent: mainWindow,
-        frame: false,
-        transparent: true,
-        alwaysOnTop: true,
-        show: false, // Keep it hidden initially
-        focusable: false,
-        skipTaskbar: true,
-        webPreferences: {
-            nodeIntegration: true,
-            contextIsolation: false,
-        },
-    });
-    overlayWindow.loadFile(path.join(__dirname, "..", "src", "overlay.html"));
-    overlayWindow.setIgnoreMouseEvents(true);
+    // overlayWindow = new BrowserWindow({
+    //   parent: mainWindow,
+    //   frame: false,
+    //   transparent: true,
+    //   alwaysOnTop: true,
+    //   show: false, // Keep it hidden initially
+    //   focusable: false,
+    //   skipTaskbar: true,
+    //   webPreferences: {
+    //     nodeIntegration: true,
+    //     contextIsolation: false,
+    //   },
+    // });
+    // overlayWindow.loadFile(path.join(__dirname, "..", "src", "overlay.html"));
+    // overlayWindow.setIgnoreMouseEvents(true);
     // Use 'ready-to-show' to display windows gracefully.
     mainWindow.once("ready-to-show", () => {
         mainWindow.show();
         // Now that the main window is visible, match the overlay's size and show it.
-        overlayWindow.setBounds(mainWindow.getBounds());
-        overlayWindow.show();
+        // overlayWindow.setBounds(mainWindow.getBounds());
+        // overlayWindow.show();
         // Mark initial setup as complete after a short delay
         setTimeout(() => {
             isInitialSetupComplete = true;
         }, 500);
     });
     mainWindow.loadFile(path.join(__dirname, "..", "index.html")); // Changed to point to root index.html
-    // mainWindow.webContents.openDevTools({ mode: "detach" });
+    mainWindow.webContents.openDevTools({ mode: "detach" });
     const viewWidth = Math.floor(mainWindow.getBounds().width / websites.length);
     const { height } = mainWindow.getBounds();
     websites.forEach((url, index) => {
@@ -77,6 +77,8 @@ function createWindow() {
             webPreferences: {
                 nodeIntegration: false,
                 contextIsolation: true,
+                // Add the preload script for the view
+                preload: path.join(__dirname, "..", "dist", "preload.cjs"), // Correct path to compiled preload
             },
         }); // Cast to CustomBrowserView
         view.id = `${url}`;
@@ -87,13 +89,15 @@ function createWindow() {
             width: viewWidth,
             height: height - 235,
         });
-        view.webContents.openDevTools({ mode: "detach" });
+        if (view.id.includes("chatgpt.com")) {
+            view.webContents.openDevTools({ mode: "detach" });
+        }
         view.webContents.setZoomFactor(1);
         view.webContents.loadURL(url);
         if (url.includes("chatgpt.com")) {
             view.webContents.on("did-finish-load", () => {
                 // Read the observer script from the file
-                const observerScriptPath = path.join(__dirname, "chatgpt-observer.js");
+                const observerScriptPath = path.join(__dirname, "..", "dist", "chatgpt-observer.js");
                 fs.readFile(observerScriptPath, "utf8", (err, script) => {
                     if (err) {
                         console.error("Failed to read ChatGPT observer script:", err);
@@ -109,29 +113,29 @@ function createWindow() {
         views.push(view);
     });
     mainWindow.on("enter-full-screen", () => {
-        overlayWindow.show();
+        // overlayWindow.show();
         updateZoomFactor();
     });
-    mainWindow.on("blur", () => {
-        // Only hide the overlay if the initial setup is done
-        if (overlayWindow && isInitialSetupComplete) {
-            overlayWindow.hide();
-        }
-    });
-    mainWindow.on("focus", () => {
-        if (overlayWindow) {
-            overlayWindow.show();
-        }
-    });
+    // mainWindow.on("blur", () => {
+    //   // Only hide the overlay if the initial setup is done
+    //   if (overlayWindow && isInitialSetupComplete) {
+    //     overlayWindow.hide();
+    //   }
+    // });
+    // mainWindow.on("focus", () => {
+    //   if (overlayWindow) {
+    //     overlayWindow.show();
+    //   }
+    // });
     let resizeTimeout;
     mainWindow.on("resize", () => {
         clearTimeout(resizeTimeout);
         resizeTimeout = setTimeout(() => {
             const bounds = mainWindow.getBounds();
             // Also resize the overlay to match the main window
-            if (overlayWindow) {
-                overlayWindow.setBounds(bounds);
-            }
+            // if (overlayWindow) {
+            //   overlayWindow.setBounds(bounds);
+            // }
             const viewWidth = Math.floor(bounds.width / websites.length);
             views.forEach((view, index) => {
                 view.setBounds({
@@ -153,7 +157,7 @@ function createFormWindow() {
         parent: mainWindow,
         modal: true,
         webPreferences: {
-            preload: path.join(__dirname, "..", "dist", "form_preload.js"), // Use the same preload script
+            preload: path.join(__dirname, "..", "dist", "preload.cjs"), // Correct path to compiled preload
             nodeIntegration: false,
             contextIsolation: true,
         },
@@ -298,7 +302,7 @@ ipcMain.on("open-edit-view", (_, prompt) => {
         parent: formWindow || mainWindow, // Use mainWindow as a fallback if formWindow is null
         modal: true, // Make it a modal window
         webPreferences: {
-            preload: path.join(__dirname, "..", "dist", "form_preload.js"), // Use the same preload script
+            preload: path.join(__dirname, "..", "dist", "preload.cjs"), // Correct path to compiled preload
             nodeIntegration: false,
             contextIsolation: true,
         },
@@ -369,4 +373,14 @@ ipcMain.on("close-edit-window", (event) => {
             formWindow.webContents.send("refresh-prompt-table");
         }
     }
+});
+// Listen for the notification from the observer script
+ipcMain.on("content-copied", () => {
+    // A brief delay to ensure the clipboard has been updated
+    setTimeout(() => {
+        const copiedText = clipboard.readText();
+        console.log("--- Content Pasted from Clipboard ---");
+        console.log(copiedText);
+        console.log("------------------------------------");
+    }, 100); // 100ms delay
 });

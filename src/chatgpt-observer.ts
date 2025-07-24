@@ -1,9 +1,11 @@
 (() => {
   console.log("ChatGPT Observer: Script injected.");
 
-  // --- Configuration ---
-  // Selector for the button that is ONLY visible while ChatGPT is generating a response.
-  const stopGeneratingButtonSelector = 'button[aria-label="Stop generating"]';
+  // Get the IPC renderer from the exposed API
+  // Get the IPC renderer from the exposed API
+  const gpt_ipcRenderer = window.electron?.ipcRenderer;
+  console.log("GPT IPC Renderer:", gpt_ipcRenderer);
+  const stopGeneratingButtonSelector = 'button[aria-label="Stop streaming"]';
 
   // Selector for the button you want to programmatically click AFTER the response is complete.
   // EXAMPLE: This selector targets the "Copy" button on the last message. You may need to adjust it.
@@ -18,7 +20,7 @@
 
     // Find the last message's button cluster
     const allMessageGroups = document.querySelectorAll('div.text-base');
-    const lastMessageGroup = allMessageGroups[allMessageGroups.length - 1];
+    const lastMessageGroup = allMessageGroups[allMessageGroups.length - 2];
 
     if (lastMessageGroup) {
       // Find the specific button within the last message group
@@ -26,6 +28,15 @@
       if (targetButton) {
         console.log("ChatGPT Observer: Found target button. Clicking now.", targetButton);
         targetButton.click();
+
+        // Notify the main process that the content has been copied
+        if (gpt_ipcRenderer) {
+          gpt_ipcRenderer.send('content-copied');
+          console.log('ChatGPT Observer: Sent content-copied event to main process.');
+        } else {
+          console.error('ChatGPT Observer: IPC renderer not available. Preload script may have failed.');
+        }
+
       } else {
         console.error("ChatGPT Observer: Target button not found with selector:", targetButtonToClickSelector);
       }
