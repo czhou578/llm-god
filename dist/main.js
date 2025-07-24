@@ -6,6 +6,7 @@ import { addBrowserView, removeBrowserView, injectPromptIntoView, sendPromptInVi
 import { createRequire } from "node:module"; // Import createRequire
 import { fileURLToPath } from "node:url"; // Import fileURLToPath
 import Store from "electron-store"; // Import electron-store
+import fs from 'fs'; // Import fs for file operations
 const require = createRequire(import.meta.url);
 const store = new Store(); // Create an instance of electron-store
 if (require("electron-squirrel-startup"))
@@ -55,6 +56,7 @@ function createWindow() {
         },
     });
     overlayWindow.loadFile(path.join(__dirname, "..", "src", "overlay.html"));
+    overlayWindow.setIgnoreMouseEvents(true);
     // Use 'ready-to-show' to display windows gracefully.
     mainWindow.once("ready-to-show", () => {
         mainWindow.show();
@@ -85,9 +87,25 @@ function createWindow() {
             width: viewWidth,
             height: height - 235,
         });
-        // view.webContents.openDevTools({ mode: "detach" });
+        view.webContents.openDevTools({ mode: "detach" });
         view.webContents.setZoomFactor(1);
         view.webContents.loadURL(url);
+        if (url.includes("chatgpt.com")) {
+            view.webContents.on("did-finish-load", () => {
+                // Read the observer script from the file
+                const observerScriptPath = path.join(__dirname, "chatgpt-observer.js");
+                fs.readFile(observerScriptPath, "utf8", (err, script) => {
+                    if (err) {
+                        console.error("Failed to read ChatGPT observer script:", err);
+                        return;
+                    }
+                    // Execute the script in the view's web contents
+                    view.webContents.executeJavaScript(script)
+                        .then(() => console.log("Successfully injected ChatGPT observer script."))
+                        .catch(e => console.error("Error injecting ChatGPT observer script:", e));
+                });
+            });
+        }
         views.push(view);
     });
     mainWindow.on("enter-full-screen", () => {
