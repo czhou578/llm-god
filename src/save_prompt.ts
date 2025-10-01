@@ -159,13 +159,13 @@ ipcRenderer1.on("refresh-prompt-table", () => {
 });
 
 // Listen for confirmation from the main process
-ipcRenderer1.on("prompt-deleted", (_, { key, value }) => {
+ipcRenderer1.on("prompt-deleted", (_: any, { key, value }: any) => {
   console.log(
     `Prompt with key "${key}" and value "${value}" was deleted from the store.`,
   );
 });
 
-ipcRenderer1.on("prompt-not-found", (_, value) => {
+ipcRenderer1.on("prompt-not-found", (_: any, value: any) => {
   console.error(`No matching entry found for value: "${value}"`);
 });
 

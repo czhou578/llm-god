@@ -55,13 +55,15 @@
       }
 
       .dropdown,
-      .prompt-picker {
+      .prompt-picker,
+      .diff {
         width: 100%;
         position: relative;
       }
 
       #dropdown-button,
-      .prompt-select {
+      .prompt-select,
+      .diff-select {
         width: 100%;
         height: 50px;
         font-size: 18px;
@@ -138,7 +140,7 @@
         <div class="dropdown">
           <button id="dropdown-button">Show Models ▼</button>
           <div class="dropdown-content">
-            <div class="dropdown-item" id="showLMArena">Show LMArena</div>
+            <!-- <div class="dropdown-item" id="showLMArena">Show LMArena</div> -->
             <div class="dropdown-item" id="showClaude">Show Claude</div>
             <div class="dropdown-item" id="showGrok">Show Grok</div>
             <div class="dropdown-item" id="showDeepSeek">Show DeepSeek</div>
@@ -147,6 +149,9 @@
         <div class="prompt-picker">
           <button class="prompt-select">Select Prompts</button>
         </div>
+        <!-- <div class="diff">
+          <button class="diff-select">Select Diff</button>
+        </div> -->
       </div>
     </div>
   </body>

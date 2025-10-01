@@ -23,6 +23,8 @@ contextBridge.exposeInMainWorld("electron", {
         "close-deepseek",
         "open-grok",
         "close-grok",
+        "open-lm-arena",
+        "close-lm-arena",
       ];
       if (validChannels.includes(channel)) {
         ipcRenderer.send(channel, data);
