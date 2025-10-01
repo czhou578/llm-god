@@ -49,6 +49,8 @@ if (hasContextBridge && canAccessWindow) {
           "close-deepseek",
           "open-grok",
           "close-grok",
+          "open-lm-arena",
+          "close-lm-arena",
           "content-copied", // Add this for view contexts too
         ];
         if (validChannels.includes(channel)) {

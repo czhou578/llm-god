@@ -2,7 +2,8 @@ import { app, BrowserWindow, ipcMain, WebContentsView, clipboard, } from "electr
 import * as remote from "@electron/remote/main/index.js";
 import path from "path";
 import electronLocalShortcut from "electron-localshortcut";
-import { addBrowserView, removeBrowserView, injectPromptIntoView, sendPromptInView, } from "./utilities.js"; // Adjusted path
+import { addBrowserView, removeBrowserView, injectPromptIntoView, sendPromptInView, stripEmojis, // Add this import
+ } from "./utilities.js"; // Adjusted path
 import { createRequire } from "node:module"; // Import createRequire
 import { fileURLToPath } from "node:url"; // Import fileURLToPath
 import Store from "electron-store"; // Import electron-store
@@ -20,11 +21,11 @@ let isInitialSetupComplete = false;
 const views = [];
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
-// require("electron-reload")(path.join(__dirname, "."));
+require("electron-reload")(path.join(__dirname, "."));
 const websites = [
     "https://chatgpt.com/",
     "https://bard.google.com",
-    "https://www.perplexity.ai/",
+    // "https://www.perplexity.ai/",
 ];
 function createWindow() {
     mainWindow = new BrowserWindow({
@@ -89,7 +90,10 @@ function createWindow() {
             width: viewWidth,
             height: height - 235,
         });
-        if (view.id.includes("chatgpt.com")) {
+        if (view.id.includes("perplexity")) {
+            view.webContents.openDevTools({ mode: "detach" });
+        }
+        if (view.id.includes("lmarena")) {
             view.webContents.openDevTools({ mode: "detach" });
         }
         view.webContents.setZoomFactor(1);
@@ -189,24 +193,49 @@ ipcMain.on("close-form-window", () => {
     }
 });
 ipcMain.on("save-prompt", (event, promptValue) => {
+    // Strip emojis before saving
+    const cleanPrompt = stripEmojis(promptValue);
     const timestamp = new Date().getTime().toString();
-    store.set(timestamp, promptValue);
+    store.set(timestamp, cleanPrompt);
     console.log("Prompt saved with key:", timestamp);
+    console.log("Original prompt:", promptValue);
+    console.log("Cleaned prompt:", cleanPrompt);
 });
 // Add handler to get stored prompts
 ipcMain.handle("get-prompts", () => {
     return store.store; // Returns all stored data
 });
+// ipcMain.on("paste-prompt", (_: IpcMainEvent, prompt: string) => {
+//   mainWindow.webContents.send("inject-prompt", prompt);
+//   console.log("paste-prompt received in main.ts:", prompt);
+//   views.forEach((view: CustomBrowserView) => {
+//     injectPromptIntoView(view, prompt);
+//   });
+// });
+// In main.ts
 ipcMain.on("paste-prompt", (_, prompt) => {
-    mainWindow.webContents.send("inject-prompt", prompt);
+    // Strip emojis from the prompt
+    const cleanPrompt = stripEmojis(prompt);
+    // console.log("paste-prompt received in main.ts (original):", prompt);
+    // console.log("paste-prompt (cleaned):", cleanPrompt);
     views.forEach((view) => {
-        injectPromptIntoView(view, prompt);
+        injectPromptIntoView(view, cleanPrompt);
     });
+    // Wrap in IIFE to avoid variable redeclaration errors
+    mainWindow.webContents.executeJavaScript(`
+    (function() {
+      const textarea = document.getElementById('prompt-input');
+      if (textarea) {
+        textarea.value = \`${cleanPrompt.replace(/\\/g, '\\\\').replace(/`/g, '\\`').replace(/\$/g, '\\$').replace(/\n/g, '\\n').replace(/\r/g, '\\r')}\`;
+        textarea.dispatchEvent(new Event('input', { bubbles: true }));
+      }
+    })();
+  `);
 });
 ipcMain.on("enter-prompt", (_, prompt) => {
-    // Added type for prompt
+    const cleanPrompt = stripEmojis(prompt);
     views.forEach((view) => {
-        injectPromptIntoView(view, prompt);
+        injectPromptIntoView(view, cleanPrompt);
     });
 });
 ipcMain.on("send-prompt", (_, prompt) => {
@@ -229,22 +258,22 @@ ipcMain.on("delete-prompt-by-value", (event, value) => {
         console.error(`No matching entry found for value: ${value}`);
     }
 });
-ipcMain.on("open-lm-arena", (_, prompt) => {
-    if (prompt === "open lm arena now") {
-        console.log("Opening LMArena");
-        let url = "https://lmarena.ai/?mode=direct";
-        addBrowserView(mainWindow, url, websites, views);
-    }
-});
-ipcMain.on("close-lm-arena", (_, prompt) => {
-    if (prompt === "close lm arena now") {
-        console.log("Closing LMArena");
-        const lmArenaView = views.find((view) => view.id.match("lmarena"));
-        if (lmArenaView) {
-            removeBrowserView(mainWindow, lmArenaView, websites, views);
-        }
-    }
-});
+// ipcMain.on("open-lm-arena", (_, prompt: string) => {
+//   if (prompt === "open lm arena now") {
+//     console.log("Opening LMArena");
+//     let url = "https://lmarena.ai/";
+//     addBrowserView(mainWindow, url, websites, views);
+//   }
+// });
+// ipcMain.on("close-lm-arena", (_, prompt: string) => {
+//   if (prompt === "close lm arena now") {
+//     console.log("Closing LMArena");
+//     const lmArenaView = views.find((view) => view.id.match("lmarena"));
+//     if (lmArenaView) {
+//       removeBrowserView(mainWindow, lmArenaView, websites, views);
+//     }
+//   }
+// });
 ipcMain.on("open-claude", (_, prompt) => {
     if (prompt === "open claude now") {
         console.log("Opening Claude");
