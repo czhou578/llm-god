@@ -1,4 +1,4 @@
-import { WebContentsView, clipboard } from "electron"; // Added WebPreferences type
+import { WebContentsView } from "electron"; // Added WebPreferences type
 /**
  * Creates and configures a new BrowserView for the main window
  * @param mainWindow - The main Electron window
@@ -123,43 +123,6 @@ export function injectPromptIntoView(view, prompt) {
             }
         `);
     }
-    else if (view.id && view.id.match("perplexity")) {
-        // Copy to clipboard
-        clipboard.writeText(escapedPrompt);
-        // Focus the input element first, then paste using Electron's native paste
-        view.webContents.executeJavaScript(`
-        (function() {
-            console.log('=== Perplexity Native Paste ===');
-            
-            var inputElement = document.querySelector('div[aria-placeholder="Ask anything…"]');
-            if (!inputElement) {
-                console.error('Input element not found');
-                return;
-            }
-            
-            console.log('Step 1 - Found input element');
-            
-            // Focus the element
-            inputElement.focus();
-            inputElement.click();
-            console.log('Step 2 - Focused element - ready for paste');
-        })();
-    `).then(() => {
-            // After focusing, use Electron's native paste command
-            setTimeout(() => {
-                view.webContents.paste(); // This is Electron's native paste method
-                console.log('Triggered native paste');
-                // Verify after paste
-                setTimeout(() => {
-                    view.webContents.executeJavaScript(`
-                    var spanElement = document.querySelector('span[data-lexical-text="true"]');
-                    console.log('=== Final State ===');
-                    console.log('Span text:', spanElement ? spanElement.textContent : 'not found');
-                `);
-                }, 200);
-            }, 100);
-        });
-    }
     else if (view.id && view.id.match("claude")) {
         view.webContents.executeJavaScript(`
             {
@@ -200,83 +163,6 @@ export function injectPromptIntoView(view, prompt) {
             }
         `);
     }
-    else if (view.id && view.id.match("lmarena")) {
-        const escapedescapedPrompt = prompt.replace(/\\/g, '\\\\').replace(/`/g, '\\`').replace(/\$/g, '\\$').replace(/\n/g, '\\n');
-        view.webContents.executeJavaScript(`
-        (function() {
-            console.log('=== LM Arena Persistent Injection ===');
-            
-            var inputElement = document.querySelector('textarea[name="message"]');
-            if (!inputElement) {
-                console.error('Textarea not found');
-                return;
-            }
-            
-            var targetValue = \`${escapedPrompt}\`;
-            var nativeValueSetter = Object.getOwnPropertyDescriptor(
-                window.HTMLTextAreaElement.prototype, 
-                "value"
-            ).set;
-            
-            var attemptCount = 0;
-            var maxAttempts = 50; // Try for up to 5 seconds
-            var isStable = false;
-            
-            // Function to set the value
-            function setValue() {
-                if (inputElement.value !== targetValue) {
-                    nativeValueSetter.call(inputElement, targetValue);
-                    var inputEvent = new Event('input', { bubbles: true });
-                    inputElement.dispatchEvent(inputEvent);
-                    console.log('Attempt', attemptCount, '- Set value to:', inputElement.value);
-                }
-            }
-            
-            // Set initial value
-            inputElement.focus();
-            setValue();
-            
-            // Use MutationObserver to watch for React clearing the value
-            var observer = new MutationObserver(function(mutations) {
-                if (!isStable && inputElement.value !== targetValue) {
-                    console.log('React cleared the value, re-setting...');
-                    setValue();
-                }
-            });
-            
-            observer.observe(inputElement, {
-                attributes: true,
-                childList: true,
-                characterData: true,
-                subtree: true
-            });
-            
-            // Also use setInterval as backup
-            var interval = setInterval(function() {
-                attemptCount++;
-                
-                if (inputElement.value === targetValue) {
-                    console.log('Value is stable!');
-                    isStable = true;
-                    clearInterval(interval);
-                    observer.disconnect();
-                    return;
-                }
-                
-                if (attemptCount >= maxAttempts) {
-                    console.error('Failed to set value after', maxAttempts, 'attempts');
-                    clearInterval(interval);
-                    observer.disconnect();
-                    return;
-                }
-                
-                setValue();
-            }, 100); // Check every 100ms
-            
-            console.log('Started persistent injection');
-        })();
-    `);
-    }
 }
 export function sendPromptInView(view) {
     if (view.id && view.id.match("chatgpt")) {
@@ -298,18 +184,6 @@ export function sendPromptInView(view) {
         btn.click();
       }
     }`);
-    }
-    else if (view.id && view.id.match("perplexity")) {
-        view.webContents.executeJavaScript(`
-                {
-        var buttons = Array.from(document.querySelectorAll('button.bg-super'));
-        if (buttons[0]) {
-          var buttonsWithSvgPath = buttons.filter(button => button.querySelector('svg path'));
-          var button = buttonsWithSvgPath[buttonsWithSvgPath.length - 1];
-          button.click();
-        }
-      }
-                `);
     }
     else if (view.id && view.id.match("claude")) {
         view.webContents.executeJavaScript(`{
@@ -343,19 +217,6 @@ export function sendPromptInView(view) {
         var btn = buttons[2]
         if (btn) {
             btn.focus();
-            btn.click();
-          } else {
-            console.log("Element not found");
-          }
-    }`);
-    }
-    else if (view.id && view.id.match("lmarena")) {
-        view.webContents.executeJavaScript(`
-        {
-        var btn = document.querySelector('button[type="submit"]');
-        if (btn) {
-            btn.focus();
-            btn.disabled = false;
             btn.click();
           } else {
             console.log("Element not found");

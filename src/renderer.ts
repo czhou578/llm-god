@@ -49,14 +49,6 @@ export function closeGrokMessage(message: string): void {
   ipcRenderer.send("close-grok", message);
 }
 
-export function openLMArena(message: string): void {
-  ipcRenderer.send("open-lm-arena", message);
-}
-
-export function closeLMArena(message: string): void {
-  ipcRenderer.send("close-lm-arena", message);
-}
-
 const textArea = document.getElementById(
   "prompt-input",
 ) as HTMLTextAreaElement | null;
@@ -68,10 +60,6 @@ const openGrokButton = document.getElementById(
 ) as HTMLButtonElement | null;
 const openDeepSeekButton = document.getElementById(
   "showDeepSeek",
-) as HTMLButtonElement | null;
-
-const openLMArenaButton = document.getElementById(
-  "showLMArena",
 ) as HTMLButtonElement | null;
 
 const promptDropdownButton = document.querySelector(
@@ -110,20 +98,6 @@ if (openDeepSeekButton) {
     } else {
       closeDeepSeekMessage("close deepseek now");
       openDeepSeekButton.textContent = "Show DeepSeek";
-    }
-  });
-}
-
-if (openLMArenaButton) {
-  openLMArenaButton.addEventListener("click", (event: MouseEvent) => {
-    console.log('button was clicked')
-    if (openLMArenaButton.textContent === "Show LMArena") {
-      console.log('message sent from renderer')
-      openLMArena("open lm arena now");
-      openLMArenaButton.textContent = "Hide LMArena";
-    } else {
-      closeLMArena("close lm arena now");
-      openLMArenaButton.textContent = "Show LMArena";
     }
   });
 }
