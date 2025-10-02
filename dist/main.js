@@ -1,4 +1,4 @@
-import { app, BrowserWindow, ipcMain, WebContentsView, clipboard, } from "electron";
+import { app, BrowserWindow, ipcMain, WebContentsView, } from "electron";
 import * as remote from "@electron/remote/main/index.js";
 import path from "path";
 import electronLocalShortcut from "electron-localshortcut";
@@ -7,11 +7,9 @@ import { addBrowserView, removeBrowserView, injectPromptIntoView, sendPromptInVi
 import { createRequire } from "node:module"; // Import createRequire
 import { fileURLToPath } from "node:url"; // Import fileURLToPath
 import Store from "electron-store"; // Import electron-store
-import fs from 'fs'; // Import fs for file operations
 const require = createRequire(import.meta.url);
 const store = new Store(); // Create an instance of electron-store
-if (require("electron-squirrel-startup"))
-    app.quit();
+// if (require("electron-squirrel-startup")) app.quit();
 remote.initialize();
 let mainWindow;
 let overlayWindow;
@@ -25,7 +23,6 @@ require("electron-reload")(path.join(__dirname, "."));
 const websites = [
     "https://chatgpt.com/",
     "https://bard.google.com",
-    // "https://www.perplexity.ai/",
 ];
 function createWindow() {
     mainWindow = new BrowserWindow({
@@ -42,29 +39,9 @@ function createWindow() {
         },
     });
     remote.enable(mainWindow.webContents);
-    // Create the overlay window immediately, but keep it hidden.
-    // overlayWindow = new BrowserWindow({
-    //   parent: mainWindow,
-    //   frame: false,
-    //   transparent: true,
-    //   alwaysOnTop: true,
-    //   show: false, // Keep it hidden initially
-    //   focusable: false,
-    //   skipTaskbar: true,
-    //   webPreferences: {
-    //     nodeIntegration: true,
-    //     contextIsolation: false,
-    //   },
-    // });
-    // overlayWindow.loadFile(path.join(__dirname, "..", "src", "overlay.html"));
-    // overlayWindow.setIgnoreMouseEvents(true);
     // Use 'ready-to-show' to display windows gracefully.
     mainWindow.once("ready-to-show", () => {
         mainWindow.show();
-        // Now that the main window is visible, match the overlay's size and show it.
-        // overlayWindow.setBounds(mainWindow.getBounds());
-        // overlayWindow.show();
-        // Mark initial setup as complete after a short delay
         setTimeout(() => {
             isInitialSetupComplete = true;
         }, 500);
@@ -90,56 +67,18 @@ function createWindow() {
             width: viewWidth,
             height: height - 235,
         });
-        if (view.id.includes("perplexity")) {
-            view.webContents.openDevTools({ mode: "detach" });
-        }
-        if (view.id.includes("lmarena")) {
-            view.webContents.openDevTools({ mode: "detach" });
-        }
         view.webContents.setZoomFactor(1);
         view.webContents.loadURL(url);
-        if (url.includes("chatgpt.com")) {
-            view.webContents.on("did-finish-load", () => {
-                // Read the observer script from the file
-                const observerScriptPath = path.join(__dirname, "..", "dist", "chatgpt-observer.js");
-                fs.readFile(observerScriptPath, "utf8", (err, script) => {
-                    if (err) {
-                        console.error("Failed to read ChatGPT observer script:", err);
-                        return;
-                    }
-                    // Execute the script in the view's web contents
-                    view.webContents.executeJavaScript(script)
-                        .then(() => console.log("Successfully injected ChatGPT observer script."))
-                        .catch(e => console.error("Error injecting ChatGPT observer script:", e));
-                });
-            });
-        }
         views.push(view);
     });
     mainWindow.on("enter-full-screen", () => {
-        // overlayWindow.show();
         updateZoomFactor();
     });
-    // mainWindow.on("blur", () => {
-    //   // Only hide the overlay if the initial setup is done
-    //   if (overlayWindow && isInitialSetupComplete) {
-    //     overlayWindow.hide();
-    //   }
-    // });
-    // mainWindow.on("focus", () => {
-    //   if (overlayWindow) {
-    //     overlayWindow.show();
-    //   }
-    // });
     let resizeTimeout;
     mainWindow.on("resize", () => {
         clearTimeout(resizeTimeout);
         resizeTimeout = setTimeout(() => {
             const bounds = mainWindow.getBounds();
-            // Also resize the overlay to match the main window
-            // if (overlayWindow) {
-            //   overlayWindow.setBounds(bounds);
-            // }
             const viewWidth = Math.floor(bounds.width / websites.length);
             views.forEach((view, index) => {
                 view.setBounds({
@@ -192,6 +131,18 @@ ipcMain.on("close-form-window", () => {
         formWindow = null; // Clear the reference
     }
 });
+ipcMain.on("enter-prompt", (_, prompt) => {
+    const cleanPrompt = stripEmojis(prompt);
+    views.forEach((view) => {
+        injectPromptIntoView(view, cleanPrompt);
+    });
+});
+ipcMain.on("send-prompt", (_, prompt) => {
+    // Added type for prompt (though unused here)
+    views.forEach((view) => {
+        sendPromptInView(view);
+    });
+});
 ipcMain.on("save-prompt", (event, promptValue) => {
     // Strip emojis before saving
     const cleanPrompt = stripEmojis(promptValue);
@@ -201,23 +152,14 @@ ipcMain.on("save-prompt", (event, promptValue) => {
     console.log("Original prompt:", promptValue);
     console.log("Cleaned prompt:", cleanPrompt);
 });
+// ------------------------------------------------------------------------------
 // Add handler to get stored prompts
 ipcMain.handle("get-prompts", () => {
     return store.store; // Returns all stored data
 });
-// ipcMain.on("paste-prompt", (_: IpcMainEvent, prompt: string) => {
-//   mainWindow.webContents.send("inject-prompt", prompt);
-//   console.log("paste-prompt received in main.ts:", prompt);
-//   views.forEach((view: CustomBrowserView) => {
-//     injectPromptIntoView(view, prompt);
-//   });
-// });
-// In main.ts
 ipcMain.on("paste-prompt", (_, prompt) => {
     // Strip emojis from the prompt
     const cleanPrompt = stripEmojis(prompt);
-    // console.log("paste-prompt received in main.ts (original):", prompt);
-    // console.log("paste-prompt (cleaned):", cleanPrompt);
     views.forEach((view) => {
         injectPromptIntoView(view, cleanPrompt);
     });
@@ -231,18 +173,6 @@ ipcMain.on("paste-prompt", (_, prompt) => {
       }
     })();
   `);
-});
-ipcMain.on("enter-prompt", (_, prompt) => {
-    const cleanPrompt = stripEmojis(prompt);
-    views.forEach((view) => {
-        injectPromptIntoView(view, cleanPrompt);
-    });
-});
-ipcMain.on("send-prompt", (_, prompt) => {
-    // Added type for prompt (though unused here)
-    views.forEach((view) => {
-        sendPromptInView(view);
-    });
 });
 ipcMain.on("delete-prompt-by-value", (event, value) => {
     value = value.normalize("NFKC");
@@ -258,22 +188,7 @@ ipcMain.on("delete-prompt-by-value", (event, value) => {
         console.error(`No matching entry found for value: ${value}`);
     }
 });
-// ipcMain.on("open-lm-arena", (_, prompt: string) => {
-//   if (prompt === "open lm arena now") {
-//     console.log("Opening LMArena");
-//     let url = "https://lmarena.ai/";
-//     addBrowserView(mainWindow, url, websites, views);
-//   }
-// });
-// ipcMain.on("close-lm-arena", (_, prompt: string) => {
-//   if (prompt === "close lm arena now") {
-//     console.log("Closing LMArena");
-//     const lmArenaView = views.find((view) => view.id.match("lmarena"));
-//     if (lmArenaView) {
-//       removeBrowserView(mainWindow, lmArenaView, websites, views);
-//     }
-//   }
-// });
+// ------------------------------------------------------------------------------
 ipcMain.on("open-claude", (_, prompt) => {
     if (prompt === "open claude now") {
         console.log("Opening Claude");
@@ -391,25 +306,9 @@ ipcMain.on("close-edit-window", (event) => {
     const win = BrowserWindow.fromWebContents(event.sender);
     if (win) {
         win.close();
-    }
-});
-ipcMain.on("close-edit-window", (event) => {
-    const win = BrowserWindow.fromWebContents(event.sender);
-    if (win) {
-        win.close();
         // Notify the form window to refresh the table
         if (formWindow && !formWindow.isDestroyed()) {
             formWindow.webContents.send("refresh-prompt-table");
         }
     }
-});
-// Listen for the notification from the observer script
-ipcMain.on("content-copied", () => {
-    // A brief delay to ensure the clipboard has been updated
-    setTimeout(() => {
-        const copiedText = clipboard.readText();
-        console.log("--- Content Pasted from Clipboard ---");
-        console.log(copiedText);
-        console.log("------------------------------------");
-    }, 100); // 100ms delay
 });
