@@ -191,7 +191,6 @@ export function sendPromptInView(view) {
                 }
 
                 if (btn) {
-                    btn.focus();
                     btn.disabled = false;
                     btn.click();
                 }
@@ -222,7 +221,6 @@ export function sendPromptInView(view) {
         if (btn) {
           btn.setAttribute("aria-disabled", "false");
           btn.disabled = false;
-          btn.focus();
           btn.click();
         }
       })();
@@ -250,7 +248,6 @@ export function sendPromptInView(view) {
         }
 
         if (btn) {
-          btn.focus();
           btn.disabled = false;
           btn.click();
         }
@@ -277,7 +274,6 @@ export function sendPromptInView(view) {
 
         if (btn) {
           btn.disabled = false;
-          btn.focus();
           btn.click();
 
           setTimeout(() => {
@@ -291,7 +287,6 @@ export function sendPromptInView(view) {
 
           if (textarea) {
             setTimeout(() => {
-              textarea.focus();
               const enterEvent = new KeyboardEvent('keydown', {
                 key: 'Enter',
                 code: 'Enter',
