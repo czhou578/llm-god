@@ -44,7 +44,7 @@ const __dirname = path.dirname(__filename);
 require("electron-reload")(path.join(__dirname, "."));
 
 const websites: string[] = [
-  "https://chatgpt.com/",
+  "https://chatgpt.com",
   "https://gemini.google.com",
 ];
 
@@ -195,13 +195,15 @@ ipcMain.on("send-prompt", (_, prompt: string) => {
       console.error(`Error injecting prompt:`, error);
     }
 
+    // Increase timeout for Copilot and other sites to properly inject the prompt
+    const delay = view.id && view.id.match("copilot") ? 300 : 100;
     setTimeout(async () => {
       try {
         await sendPromptInView(view);
       } catch (error) {
         console.error(`Error sending prompt:`, error);
       }
-    }, 100);
+    }, delay);
   });
 });
 
@@ -315,6 +317,24 @@ ipcMain.on("close-deepseek", (_, prompt: string) => {
     const deepseekView = views.find((view) => view.id.match("deepseek"));
     if (deepseekView) {
       removeBrowserView(mainWindow, deepseekView, websites, views);
+    }
+  }
+});
+
+ipcMain.on("open-copilot", (_, prompt: string) => {
+  if (prompt === "open copilot now") {
+    console.log("Opening Copilot");
+    let url = "https://copilot.microsoft.com/";
+    addBrowserView(mainWindow, url, websites, views);
+  }
+});
+
+ipcMain.on("close-copilot", (_, prompt: string) => {
+  if (prompt === "close copilot now") {
+    console.log("Closing Copilot");
+    const copilotView = views.find((view) => view.id.match("copilot"));
+    if (copilotView) {
+      removeBrowserView(mainWindow, copilotView, websites, views);
     }
   }
 });
