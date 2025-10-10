@@ -21,7 +21,7 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 require("electron-reload")(path.join(__dirname, "."));
 const websites = [
-    "https://chatgpt.com/",
+    "https://chatgpt.com",
     "https://gemini.google.com",
 ];
 function createWindow() {
@@ -148,6 +148,8 @@ ipcMain.on("send-prompt", (_, prompt) => {
         catch (error) {
             console.error(`Error injecting prompt:`, error);
         }
+        // Increase timeout for Copilot and other sites to properly inject the prompt
+        const delay = view.id && view.id.match("copilot") ? 300 : 100;
         setTimeout(async () => {
             try {
                 await sendPromptInView(view);
@@ -155,7 +157,7 @@ ipcMain.on("send-prompt", (_, prompt) => {
             catch (error) {
                 console.error(`Error sending prompt:`, error);
             }
-        }, 100);
+        }, delay);
     });
 });
 ipcMain.on("save-prompt", (event, promptValue) => {
@@ -183,7 +185,7 @@ ipcMain.on("paste-prompt", (_, prompt) => {
     (function() {
       const textarea = document.getElementById('prompt-input');
       if (textarea) {
-        textarea.value = \`${cleanPrompt.replace(/\\/g, '\\\\').replace(/`/g, '\\`').replace(/\$/g, '\\$').replace(/\n/g, '\\n').replace(/\r/g, '\\r')}\`;
+        textarea.value = \`${cleanPrompt.replace(/\\/g, "\\\\").replace(/`/g, "\\`").replace(/\$/g, "\\$").replace(/\n/g, "\\n").replace(/\r/g, "\\r")}\`;
         textarea.dispatchEvent(new Event('input', { bubbles: true }));
       }
     })();
@@ -249,6 +251,22 @@ ipcMain.on("close-deepseek", (_, prompt) => {
         const deepseekView = views.find((view) => view.id.match("deepseek"));
         if (deepseekView) {
             removeBrowserView(mainWindow, deepseekView, websites, views);
+        }
+    }
+});
+ipcMain.on("open-copilot", (_, prompt) => {
+    if (prompt === "open copilot now") {
+        console.log("Opening Copilot");
+        let url = "https://copilot.microsoft.com/";
+        addBrowserView(mainWindow, url, websites, views);
+    }
+});
+ipcMain.on("close-copilot", (_, prompt) => {
+    if (prompt === "close copilot now") {
+        console.log("Closing Copilot");
+        const copilotView = views.find((view) => view.id.match("copilot"));
+        if (copilotView) {
+            removeBrowserView(mainWindow, copilotView, websites, views);
         }
     }
 });

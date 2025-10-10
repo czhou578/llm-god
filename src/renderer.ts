@@ -49,6 +49,14 @@ export function closeGrokMessage(message: string): void {
   ipcRenderer.send("close-grok", message);
 }
 
+export function openCopilotMessage(message: string): void {
+  ipcRenderer.send("open-copilot", message);
+}
+
+export function closeCopilotMessage(message: string): void {
+  ipcRenderer.send("close-copilot", message);
+}
+
 const textArea = document.getElementById(
   "prompt-input",
 ) as HTMLTextAreaElement | null;
@@ -60,6 +68,9 @@ const openGrokButton = document.getElementById(
 ) as HTMLButtonElement | null;
 const openDeepSeekButton = document.getElementById(
   "showDeepSeek",
+) as HTMLButtonElement | null;
+const openCopilotButton = document.getElementById(
+  "showCopilot",
 ) as HTMLButtonElement | null;
 
 const promptDropdownButton = document.querySelector(
@@ -98,6 +109,18 @@ if (openDeepSeekButton) {
     } else {
       closeDeepSeekMessage("close deepseek now");
       openDeepSeekButton.textContent = "Show DeepSeek";
+    }
+  });
+}
+
+if (openCopilotButton) {
+  openCopilotButton.addEventListener("click", (event: MouseEvent) => {
+    if (openCopilotButton.textContent === "Show Copilot") {
+      openCopilotMessage("open copilot now");
+      openCopilotButton.textContent = "Hide Copilot";
+    } else {
+      closeCopilotMessage("close copilot now");
+      openCopilotButton.textContent = "Show Copilot";
     }
   });
 }
