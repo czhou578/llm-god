@@ -21,7 +21,7 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 require("electron-reload")(path.join(__dirname, "."));
 const websites = [
-    "https://chatgpt.com",
+    "https://chatgpt.com/",
     "https://gemini.google.com",
 ];
 function createWindow() {

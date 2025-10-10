@@ -15,13 +15,13 @@ declare global {
 // we're in context isolation mode
 const canAccessWindow = (() => {
   try {
-    return typeof window !== 'undefined';
+    return typeof window !== "undefined";
   } catch (e) {
     return false;
   }
 })();
 
-const hasContextBridge = typeof contextBridge !== 'undefined';
+const hasContextBridge = typeof contextBridge !== "undefined";
 
 if (hasContextBridge && canAccessWindow) {
   // We're in context isolation mode (secure contexts)
