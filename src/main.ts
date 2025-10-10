@@ -176,10 +176,9 @@ ipcMain.on("close-form-window", () => {
   }
 });
 
-
 ipcMain.on("enter-prompt", (_: IpcMainEvent, prompt: string) => {
   const cleanPrompt = stripEmojis(prompt);
-  
+
   views.forEach((view: CustomBrowserView) => {
     injectPromptIntoView(view, cleanPrompt);
   });
@@ -208,7 +207,7 @@ ipcMain.on("send-prompt", (_, prompt: string) => {
 ipcMain.on("save-prompt", (event, promptValue: string) => {
   // Strip emojis before saving
   const cleanPrompt = stripEmojis(promptValue);
-  
+
   const timestamp = new Date().getTime().toString();
   store.set(timestamp, cleanPrompt);
 
@@ -216,7 +215,6 @@ ipcMain.on("save-prompt", (event, promptValue: string) => {
   console.log("Original prompt:", promptValue);
   console.log("Cleaned prompt:", cleanPrompt);
 });
-
 
 // ------------------------------------------------------------------------------
 
@@ -228,17 +226,17 @@ ipcMain.handle("get-prompts", () => {
 ipcMain.on("paste-prompt", (_: IpcMainEvent, prompt: string) => {
   // Strip emojis from the prompt
   const cleanPrompt = stripEmojis(prompt);
-  
+
   views.forEach((view: CustomBrowserView) => {
     injectPromptIntoView(view, cleanPrompt);
   });
-  
+
   // Wrap in IIFE to avoid variable redeclaration errors
   mainWindow.webContents.executeJavaScript(`
     (function() {
       const textarea = document.getElementById('prompt-input');
       if (textarea) {
-        textarea.value = \`${cleanPrompt.replace(/\\/g, '\\\\').replace(/`/g, '\\`').replace(/\$/g, '\\$').replace(/\n/g, '\\n').replace(/\r/g, '\\r')}\`;
+        textarea.value = \`${cleanPrompt.replace(/\\/g, "\\\\").replace(/`/g, "\\`").replace(/\$/g, "\\$").replace(/\n/g, "\\n").replace(/\r/g, "\\r")}\`;
         textarea.dispatchEvent(new Event('input', { bubbles: true }));
       }
     })();
