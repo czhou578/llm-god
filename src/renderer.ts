@@ -98,6 +98,25 @@ const openGeminiButton = document.getElementById(
 const promptDropdownButton = document.querySelector(
   ".prompt-select",
 ) as HTMLButtonElement | null;
+const modelSelectButton = document.querySelector(
+  ".model-select",
+) as HTMLButtonElement | null;
+
+// Check if ChatGPT is in default models and set initial button text
+window.addEventListener("DOMContentLoaded", async () => {
+  const ipc = window.electron.ipcRenderer;
+  const defaultModels = await ipc.invoke("get-default-models");
+
+  if (openChatGPTButton) {
+    const hasChatGPT = defaultModels && defaultModels.some((url: string) => url.includes("chatgpt"));
+    openChatGPTButton.textContent = hasChatGPT ? "Hide ChatGPT" : "Show ChatGPT";
+  }
+
+  if (openGeminiButton) {
+    const hasGemini = defaultModels && defaultModels.some((url: string) => url.includes("gemini"));
+    openGeminiButton.textContent = hasGemini ? "Hide Gemini" : "Show Gemini";
+  }
+});
 
 if (openChatGPTButton) {
   openChatGPTButton.addEventListener("click", (event: MouseEvent) => {
@@ -196,6 +215,14 @@ if (promptDropdownButton) {
     console.log("Prompt dropdown button clicked");
     event.stopPropagation();
     ipcRenderer.send("open-form-window");
+  });
+}
+
+if (modelSelectButton) {
+  modelSelectButton.addEventListener("click", (event: MouseEvent) => {
+    console.log("Model select button clicked");
+    event.stopPropagation();
+    ipcRenderer.send("open-model-selection-window");
   });
 }
 

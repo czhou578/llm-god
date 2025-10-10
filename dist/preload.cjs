@@ -47,6 +47,9 @@ if (hasContextBridge && canAccessWindow) {
                     "close-gemini",
                     "open-lm-arena",
                     "close-lm-arena",
+                    "open-model-selection-window",
+                    "close-model-selection-window",
+                    "save-default-models",
                     "content-copied", // Add this for view contexts too
                 ];
                 if (validChannels.includes(channel)) {
@@ -54,7 +57,7 @@ if (hasContextBridge && canAccessWindow) {
                 }
             },
             invoke: (channel, data) => {
-                const validChannels = ["get-prompts", "get-key-by-value"];
+                const validChannels = ["get-prompts", "get-key-by-value", "get-default-models"];
                 if (validChannels.includes(channel)) {
                     return ipcRenderer.invoke(channel, data);
                 }

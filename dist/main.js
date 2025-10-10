@@ -14,16 +14,31 @@ remote.initialize();
 let mainWindow;
 let overlayWindow;
 let formWindow; // Allow formWindow to be null
+let modelSelectionWindow = null;
 let pendingRowSelectedKey = null; // Store the key of the selected row for later use
 let isInitialSetupComplete = false;
 const views = [];
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
-require("electron-reload")(path.join(__dirname, "."));
-const websites = [
-    "https://chatgpt.com",
-    "https://gemini.google.com",
-];
+// Only use electron-reload in development
+if (process.env.NODE_ENV !== 'production') {
+    try {
+        require("electron-reload")(path.join(__dirname, "."));
+    }
+    catch (e) {
+        // electron-reload not available in production, skip it
+    }
+}
+// Load default models from store, or use defaults
+const getDefaultWebsites = () => {
+    const savedModels = store.get("defaultModels");
+    if (savedModels && savedModels.length > 0) {
+        return savedModels;
+    }
+    // Default models if none are saved
+    return ["https://chatgpt.com", "https://gemini.google.com"];
+};
+const websites = getDefaultWebsites();
 function createWindow() {
     mainWindow = new BrowserWindow({
         width: 2000,
@@ -65,7 +80,7 @@ function createWindow() {
             x: index * viewWidth,
             y: 0,
             width: viewWidth,
-            height: height - 235,
+            height: height - 280,
         });
         view.webContents.setZoomFactor(1);
         view.webContents.loadURL(url);
@@ -87,7 +102,7 @@ function createWindow() {
                     x: index * viewWidth,
                     y: 0,
                     width: viewWidth,
-                    height: bounds.height - 200,
+                    height: bounds.height - 280,
                 });
             });
             updateZoomFactor();
@@ -108,6 +123,20 @@ function createFormWindow() {
         },
     });
     formWindow.loadFile(path.join(__dirname, "..", "src", "form.html"));
+}
+function createModelSelectionWindow() {
+    modelSelectionWindow = new BrowserWindow({
+        width: 600,
+        height: 700,
+        parent: mainWindow,
+        modal: true,
+        webPreferences: {
+            preload: path.join(__dirname, "..", "dist", "preload.cjs"),
+            nodeIntegration: false,
+            contextIsolation: true,
+        },
+    });
+    modelSelectionWindow.loadFile(path.join(__dirname, "..", "src", "select_models.html"));
 }
 function updateZoomFactor() {
     views.forEach((view) => {
@@ -210,7 +239,14 @@ ipcMain.on("open-claude", (_, prompt) => {
     if (prompt === "open claude now") {
         console.log("Opening Claude");
         let url = "https://claude.ai/chats/";
-        addBrowserView(mainWindow, url, websites, views);
+        // Check if Claude is already open
+        const alreadyOpen = views.some((view) => view.id.match("claude"));
+        if (!alreadyOpen) {
+            addBrowserView(mainWindow, url, websites, views);
+        }
+        else {
+            console.log("Claude is already open");
+        }
     }
 });
 ipcMain.on("close-claude", (_, prompt) => {
@@ -226,7 +262,14 @@ ipcMain.on("open-grok", (_, prompt) => {
     if (prompt === "open grok now") {
         console.log("Opening Grok");
         let url = "https://grok.com/";
-        addBrowserView(mainWindow, url, websites, views);
+        // Check if Grok is already open
+        const alreadyOpen = views.some((view) => view.id.match("grok"));
+        if (!alreadyOpen) {
+            addBrowserView(mainWindow, url, websites, views);
+        }
+        else {
+            console.log("Grok is already open");
+        }
     }
 });
 ipcMain.on("close-grok", (_, prompt) => {
@@ -242,7 +285,14 @@ ipcMain.on("open-deepseek", (_, prompt) => {
     if (prompt === "open deepseek now") {
         console.log("Opening DeepSeek");
         let url = "https://chat.deepseek.com/";
-        addBrowserView(mainWindow, url, websites, views);
+        // Check if DeepSeek is already open
+        const alreadyOpen = views.some((view) => view.id.match("deepseek"));
+        if (!alreadyOpen) {
+            addBrowserView(mainWindow, url, websites, views);
+        }
+        else {
+            console.log("DeepSeek is already open");
+        }
     }
 });
 ipcMain.on("close-deepseek", (_, prompt) => {
@@ -258,7 +308,14 @@ ipcMain.on("open-copilot", (_, prompt) => {
     if (prompt === "open copilot now") {
         console.log("Opening Copilot");
         let url = "https://copilot.microsoft.com/";
-        addBrowserView(mainWindow, url, websites, views);
+        // Check if Copilot is already open
+        const alreadyOpen = views.some((view) => view.id.match("copilot"));
+        if (!alreadyOpen) {
+            addBrowserView(mainWindow, url, websites, views);
+        }
+        else {
+            console.log("Copilot is already open");
+        }
     }
 });
 ipcMain.on("close-copilot", (_, prompt) => {
@@ -274,7 +331,14 @@ ipcMain.on("open-chatgpt", (_, prompt) => {
     if (prompt === "open chatgpt now") {
         console.log("Opening ChatGPT");
         let url = "https://chatgpt.com";
-        addBrowserView(mainWindow, url, websites, views);
+        // Check if ChatGPT is already open
+        const alreadyOpen = views.some((view) => view.id.match("chatgpt"));
+        if (!alreadyOpen) {
+            addBrowserView(mainWindow, url, websites, views);
+        }
+        else {
+            console.log("ChatGPT is already open");
+        }
     }
 });
 ipcMain.on("close-chatgpt", (_, prompt) => {
@@ -290,7 +354,14 @@ ipcMain.on("open-gemini", (_, prompt) => {
     if (prompt === "open gemini now") {
         console.log("Opening Gemini");
         let url = "https://gemini.google.com";
-        addBrowserView(mainWindow, url, websites, views);
+        // Check if Gemini is already open
+        const alreadyOpen = views.some((view) => view.id.match("gemini"));
+        if (!alreadyOpen) {
+            addBrowserView(mainWindow, url, websites, views);
+        }
+        else {
+            console.log("Gemini is already open");
+        }
     }
 });
 ipcMain.on("close-gemini", (_, prompt) => {
@@ -376,4 +447,29 @@ ipcMain.on("close-edit-window", (event) => {
             formWindow.webContents.send("refresh-prompt-table");
         }
     }
+});
+// Model selection window handlers
+ipcMain.on("open-model-selection-window", () => {
+    createModelSelectionWindow();
+});
+ipcMain.on("close-model-selection-window", () => {
+    if (modelSelectionWindow) {
+        modelSelectionWindow.close();
+        modelSelectionWindow = null;
+    }
+});
+ipcMain.handle("get-default-models", () => {
+    return store.get("defaultModels") || [];
+});
+ipcMain.on("save-default-models", (_, models) => {
+    store.set("defaultModels", models);
+    console.log("Saved default models:", models);
+    // Show a message and restart the app
+    if (modelSelectionWindow) {
+        modelSelectionWindow.close();
+        modelSelectionWindow = null;
+    }
+    // Restart the application
+    app.relaunch();
+    app.exit(0);
 });

@@ -42,7 +42,7 @@ export function addBrowserView(
       x: index * viewWidth,
       y: 0,
       width: viewWidth,
-      height: height - 235,
+      height: height - 280,
     });
   });
 
@@ -50,7 +50,7 @@ export function addBrowserView(
     x: (websites.length - 1) * viewWidth,
     y: 0,
     width: viewWidth,
-    height: height - 235,
+    height: height - 280,
   });
 
   view.webContents.setZoomFactor(1.5);
@@ -91,7 +91,7 @@ export function removeBrowserView(
       x: index * viewWidth,
       y: 0,
       width: viewWidth,
-      height: height - 235,
+      height: height - 280,
     });
   });
 }

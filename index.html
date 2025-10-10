@@ -28,8 +28,8 @@
         background-color: #f0f0f0;
         height: auto;
         padding: 10px;
-        min-height: 120px; /* Ensure a minimum height */
-        max-height: 40%; /* Prevent it from taking too much space */
+        min-height: 180px; /* Ensure a minimum height */
+        max-height: 50%; /* Prevent it from taking too much space */
         position: relative; /* Add this to create a new stacking context */
         align-items: flex-start; /* Align children to the top */
       }
@@ -56,6 +56,7 @@
 
       .dropdown,
       .prompt-picker,
+      .model-picker,
       .diff {
         width: 100%;
         position: relative;
@@ -63,6 +64,7 @@
 
       #dropdown-button,
       .prompt-select,
+      .model-select,
       .diff-select {
         width: 100%;
         height: 50px;
@@ -115,7 +117,8 @@
       }
 
       /* Remove any margins that might affect layout */
-      .prompt-picker {
+      .prompt-picker,
+      .model-picker {
         margin: 0;
       }
 
@@ -135,7 +138,11 @@
 
   <body>
     <div id="prompt-area">
-      <textarea id="prompt-input" rows="3" placeholder="Press Ctrl + Enter to send prompt"></textarea>
+      <textarea
+        id="prompt-input"
+        rows="3"
+        placeholder="Press Ctrl + Enter to send prompt"
+      ></textarea>
       <div class="button-group">
         <div class="dropdown">
           <button id="dropdown-button">Show Models ▼</button>
@@ -150,6 +157,9 @@
         </div>
         <div class="prompt-picker">
           <button class="prompt-select">Select Prompts</button>
+        </div>
+        <div class="model-picker">
+          <button class="model-select">Default Models</button>
         </div>
         <!-- <div class="diff">
           <button class="diff-select">Select Diff</button>

@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <meta
+      http-equiv="Content-Security-Policy"
+      content="default-src 'self'; style-src 'self' 'unsafe-inline';"
+    />
+    <title>Select Default Models</title>
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      body {
+        font-family: Arial, sans-serif;
+        padding: 20px;
+        background-color: #f5f5f5;
+      }
+
+      h2 {
+        margin-bottom: 20px;
+        color: #333;
+      }
+
+      .instructions {
+        margin-bottom: 20px;
+        padding: 10px;
+        background-color: #e3f2fd;
+        border-left: 4px solid #2196f3;
+        color: #1976d2;
+      }
+
+      .model-list {
+        background-color: white;
+        padding: 20px;
+        border-radius: 8px;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        margin-bottom: 20px;
+      }
+
+      .model-item {
+        display: flex;
+        align-items: center;
+        padding: 12px;
+        margin-bottom: 8px;
+        border: 2px solid #e0e0e0;
+        border-radius: 4px;
+        cursor: pointer;
+        transition: all 0.2s;
+      }
+
+      .model-item:hover {
+        background-color: #f5f5f5;
+        border-color: #2196f3;
+      }
+
+      .model-item input[type="checkbox"] {
+        width: 20px;
+        height: 20px;
+        margin-right: 12px;
+        cursor: pointer;
+      }
+
+      .model-item label {
+        cursor: pointer;
+        font-size: 16px;
+        color: #333;
+        user-select: none;
+      }
+
+      .button-group {
+        display: flex;
+        gap: 10px;
+        justify-content: flex-end;
+      }
+
+      button {
+        padding: 12px 24px;
+        font-size: 16px;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+        transition: background-color 0.2s;
+      }
+
+      #save-button {
+        background-color: #4caf50;
+        color: white;
+      }
+
+      #save-button:hover {
+        background-color: #45a049;
+      }
+
+      #cancel-button {
+        background-color: #f44336;
+        color: white;
+      }
+
+      #cancel-button:hover {
+        background-color: #da190b;
+      }
+    </style>
+  </head>
+  <body>
+    <h2>Select Default Models</h2>
+    <div class="instructions">
+      Choose which models should be loaded by default when the application starts.
+      You can select multiple models.
+    </div>
+
+    <div class="model-list">
+      <div class="model-item">
+        <input type="checkbox" id="chatgpt" value="https://chatgpt.com" />
+        <label for="chatgpt">ChatGPT</label>
+      </div>
+      <div class="model-item">
+        <input type="checkbox" id="gemini" value="https://gemini.google.com" />
+        <label for="gemini">Gemini</label>
+      </div>
+      <div class="model-item">
+        <input type="checkbox" id="claude" value="https://claude.ai/chats/" />
+        <label for="claude">Claude</label>
+      </div>
+      <div class="model-item">
+        <input type="checkbox" id="grok" value="https://grok.com/" />
+        <label for="grok">Grok</label>
+      </div>
+      <div class="model-item">
+        <input type="checkbox" id="deepseek" value="https://chat.deepseek.com/" />
+        <label for="deepseek">DeepSeek</label>
+      </div>
+      <div class="model-item">
+        <input type="checkbox" id="copilot" value="https://copilot.microsoft.com/" />
+        <label for="copilot">Microsoft Copilot</label>
+      </div>
+    </div>
+
+    <div class="button-group">
+      <button id="cancel-button">Cancel</button>
+      <button id="save-button">Save & Restart</button>
+    </div>
+
+    <script type="module" src="../dist/select_models_renderer.js"></script>
+  </body>
+</html>
