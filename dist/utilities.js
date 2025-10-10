@@ -39,7 +39,7 @@ export function addBrowserView(mainWindow, url, websites, views, webPreferences 
     view.webContents.setZoomFactor(1.5);
     view.webContents.loadURL(url);
     // Open DevTools for debugging
-    view.webContents.openDevTools({ mode: "detach" });
+    // view.webContents.openDevTools({ mode: "detach" });
     views.push(view);
     return view;
 }

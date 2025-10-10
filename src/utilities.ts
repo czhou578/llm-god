@@ -57,7 +57,7 @@ export function addBrowserView(
   view.webContents.loadURL(url);
 
   // Open DevTools for debugging
-  view.webContents.openDevTools({ mode: "detach" });
+  // view.webContents.openDevTools({ mode: "detach" });
 
   views.push(view);
   return view;

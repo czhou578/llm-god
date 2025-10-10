@@ -21,8 +21,8 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 require("electron-reload")(path.join(__dirname, "."));
 const websites = [
-    "https://grok.com/",
-    "https://chat.deepseek.com/",
+    "https://chatgpt.com/",
+    "https://gemini.google.com",
 ];
 function createWindow() {
     mainWindow = new BrowserWindow({
@@ -47,7 +47,7 @@ function createWindow() {
         }, 500);
     });
     mainWindow.loadFile(path.join(__dirname, "..", "index.html")); // Changed to point to root index.html
-    mainWindow.webContents.openDevTools({ mode: "detach" });
+    // mainWindow.webContents.openDevTools({ mode: "detach" });
     const viewWidth = Math.floor(mainWindow.getBounds().width / websites.length);
     const { height } = mainWindow.getBounds();
     websites.forEach((url, index) => {
@@ -70,7 +70,7 @@ function createWindow() {
         view.webContents.setZoomFactor(1);
         view.webContents.loadURL(url);
         // Open DevTools for each view for debugging
-        view.webContents.openDevTools({ mode: "detach" });
+        // view.webContents.openDevTools({ mode: "detach" });
         views.push(view);
     });
     mainWindow.on("enter-full-screen", () => {
