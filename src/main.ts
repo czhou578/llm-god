@@ -186,27 +186,20 @@ ipcMain.on("enter-prompt", (_: IpcMainEvent, prompt: string) => {
 });
 
 ipcMain.on("send-prompt", (_, prompt: string) => {
-  console.log("Received send-prompt event with prompt:", prompt);
   const cleanPrompt = stripEmojis(prompt);
-  console.log("Cleaned prompt:", cleanPrompt);
-  console.log("Number of views:", views.length);
 
-  views.forEach(async (view, index) => {
-    console.log(`Processing view ${index}, id: ${view.id}`);
+  views.forEach(async (view) => {
     try {
       await injectPromptIntoView(view, cleanPrompt);
-      console.log(`Successfully injected prompt in view ${index}`);
     } catch (error) {
-      console.error(`Error injecting prompt in view ${index}:`, error);
+      console.error(`Error injecting prompt:`, error);
     }
 
     setTimeout(async () => {
-      console.log(`Sending prompt in view ${index}`);
       try {
         await sendPromptInView(view);
-        console.log(`Successfully sent prompt in view ${index}`);
       } catch (error) {
-        console.error(`Error sending prompt in view ${index}:`, error);
+        console.error(`Error sending prompt:`, error);
       }
     }, 100);
   });
