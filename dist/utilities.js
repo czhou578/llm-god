@@ -371,25 +371,39 @@ export function sendPromptInView(view) {
     else if (view.id && view.id.match("copilot")) {
         view.webContents.executeJavaScript(`
       (function() {
-        var btn = document.querySelector('button[aria-label="Submit"]');
-        if (!btn) btn = document.querySelector('button[type="submit"]');
-        if (!btn) {
-          const textarea = document.querySelector('textarea');
-          if (textarea) {
-            const form = textarea.closest('form');
-            if (form) {
-              const buttons = form.querySelectorAll('button');
-              btn = Array.from(buttons).find(b => {
-                const svg = b.querySelector('svg');
-                return svg && !b.disabled;
-              });
-            }
+        const textarea = document.querySelector('textarea');
+        const allButtons = document.querySelectorAll('button');
+
+        var btn = Array.from(allButtons).find(b => {
+          const label = b.getAttribute('aria-label');
+          return label && label.toLowerCase().includes('submit');
+        });
+
+        if (!btn && textarea) {
+          const form = textarea.closest('form');
+          if (form) {
+            const buttons = form.querySelectorAll('button');
+            btn = Array.from(buttons).find(b => {
+              const svg = b.querySelector('svg');
+              const isSubmit = b.type === 'submit';
+              return (svg || isSubmit) && !b.disabled;
+            });
           }
         }
 
         if (btn) {
           btn.disabled = false;
           btn.click();
+        } else if (textarea) {
+          const enterEvent = new KeyboardEvent('keydown', {
+            key: 'Enter',
+            code: 'Enter',
+            keyCode: 13,
+            which: 13,
+            bubbles: true,
+            cancelable: true
+          });
+          textarea.dispatchEvent(enterEvent);
         }
       })();
     `);

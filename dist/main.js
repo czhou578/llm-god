@@ -21,7 +21,7 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 require("electron-reload")(path.join(__dirname, "."));
 const websites = [
-    "https://chatgpt.com/",
+    "https://chatgpt.com",
     "https://gemini.google.com",
 ];
 function createWindow() {
@@ -148,6 +148,8 @@ ipcMain.on("send-prompt", (_, prompt) => {
         catch (error) {
             console.error(`Error injecting prompt:`, error);
         }
+        // Increase timeout for Copilot and other sites to properly inject the prompt
+        const delay = view.id && view.id.match("copilot") ? 300 : 100;
         setTimeout(async () => {
             try {
                 await sendPromptInView(view);
@@ -155,7 +157,7 @@ ipcMain.on("send-prompt", (_, prompt) => {
             catch (error) {
                 console.error(`Error sending prompt:`, error);
             }
-        }, 100);
+        }, delay);
     });
 });
 ipcMain.on("save-prompt", (event, promptValue) => {
