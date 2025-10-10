@@ -32,6 +32,12 @@
         max-height: 50%; /* Prevent it from taking too much space */
         position: relative; /* Add this to create a new stacking context */
         align-items: flex-start; /* Align children to the top */
+        transition: background-color 0.3s, color 0.3s;
+      }
+
+      #prompt-area.dark-mode {
+        background-color: #1e1e1e;
+        color: #e0e0e0;
       }
 
       #prompt-input {
@@ -41,6 +47,13 @@
         line-height: 1.5;
         width: 88%;
         height: 100%;
+        transition: background-color 0.3s, color 0.3s, border-color 0.3s;
+      }
+
+      #prompt-area.dark-mode #prompt-input {
+        background-color: #2d2d2d;
+        color: #e0e0e0;
+        border: 1px solid #444;
       }
 
       /* Group dropdown and prompt-picker vertically */
@@ -48,10 +61,22 @@
         display: flex;
         flex-direction: column;
         align-items: flex-start; /* Align to the right */
-        width: 10%;
+        width: 12%;
         margin-left: auto;
         margin-right: 10px;
         gap: 10px; /* Space between buttons */
+      }
+
+      .theme-toggle {
+        width: 40px !important;
+        height: 40px !important;
+        font-size: 20px !important;
+        padding: 5px !important;
+        position: absolute;
+        right: calc(12% + 15px);
+        top: 50%;
+        transform: translateY(-50%);
+        border-radius: 50%;
       }
 
       .dropdown,
@@ -65,7 +90,8 @@
       #dropdown-button,
       .prompt-select,
       .model-select,
-      .diff-select {
+      .diff-select,
+      .theme-toggle {
         width: 100%;
         height: 50px;
         font-size: 18px;
@@ -78,6 +104,17 @@
         display: block;
         text-align: center;
         font-weight: bold;
+        transition: background-color 0.3s, color 0.3s, border-color 0.3s;
+      }
+
+      #prompt-area.dark-mode #dropdown-button,
+      #prompt-area.dark-mode .prompt-select,
+      #prompt-area.dark-mode .model-select,
+      #prompt-area.dark-mode .diff-select,
+      #prompt-area.dark-mode .theme-toggle {
+        background-color: #2d2d2d;
+        color: #e0e0e0;
+        border-color: #444;
       }
 
       .dropdown-content {
@@ -110,10 +147,25 @@
         margin: 0;
         margin-bottom: 5px;
         font-size: 16px;
+        transition: background-color 0.3s;
       }
 
       .dropdown-item:hover {
         background-color: #ddd;
+      }
+
+      #prompt-area.dark-mode .dropdown-content {
+        background-color: #2d2d2d;
+        border-color: #0078d7;
+      }
+
+      #prompt-area.dark-mode .dropdown-item {
+        background-color: #3a3a3a;
+        color: #e0e0e0;
+      }
+
+      #prompt-area.dark-mode .dropdown-item:hover {
+        background-color: #4a4a4a;
       }
 
       /* Remove any margins that might affect layout */
@@ -143,6 +195,7 @@
         rows="3"
         placeholder="Press Ctrl + Enter to send prompt"
       ></textarea>
+      <button class="theme-toggle">🌙</button>
       <div class="button-group">
         <div class="dropdown">
           <button id="dropdown-button">Show Models ▼</button>

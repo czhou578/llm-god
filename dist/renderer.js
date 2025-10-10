@@ -66,6 +66,7 @@ const openChatGPTButton = document.getElementById("showChatGPT");
 const openGeminiButton = document.getElementById("showGemini");
 const promptDropdownButton = document.querySelector(".prompt-select");
 const modelSelectButton = document.querySelector(".model-select");
+const themeToggleButton = document.querySelector(".theme-toggle");
 // Check if ChatGPT is in default models and set initial button text
 window.addEventListener("DOMContentLoaded", async () => {
     const ipc = window.electron.ipcRenderer;
@@ -77,6 +78,15 @@ window.addEventListener("DOMContentLoaded", async () => {
     if (openGeminiButton) {
         const hasGemini = defaultModels && defaultModels.some((url) => url.includes("gemini"));
         openGeminiButton.textContent = hasGemini ? "Hide Gemini" : "Show Gemini";
+    }
+    // Load saved theme preference
+    const savedTheme = localStorage.getItem("theme");
+    const promptArea = document.getElementById("prompt-area");
+    if (savedTheme === "dark" && promptArea) {
+        promptArea.classList.add("dark-mode");
+        if (themeToggleButton) {
+            themeToggleButton.textContent = "☀️";
+        }
     }
 });
 if (openChatGPTButton) {
@@ -181,6 +191,22 @@ if (modelSelectButton) {
         console.log("Model select button clicked");
         event.stopPropagation();
         ipcRenderer.send("open-model-selection-window");
+    });
+}
+if (themeToggleButton) {
+    themeToggleButton.addEventListener("click", (event) => {
+        const promptArea = document.getElementById("prompt-area");
+        if (promptArea) {
+            promptArea.classList.toggle("dark-mode");
+            if (promptArea.classList.contains("dark-mode")) {
+                themeToggleButton.textContent = "☀️";
+                localStorage.setItem("theme", "dark");
+            }
+            else {
+                themeToggleButton.textContent = "🌙";
+                localStorage.setItem("theme", "light");
+            }
+        }
     });
 }
 // Update the inject-prompt handler
