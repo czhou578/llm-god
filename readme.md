@@ -2,7 +2,7 @@
 
 ## Screenshot
 
-<img width="3447" height="1899" alt="image" src="https://github.com/user-attachments/assets/529000de-d6f7-494e-a0ef-0388b08a4424" />
+![alt text](image-1.png)
 
 This is a desktop app for Windows machines only (currently) that allows users to simultaneously prompt multiple LLM's at once in one environment. I use this app every day, for coding or non coding purposes. It has saved me countless hours of copypasting and is just so much more efficient.
 
@@ -13,6 +13,7 @@ Currently, the following LLM web interfaces are supported:
 - Anthropic Claude
 - X.ai Grok
 - DeepSeek
+- Copilot
 
 ## Downloading the App for Personal Use
 
@@ -97,4 +98,4 @@ While developing, I liked to have the devtools of the app be visible and also ha
 
 5/17: Migrated to using TypeScript across the app.
 6/15: Added support for LMArena and also for adding custom prompts that can be saved.
-10/10: Removed support for Perplexity and LMArena (due to incompatibility) and added more contextual searching for JavaScript injection logic.
+10/10: Removed support for Perplexity and LMArena (due to incompatibility) and added more contextual searching for JavaScript injection logic. Added Copilot support.
