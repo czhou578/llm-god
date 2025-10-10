@@ -6,8 +6,6 @@
 <img width="3447" height="1899" alt="image" src="https://github.com/user-attachments/assets/529000de-d6f7-494e-a0ef-0388b08a4424" />
 
 
-
-
 This is a desktop app for Windows machines only (currently) that allows users to simultaneously prompt multiple LLM's at once in one environment. I use this app every day, for coding or non coding purposes. It has saved me countless hours of copypasting and is just so much more efficient.
 
 Currently, the following LLM web interfaces are supported:
