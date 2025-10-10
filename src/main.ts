@@ -303,6 +303,24 @@ ipcMain.on("close-deepseek", (_, prompt: string) => {
   }
 });
 
+ipcMain.on("open-copilot", (_, prompt: string) => {
+  if (prompt === "open copilot now") {
+    console.log("Opening Copilot");
+    let url = "https://copilot.microsoft.com/";
+    addBrowserView(mainWindow, url, websites, views);
+  }
+});
+
+ipcMain.on("close-copilot", (_, prompt: string) => {
+  if (prompt === "close copilot now") {
+    console.log("Closing Copilot");
+    const copilotView = views.find((view) => view.id.match("copilot"));
+    if (copilotView) {
+      removeBrowserView(mainWindow, copilotView, websites, views);
+    }
+  }
+});
+
 ipcMain.on("open-edit-view", (_, prompt: string) => {
   console.log("Opening edit view for prompt:", prompt);
   prompt = prompt.normalize("NFKC");
