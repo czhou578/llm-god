@@ -47,7 +47,7 @@ function createWindow() {
         }, 500);
     });
     mainWindow.loadFile(path.join(__dirname, "..", "index.html")); // Changed to point to root index.html
-    mainWindow.webContents.openDevTools({ mode: "detach" });
+    // mainWindow.webContents.openDevTools({ mode: "detach" });
     const viewWidth = Math.floor(mainWindow.getBounds().width / websites.length);
     const { height } = mainWindow.getBounds();
     websites.forEach((url, index) => {
@@ -234,6 +234,22 @@ ipcMain.on("close-deepseek", (_, prompt) => {
         const deepseekView = views.find((view) => view.id.match("deepseek"));
         if (deepseekView) {
             removeBrowserView(mainWindow, deepseekView, websites, views);
+        }
+    }
+});
+ipcMain.on("open-copilot", (_, prompt) => {
+    if (prompt === "open copilot now") {
+        console.log("Opening Copilot");
+        let url = "https://copilot.microsoft.com/";
+        addBrowserView(mainWindow, url, websites, views);
+    }
+});
+ipcMain.on("close-copilot", (_, prompt) => {
+    if (prompt === "close copilot now") {
+        console.log("Closing Copilot");
+        const copilotView = views.find((view) => view.id.match("copilot"));
+        if (copilotView) {
+            removeBrowserView(mainWindow, copilotView, websites, views);
         }
     }
 });

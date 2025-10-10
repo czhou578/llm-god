@@ -163,6 +163,20 @@ export function injectPromptIntoView(view, prompt) {
             }
         `);
     }
+    else if (view.id && view.id.match("copilot")) {
+        view.webContents.executeJavaScript(`
+            {
+                var inputElement = document.querySelector('textarea[aria-label="Ask me anything..."]');
+                if (!inputElement) inputElement = document.querySelector('textarea');
+                if (inputElement) {
+                    var nativeTextAreaValueSetter = Object.getOwnPropertyDescriptor(window.HTMLTextAreaElement.prototype, "value").set;
+                    nativeTextAreaValueSetter.call(inputElement, \`${escapedPrompt}\`);
+                    const inputEvent = new Event('input', { bubbles: true });
+                    inputElement.dispatchEvent(inputEvent);
+                }
+            }
+        `);
+    }
 }
 export function sendPromptInView(view) {
     if (view.id && view.id.match("chatgpt")) {
@@ -217,6 +231,20 @@ export function sendPromptInView(view) {
         var btn = buttons[2]
         if (btn) {
             btn.focus();
+            btn.click();
+          } else {
+            console.log("Element not found");
+          }
+    }`);
+    }
+    else if (view.id && view.id.match("copilot")) {
+        view.webContents.executeJavaScript(`
+        {
+        var btn = document.querySelector('button[aria-label="Submit"]');
+        if (!btn) btn = document.querySelector('button[type="submit"]');
+        if (btn) {
+            btn.focus();
+            btn.disabled = false;
             btn.click();
           } else {
             console.log("Element not found");
