@@ -39,6 +39,8 @@ if (hasContextBridge && canAccessWindow) {
                     "close-deepseek",
                     "open-grok",
                     "close-grok",
+                    "open-copilot",
+                    "close-copilot",
                     "open-lm-arena",
                     "close-lm-arena",
                     "content-copied", // Add this for view contexts too
