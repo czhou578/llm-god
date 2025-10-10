@@ -339,6 +339,42 @@ ipcMain.on("close-copilot", (_, prompt: string) => {
   }
 });
 
+ipcMain.on("open-chatgpt", (_, prompt: string) => {
+  if (prompt === "open chatgpt now") {
+    console.log("Opening ChatGPT");
+    let url = "https://chatgpt.com";
+    addBrowserView(mainWindow, url, websites, views);
+  }
+});
+
+ipcMain.on("close-chatgpt", (_, prompt: string) => {
+  if (prompt === "close chatgpt now") {
+    console.log("Closing ChatGPT");
+    const chatgptView = views.find((view) => view.id.match("chatgpt"));
+    if (chatgptView) {
+      removeBrowserView(mainWindow, chatgptView, websites, views);
+    }
+  }
+});
+
+ipcMain.on("open-gemini", (_, prompt: string) => {
+  if (prompt === "open gemini now") {
+    console.log("Opening Gemini");
+    let url = "https://gemini.google.com";
+    addBrowserView(mainWindow, url, websites, views);
+  }
+});
+
+ipcMain.on("close-gemini", (_, prompt: string) => {
+  if (prompt === "close gemini now") {
+    console.log("Closing Gemini");
+    const geminiView = views.find((view) => view.id.match("gemini"));
+    if (geminiView) {
+      removeBrowserView(mainWindow, geminiView, websites, views);
+    }
+  }
+});
+
 ipcMain.on("open-edit-view", (_, prompt: string) => {
   console.log("Opening edit view for prompt:", prompt);
   prompt = prompt.normalize("NFKC");

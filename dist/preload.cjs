@@ -41,6 +41,10 @@ if (hasContextBridge && canAccessWindow) {
                     "close-grok",
                     "open-copilot",
                     "close-copilot",
+                    "open-chatgpt",
+                    "close-chatgpt",
+                    "open-gemini",
+                    "close-gemini",
                     "open-lm-arena",
                     "close-lm-arena",
                     "content-copied", // Add this for view contexts too
