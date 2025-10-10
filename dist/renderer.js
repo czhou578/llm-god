@@ -2,17 +2,17 @@ const ipcRenderer = window.electron.ipcRenderer;
 // Add emoji stripping function (duplicate from utilities since renderer can't import from utilities)
 function stripEmojis(text) {
     return text
-        .replace(/[\u{1F600}-\u{1F64F}]/gu, '')
-        .replace(/[\u{1F300}-\u{1F5FF}]/gu, '')
-        .replace(/[\u{1F680}-\u{1F6FF}]/gu, '')
-        .replace(/[\u{1F1E0}-\u{1F1FF}]/gu, '')
-        .replace(/[\u{2600}-\u{26FF}]/gu, '')
-        .replace(/[\u{2700}-\u{27BF}]/gu, '')
-        .replace(/[\u{1F900}-\u{1F9FF}]/gu, '')
-        .replace(/[\u{1FA00}-\u{1FA6F}]/gu, '')
-        .replace(/[\u{1FA70}-\u{1FAFF}]/gu, '')
-        .replace(/[\u{FE00}-\u{FE0F}]/gu, '')
-        .replace(/[\u{200D}]/gu, '')
+        .replace(/[\u{1F600}-\u{1F64F}]/gu, "")
+        .replace(/[\u{1F300}-\u{1F5FF}]/gu, "")
+        .replace(/[\u{1F680}-\u{1F6FF}]/gu, "")
+        .replace(/[\u{1F1E0}-\u{1F1FF}]/gu, "")
+        .replace(/[\u{2600}-\u{26FF}]/gu, "")
+        .replace(/[\u{2700}-\u{27BF}]/gu, "")
+        .replace(/[\u{1F900}-\u{1F9FF}]/gu, "")
+        .replace(/[\u{1FA00}-\u{1FA6F}]/gu, "")
+        .replace(/[\u{1FA70}-\u{1FAFF}]/gu, "")
+        .replace(/[\u{FE00}-\u{FE0F}]/gu, "")
+        .replace(/[\u{200D}]/gu, "")
         .trim();
 }
 export function logToWebPage(message) {
@@ -135,7 +135,7 @@ ipcRenderer.on("inject-prompt", (_, selectedPrompt) => {
             console.log("Textarea found, injecting prompt");
             promptInput.value = cleanPrompt;
             promptInput.focus();
-            const inputEvent = new Event('input', { bubbles: true });
+            const inputEvent = new Event("input", { bubbles: true });
             promptInput.dispatchEvent(inputEvent);
             console.log("Prompt injected successfully");
         }
@@ -144,8 +144,8 @@ ipcRenderer.on("inject-prompt", (_, selectedPrompt) => {
             setTimeout(injectPrompt, 100);
         }
     };
-    if (document.readyState === 'loading') {
-        document.addEventListener('DOMContentLoaded', injectPrompt);
+    if (document.readyState === "loading") {
+        document.addEventListener("DOMContentLoaded", injectPrompt);
     }
     else {
         injectPrompt();

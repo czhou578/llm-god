@@ -399,16 +399,28 @@ export function sendPromptInView(view: CustomBrowserView) {
     `);
   } else if (view.id && view.id.match("copilot")) {
     view.webContents.executeJavaScript(`
-        {
+      (function() {
         var btn = document.querySelector('button[aria-label="Submit"]');
         if (!btn) btn = document.querySelector('button[type="submit"]');
-        if (btn) {
-            btn.focus();
-            btn.disabled = false;
-            btn.click();
-          } else {
-            console.log("Element not found");
+        if (!btn) {
+          const textarea = document.querySelector('textarea');
+          if (textarea) {
+            const form = textarea.closest('form');
+            if (form) {
+              const buttons = form.querySelectorAll('button');
+              btn = Array.from(buttons).find(b => {
+                const svg = b.querySelector('svg');
+                return svg && !b.disabled;
+              });
+            }
           }
-    }`);
+        }
+
+        if (btn) {
+          btn.disabled = false;
+          btn.click();
+        }
+      })();
+    `);
   }
 }
