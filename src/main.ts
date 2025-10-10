@@ -45,7 +45,7 @@ require("electron-reload")(path.join(__dirname, "."));
 
 const websites: string[] = [
   "https://chatgpt.com/",
-  "https://bard.google.com",
+  "https://gemini.google.com",
 ];
 
 function createWindow(): void {
@@ -99,6 +99,9 @@ function createWindow(): void {
 
     view.webContents.setZoomFactor(1);
     view.webContents.loadURL(url);
+
+    // Open DevTools for each view for debugging
+    // view.webContents.openDevTools({ mode: "detach" });
 
     views.push(view);
   });
@@ -183,9 +186,22 @@ ipcMain.on("enter-prompt", (_: IpcMainEvent, prompt: string) => {
 });
 
 ipcMain.on("send-prompt", (_, prompt: string) => {
-  // Added type for prompt (though unused here)
-  views.forEach((view) => {
-    sendPromptInView(view);
+  const cleanPrompt = stripEmojis(prompt);
+
+  views.forEach(async (view) => {
+    try {
+      await injectPromptIntoView(view, cleanPrompt);
+    } catch (error) {
+      console.error(`Error injecting prompt:`, error);
+    }
+
+    setTimeout(async () => {
+      try {
+        await sendPromptInView(view);
+      } catch (error) {
+        console.error(`Error sending prompt:`, error);
+      }
+    }, 100);
   });
 });
 

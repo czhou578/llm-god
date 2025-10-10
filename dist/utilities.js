@@ -38,6 +38,8 @@ export function addBrowserView(mainWindow, url, websites, views, webPreferences 
     });
     view.webContents.setZoomFactor(1.5);
     view.webContents.loadURL(url);
+    // Open DevTools for debugging
+    // view.webContents.openDevTools({ mode: "detach" });
     views.push(view);
     return view;
 }
@@ -110,15 +112,24 @@ export function injectPromptIntoView(view, prompt) {
             })();
         `);
     }
-    else if (view.id && view.id.match("bard")) {
+    else if (view.id && view.id.match("bard") || view.id && view.id.match("gemini")) {
         view.webContents.executeJavaScript(`
             {
                 var inputElement = document.querySelector(".ql-editor.textarea");
+                if (!inputElement) {
+                    inputElement = document.querySelector("rich-textarea textarea");
+                }
+                if (!inputElement) {
+                    inputElement = document.querySelector("[contenteditable='true']");
+                }
                 if (inputElement) {
                     const inputEvent = new Event('input', { bubbles: true });
-                    inputElement.value = \`${escapedPrompt}\`;
+                    if (inputElement.tagName === 'TEXTAREA') {
+                        inputElement.value = \`${escapedPrompt}\`;
+                    } else {
+                        inputElement.innerText = \`${escapedPrompt}\`;
+                    }
                     inputElement.dispatchEvent(inputEvent);
-                    inputElement.querySelector('p').textContent = \`${escapedPrompt}\`;
                 }
             }
         `);
@@ -181,61 +192,181 @@ export function injectPromptIntoView(view, prompt) {
 export function sendPromptInView(view) {
     if (view.id && view.id.match("chatgpt")) {
         view.webContents.executeJavaScript(`
-            var btn = document.querySelector('button[aria-label*="Send prompt"]');
-            if (btn) {
-                btn.focus();
-                btn.disabled = false;
-                btn.click();
-            }
+            (function() {
+                var btn = document.querySelector('button[data-testid="send-button"]');
+                if (!btn) btn = document.querySelector('button[aria-label*="Send"]');
+                if (!btn) btn = document.querySelector('button[data-testid="fruitjuice-send-button"]');
+                if (!btn) {
+                    const buttons = Array.from(document.querySelectorAll('button'));
+                    btn = buttons.find(b => {
+                        const svg = b.querySelector('svg');
+                        return svg && b.closest('form') && !b.disabled;
+                    });
+                }
+
+                if (btn) {
+                    btn.disabled = false;
+                    btn.click();
+                }
+            })();
         `);
     }
-    else if (view.id && view.id.match("bard")) {
-        view.webContents.executeJavaScript(`{
-      var btn = document.querySelector("button[aria-label*='Send message']");
-      if (btn) {
-        btn.setAttribute("aria-disabled", "false");
-        btn.focus();
-        btn.click();
-      }
-    }`);
+    else if (view.id && view.id.match("bard") || view.id && view.id.match("gemini")) {
+        view.webContents.executeJavaScript(`
+      (function() {
+        var btn = document.querySelector("button[aria-label*='Send message']");
+        if (!btn) btn = document.querySelector("button[aria-label*='Send']");
+        if (!btn) btn = document.querySelector("button[mattooltip*='Send']");
+        if (!btn) btn = document.querySelector("button.send-button");
+        if (!btn) {
+          const textarea = document.querySelector('rich-textarea, textarea, [contenteditable="true"]');
+          if (textarea) {
+            const form = textarea.closest('form');
+            if (form) {
+              const buttons = form.querySelectorAll('button');
+              btn = Array.from(buttons).find(b => {
+                const svg = b.querySelector('svg');
+                return svg && !b.disabled;
+              });
+            }
+          }
+        }
+
+        if (btn) {
+          btn.setAttribute("aria-disabled", "false");
+          btn.disabled = false;
+          btn.click();
+        }
+      })();
+    `);
     }
     else if (view.id && view.id.match("claude")) {
-        view.webContents.executeJavaScript(`{
-    var btn = document.querySelector("button[aria-label*='Send message']");
-    if (!btn) var btn = document.querySelector('button:has(div svg)');
-    if (!btn) var btn = document.querySelector('button:has(svg)');
-    if (btn) {
-      btn.focus();
-      btn.disabled = false;
-      btn.click();
-    }
-  }`);
+        view.webContents.executeJavaScript(`
+      (function() {
+        var btn = document.querySelector("button[aria-label*='Send message']");
+        if (!btn) btn = document.querySelector("button[aria-label*='Send Message']");
+        if (!btn) btn = document.querySelector('button:has(div svg)');
+        if (!btn) btn = document.querySelector('button:has(svg)');
+        if (!btn) {
+          const inputArea = document.querySelector('[contenteditable="true"]');
+          if (inputArea) {
+            const container = inputArea.closest('div[class*="composer"]') || inputArea.closest('form') || inputArea.parentElement;
+            if (container) {
+              const buttons = container.querySelectorAll('button');
+              btn = Array.from(buttons).find(b => {
+                const svg = b.querySelector('svg');
+                return svg && !b.disabled;
+              });
+            }
+          }
+        }
+
+        if (btn) {
+          btn.disabled = false;
+          btn.click();
+        }
+      })();
+    `);
     }
     else if (view.id && view.id.match("grok")) {
         view.webContents.executeJavaScript(`
-        {
+      (function() {
+        const textarea = document.querySelector('textarea');
         var btn = document.querySelector('button[aria-label*="Submit"]');
-        if (btn) {
-            btn.focus();
-            btn.disabled = false;
-            btn.click();
-          } else {
-            console.log("Element not found");
+        if (!btn) btn = document.querySelector('button[aria-label*="Send"]');
+        if (!btn) btn = document.querySelector('button[data-testid="send-button"]');
+        if (!btn && textarea) {
+          const form = textarea.closest('form');
+          if (form) {
+            const buttons = form.querySelectorAll('button');
+            btn = Array.from(buttons).find(b => {
+              const svg = b.querySelector('svg');
+              return svg && !b.disabled;
+            });
           }
-      }`);
+        }
+
+        if (btn) {
+          btn.disabled = false;
+          btn.click();
+
+          setTimeout(() => {
+            const clickEvent = new MouseEvent('click', {
+              bubbles: true,
+              cancelable: true,
+              view: window
+            });
+            btn.dispatchEvent(clickEvent);
+          }, 50);
+
+          if (textarea) {
+            setTimeout(() => {
+              const enterEvent = new KeyboardEvent('keydown', {
+                key: 'Enter',
+                code: 'Enter',
+                keyCode: 13,
+                bubbles: true,
+                cancelable: true
+              });
+              textarea.dispatchEvent(enterEvent);
+            }, 100);
+          }
+        }
+      })();
+    `);
     }
     else if (view.id && view.id.match("deepseek")) {
         view.webContents.executeJavaScript(`
-        {
-        var buttons = Array.from(document.querySelectorAll('div[role="button"]'));
-        var btn = buttons[2]
-        if (btn) {
-            btn.focus();
-            btn.click();
-          } else {
-            console.log("Element not found");
+      (function() {
+        var btn = null;
+        const textarea = document.querySelector('textarea');
+
+        if (textarea) {
+          let container = textarea.parentElement;
+          while (container && !container.querySelector('div.ds-icon-button[role="button"]')) {
+            container = container.parentElement;
+            if (container === document.body) break;
           }
-    }`);
+
+          if (container) {
+            const buttons = Array.from(container.querySelectorAll('div.ds-icon-button[role="button"]'));
+            const textareaRect = textarea.getBoundingClientRect();
+
+            const candidateButtons = buttons
+              .map(b => {
+                const btnRect = b.getBoundingClientRect();
+                const isDisabled = b.getAttribute('aria-disabled') === 'true';
+                const hasSVG = !!b.querySelector('svg');
+                const distance = Math.abs(btnRect.top - textareaRect.top) + Math.abs(btnRect.left - textareaRect.left);
+                const isNearby = distance < 700;
+                const hasDirectFileInput = b.querySelector('input[type="file"]') !== null;
+
+                return {
+                  button: b,
+                  rect: btnRect,
+                  isDisabled,
+                  hasSVG,
+                  distance,
+                  isNearby,
+                  hasDirectFileInput
+                };
+              })
+              .filter(info => info.hasSVG && !info.isDisabled && info.isNearby && !info.hasDirectFileInput);
+
+            if (candidateButtons.length > 0) {
+              btn = candidateButtons.reduce((rightmost, current) => {
+                return current.rect.left > rightmost.rect.left ? current : rightmost;
+              }).button;
+            }
+          }
+        }
+
+        if (btn) {
+          btn.setAttribute('aria-disabled', 'false');
+          btn.click();
+        }
+      })();
+    `);
     }
     else if (view.id && view.id.match("copilot")) {
         view.webContents.executeJavaScript(`

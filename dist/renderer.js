@@ -107,9 +107,12 @@ if (textArea) {
         if (event.ctrlKey) {
             if (event.key === "Enter") {
                 event.preventDefault();
-                ipcRenderer.send("send-prompt");
-                console.log("Ctrl + Enter pressed");
-                textArea.value = "";
+                const promptText = textArea.value;
+                if (promptText.trim()) {
+                    console.log("Ctrl + Enter pressed, sending prompt:", promptText);
+                    ipcRenderer.send("send-prompt", promptText);
+                    textArea.value = "";
+                }
             }
         }
     });
