@@ -38,6 +38,8 @@ export function addBrowserView(mainWindow, url, websites, views, webPreferences 
     });
     view.webContents.setZoomFactor(1.5);
     view.webContents.loadURL(url);
+    // Open DevTools for debugging
+    view.webContents.openDevTools({ mode: "detach" });
     views.push(view);
     return view;
 }
@@ -103,22 +105,37 @@ export function injectPromptIntoView(view, prompt) {
             (function() {
                 const inputElement = document.querySelector('#prompt-textarea > p');
                 if (inputElement) {
+                    console.log("ChatGPT: Found input element, injecting prompt...");
                     const inputEvent = new Event('input', { bubbles: true });
                     inputElement.innerText = \`${escapedPrompt}\`;
                     inputElement.dispatchEvent(inputEvent);
+                } else {
+                    console.error("ChatGPT: Input element not found!");
                 }
             })();
         `);
     }
-    else if (view.id && view.id.match("bard")) {
+    else if (view.id && view.id.match("bard") || view.id && view.id.match("gemini")) {
         view.webContents.executeJavaScript(`
             {
                 var inputElement = document.querySelector(".ql-editor.textarea");
+                if (!inputElement) {
+                    inputElement = document.querySelector("rich-textarea textarea");
+                }
+                if (!inputElement) {
+                    inputElement = document.querySelector("[contenteditable='true']");
+                }
                 if (inputElement) {
+                    console.log("Gemini/Bard: Found input element, injecting prompt...");
                     const inputEvent = new Event('input', { bubbles: true });
-                    inputElement.value = \`${escapedPrompt}\`;
+                    if (inputElement.tagName === 'TEXTAREA') {
+                        inputElement.value = \`${escapedPrompt}\`;
+                    } else {
+                        inputElement.innerText = \`${escapedPrompt}\`;
+                    }
                     inputElement.dispatchEvent(inputEvent);
-                    inputElement.querySelector('p').textContent = \`${escapedPrompt}\`;
+                } else {
+                    console.error("Gemini/Bard: Input element not found!");
                 }
             }
         `);
@@ -167,60 +184,279 @@ export function injectPromptIntoView(view, prompt) {
 export function sendPromptInView(view) {
     if (view.id && view.id.match("chatgpt")) {
         view.webContents.executeJavaScript(`
-            var btn = document.querySelector('button[aria-label*="Send prompt"]');
-            if (btn) {
-                btn.focus();
-                btn.disabled = false;
-                btn.click();
-            }
+            (function() {
+                // Try multiple selectors for ChatGPT send button
+                var btn = document.querySelector('button[data-testid="send-button"]');
+                if (!btn) btn = document.querySelector('button[aria-label*="Send"]');
+                if (!btn) btn = document.querySelector('button[data-testid="fruitjuice-send-button"]');
+                if (!btn) {
+                    // Find button with SVG icon (send icon)
+                    const buttons = Array.from(document.querySelectorAll('button'));
+                    btn = buttons.find(b => {
+                        const svg = b.querySelector('svg');
+                        return svg && b.closest('form') && !b.disabled;
+                    });
+                }
+
+                if (btn) {
+                    console.log("ChatGPT: Found send button, clicking...");
+                    btn.focus();
+                    btn.disabled = false;
+                    btn.click();
+                } else {
+                    console.error("ChatGPT: Send button not found!");
+                    console.log("Available buttons with attributes:", Array.from(document.querySelectorAll('button')).map(b => ({
+                        testid: b.getAttribute('data-testid'),
+                        aria: b.getAttribute('aria-label'),
+                        disabled: b.disabled,
+                        hasSVG: !!b.querySelector('svg')
+                    })));
+                }
+            })();
         `);
     }
-    else if (view.id && view.id.match("bard")) {
-        view.webContents.executeJavaScript(`{
-      var btn = document.querySelector("button[aria-label*='Send message']");
-      if (btn) {
-        btn.setAttribute("aria-disabled", "false");
-        btn.focus();
-        btn.click();
-      }
-    }`);
+    else if (view.id && view.id.match("bard") || view.id && view.id.match("gemini")) {
+        view.webContents.executeJavaScript(`
+      (function() {
+        // Try multiple selectors for Gemini/Bard send button
+        var btn = document.querySelector("button[aria-label*='Send message']");
+        if (!btn) btn = document.querySelector("button[aria-label*='Send']");
+        if (!btn) btn = document.querySelector("button[mattooltip*='Send']");
+        if (!btn) btn = document.querySelector("button.send-button");
+        if (!btn) {
+          // Find button near textarea
+          const textarea = document.querySelector('rich-textarea, textarea, [contenteditable="true"]');
+          if (textarea) {
+            const form = textarea.closest('form');
+            if (form) {
+              const buttons = form.querySelectorAll('button');
+              btn = Array.from(buttons).find(b => {
+                const svg = b.querySelector('svg');
+                return svg && !b.disabled;
+              });
+            }
+          }
+        }
+
+        if (btn) {
+          console.log("Gemini/Bard: Found send button, clicking...");
+          btn.setAttribute("aria-disabled", "false");
+          btn.disabled = false;
+          btn.focus();
+          btn.click();
+        } else {
+          console.error("Gemini/Bard: Send button not found!");
+          console.log("Available buttons:", Array.from(document.querySelectorAll('button')).map(b => ({
+            aria: b.getAttribute('aria-label'),
+            mat: b.getAttribute('mattooltip'),
+            class: b.className,
+            disabled: b.disabled,
+            hasSVG: !!b.querySelector('svg')
+          })));
+        }
+      })();
+    `);
     }
     else if (view.id && view.id.match("claude")) {
-        view.webContents.executeJavaScript(`{
-    var btn = document.querySelector("button[aria-label*='Send message']");
-    if (!btn) var btn = document.querySelector('button:has(div svg)');
-    if (!btn) var btn = document.querySelector('button:has(svg)');
-    if (btn) {
-      btn.focus();
-      btn.disabled = false;
-      btn.click();
-    }
-  }`);
+        view.webContents.executeJavaScript(`
+      (function() {
+        // Try multiple selectors for Claude send button
+        var btn = document.querySelector("button[aria-label*='Send message']");
+        if (!btn) btn = document.querySelector("button[aria-label*='Send Message']");
+        if (!btn) btn = document.querySelector('button:has(div svg)');
+        if (!btn) btn = document.querySelector('button:has(svg)');
+        if (!btn) {
+          // Find button in the input area
+          const inputArea = document.querySelector('[contenteditable="true"]');
+          if (inputArea) {
+            const container = inputArea.closest('div[class*="composer"]') || inputArea.closest('form') || inputArea.parentElement;
+            if (container) {
+              const buttons = container.querySelectorAll('button');
+              btn = Array.from(buttons).find(b => {
+                const svg = b.querySelector('svg');
+                return svg && !b.disabled;
+              });
+            }
+          }
+        }
+
+        if (btn) {
+          console.log("Claude: Found send button, clicking...");
+          btn.focus();
+          btn.disabled = false;
+          btn.click();
+        } else {
+          console.error("Claude: Send button not found!");
+          console.log("Available buttons:", Array.from(document.querySelectorAll('button')).map(b => ({
+            aria: b.getAttribute('aria-label'),
+            class: b.className,
+            disabled: b.disabled,
+            hasSVG: !!b.querySelector('svg')
+          })));
+        }
+      })();
+    `);
     }
     else if (view.id && view.id.match("grok")) {
         view.webContents.executeJavaScript(`
-        {
+      (function() {
+        // Check if textarea has content
+        const textarea = document.querySelector('textarea');
+        if (textarea) {
+          console.log("Grok: Textarea value:", textarea.value);
+          console.log("Grok: Textarea length:", textarea.value.length);
+        } else {
+          console.error("Grok: Textarea not found!");
+        }
+
+        // Try multiple selectors for Grok send button
         var btn = document.querySelector('button[aria-label*="Submit"]');
-        if (btn) {
-            btn.focus();
-            btn.disabled = false;
-            btn.click();
-          } else {
-            console.log("Element not found");
+        if (!btn) btn = document.querySelector('button[aria-label*="Send"]');
+        if (!btn) btn = document.querySelector('button[data-testid="send-button"]');
+        if (!btn && textarea) {
+          // Find button near textarea
+          const form = textarea.closest('form');
+          if (form) {
+            const buttons = form.querySelectorAll('button');
+            btn = Array.from(buttons).find(b => {
+              const svg = b.querySelector('svg');
+              return svg && !b.disabled;
+            });
           }
-      }`);
+        }
+
+        if (btn) {
+          console.log("Grok: Found send button", btn);
+          console.log("Grok: Button disabled:", btn.disabled);
+          console.log("Grok: Button aria-label:", btn.getAttribute('aria-label'));
+
+          // Try different approaches to trigger send
+          btn.disabled = false;
+          btn.focus();
+
+          // Try clicking
+          console.log("Grok: Attempting click...");
+          btn.click();
+
+          // Also try dispatching mouse events
+          setTimeout(() => {
+            console.log("Grok: Attempting MouseEvent...");
+            const clickEvent = new MouseEvent('click', {
+              bubbles: true,
+              cancelable: true,
+              view: window
+            });
+            btn.dispatchEvent(clickEvent);
+          }, 50);
+
+          // Also try pressing Enter on textarea
+          if (textarea) {
+            setTimeout(() => {
+              console.log("Grok: Attempting Enter key on textarea...");
+              textarea.focus();
+              const enterEvent = new KeyboardEvent('keydown', {
+                key: 'Enter',
+                code: 'Enter',
+                keyCode: 13,
+                bubbles: true,
+                cancelable: true
+              });
+              textarea.dispatchEvent(enterEvent);
+            }, 100);
+          }
+        } else {
+          console.error("Grok: Send button not found!");
+          console.log("Available buttons:", Array.from(document.querySelectorAll('button')).map(b => ({
+            aria: b.getAttribute('aria-label'),
+            testid: b.getAttribute('data-testid'),
+            disabled: b.disabled,
+            hasSVG: !!b.querySelector('svg')
+          })));
+        }
+      })();
+    `);
     }
     else if (view.id && view.id.match("deepseek")) {
         view.webContents.executeJavaScript(`
-        {
-        var buttons = Array.from(document.querySelectorAll('div[role="button"]'));
-        var btn = buttons[2]
-        if (btn) {
-            btn.focus();
-            btn.click();
-          } else {
-            console.log("Element not found");
+      (function() {
+        // DeepSeek: Find send button near textarea (not sidebar button)
+        var btn = null;
+        const textarea = document.querySelector('textarea');
+
+        if (textarea) {
+          // Get the closest container that includes both textarea and send button
+          let container = textarea.parentElement;
+          while (container && !container.querySelector('div.ds-icon-button[role="button"]')) {
+            container = container.parentElement;
+            if (container === document.body) break;
           }
-    }`);
+
+          if (container) {
+            // Find all icon buttons in this container
+            const buttons = Array.from(container.querySelectorAll('div.ds-icon-button[role="button"]'));
+
+            // Filter out buttons that are far from textarea (like sidebar buttons)
+            const textareaRect = textarea.getBoundingClientRect();
+
+            // Filter buttons to exclude file upload buttons and select the best candidate
+            const candidateButtons = buttons
+              .map(b => {
+                const btnRect = b.getBoundingClientRect();
+                const isDisabled = b.getAttribute('aria-disabled') === 'true';
+                const hasSVG = !!b.querySelector('svg');
+                const distance = Math.abs(btnRect.top - textareaRect.top) + Math.abs(btnRect.left - textareaRect.left);
+                const isNearby = distance < 700;
+
+                // Check if this button is directly wrapping a file input (file upload button)
+                const hasDirectFileInput = b.querySelector('input[type="file"]') !== null;
+
+                return {
+                  button: b,
+                  rect: btnRect,
+                  isDisabled,
+                  hasSVG,
+                  distance,
+                  isNearby,
+                  hasDirectFileInput
+                };
+              })
+              .filter(info => {
+                console.log("DeepSeek: Checking button", {
+                  disabled: info.isDisabled,
+                  hasSVG: info.hasSVG,
+                  distance: info.distance,
+                  isNearby: info.isNearby,
+                  hasDirectFileInput: info.hasDirectFileInput,
+                  btnPos: {top: info.rect.top, left: info.rect.left},
+                  textareaPos: {top: textareaRect.top, left: textareaRect.left}
+                });
+
+                // Accept buttons that are enabled, have SVG, nearby, and NOT file upload buttons
+                return info.hasSVG && !info.isDisabled && info.isNearby && !info.hasDirectFileInput;
+              });
+
+            // Select the rightmost button (send buttons are typically on the right)
+            if (candidateButtons.length > 0) {
+              btn = candidateButtons.reduce((rightmost, current) => {
+                return current.rect.left > rightmost.rect.left ? current : rightmost;
+              }).button;
+            }
+          }
+        }
+
+        if (btn) {
+          console.log("DeepSeek: Found send button, clicking...", btn);
+          btn.setAttribute('aria-disabled', 'false');
+          btn.click();
+        } else {
+          console.error("DeepSeek: Send button not found!");
+          if (textarea) {
+            console.log("Textarea found at:", textarea.getBoundingClientRect());
+          } else {
+            console.log("Textarea not found!");
+          }
+        }
+      })();
+    `);
     }
 }

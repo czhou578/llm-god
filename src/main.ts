@@ -44,8 +44,8 @@ const __dirname = path.dirname(__filename);
 require("electron-reload")(path.join(__dirname, "."));
 
 const websites: string[] = [
-  "https://chatgpt.com/",
-  "https://bard.google.com",
+  "https://grok.com/",
+  "https://chat.deepseek.com/",
 ];
 
 function createWindow(): void {
@@ -74,7 +74,7 @@ function createWindow(): void {
 
   mainWindow.loadFile(path.join(__dirname, "..", "index.html")); // Changed to point to root index.html
 
-  // mainWindow.webContents.openDevTools({ mode: "detach" });
+  mainWindow.webContents.openDevTools({ mode: "detach" });
   const viewWidth = Math.floor(mainWindow.getBounds().width / websites.length);
   const { height } = mainWindow.getBounds();
 
@@ -99,6 +99,9 @@ function createWindow(): void {
 
     view.webContents.setZoomFactor(1);
     view.webContents.loadURL(url);
+
+    // Open DevTools for each view for debugging
+    view.webContents.openDevTools({ mode: "detach" });
 
     views.push(view);
   });
@@ -183,9 +186,29 @@ ipcMain.on("enter-prompt", (_: IpcMainEvent, prompt: string) => {
 });
 
 ipcMain.on("send-prompt", (_, prompt: string) => {
-  // Added type for prompt (though unused here)
-  views.forEach((view) => {
-    sendPromptInView(view);
+  console.log("Received send-prompt event with prompt:", prompt);
+  const cleanPrompt = stripEmojis(prompt);
+  console.log("Cleaned prompt:", cleanPrompt);
+  console.log("Number of views:", views.length);
+
+  views.forEach(async (view, index) => {
+    console.log(`Processing view ${index}, id: ${view.id}`);
+    try {
+      await injectPromptIntoView(view, cleanPrompt);
+      console.log(`Successfully injected prompt in view ${index}`);
+    } catch (error) {
+      console.error(`Error injecting prompt in view ${index}:`, error);
+    }
+
+    setTimeout(async () => {
+      console.log(`Sending prompt in view ${index}`);
+      try {
+        await sendPromptInView(view);
+        console.log(`Successfully sent prompt in view ${index}`);
+      } catch (error) {
+        console.error(`Error sending prompt in view ${index}:`, error);
+      }
+    }, 100);
   });
 });
 

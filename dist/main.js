@@ -21,8 +21,8 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 require("electron-reload")(path.join(__dirname, "."));
 const websites = [
-    "https://chatgpt.com/",
-    "https://bard.google.com",
+    "https://grok.com/",
+    "https://chat.deepseek.com/",
 ];
 function createWindow() {
     mainWindow = new BrowserWindow({
@@ -69,6 +69,8 @@ function createWindow() {
         });
         view.webContents.setZoomFactor(1);
         view.webContents.loadURL(url);
+        // Open DevTools for each view for debugging
+        view.webContents.openDevTools({ mode: "detach" });
         views.push(view);
     });
     mainWindow.on("enter-full-screen", () => {
@@ -138,9 +140,29 @@ ipcMain.on("enter-prompt", (_, prompt) => {
     });
 });
 ipcMain.on("send-prompt", (_, prompt) => {
-    // Added type for prompt (though unused here)
-    views.forEach((view) => {
-        sendPromptInView(view);
+    console.log("Received send-prompt event with prompt:", prompt);
+    const cleanPrompt = stripEmojis(prompt);
+    console.log("Cleaned prompt:", cleanPrompt);
+    console.log("Number of views:", views.length);
+    views.forEach(async (view, index) => {
+        console.log(`Processing view ${index}, id: ${view.id}`);
+        try {
+            await injectPromptIntoView(view, cleanPrompt);
+            console.log(`Successfully injected prompt in view ${index}`);
+        }
+        catch (error) {
+            console.error(`Error injecting prompt in view ${index}:`, error);
+        }
+        setTimeout(async () => {
+            console.log(`Sending prompt in view ${index}`);
+            try {
+                await sendPromptInView(view);
+                console.log(`Successfully sent prompt in view ${index}`);
+            }
+            catch (error) {
+                console.error(`Error sending prompt in view ${index}:`, error);
+            }
+        }, 100);
     });
 });
 ipcMain.on("save-prompt", (event, promptValue) => {
