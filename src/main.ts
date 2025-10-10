@@ -2,8 +2,8 @@ import {
   app,
   BrowserWindow,
   ipcMain,
-  IpcMainEvent,
   WebContentsView,
+  IpcMainEvent,
 } from "electron";
 import * as remote from "@electron/remote/main/index.js";
 import path from "path";
@@ -13,6 +13,7 @@ import {
   removeBrowserView,
   injectPromptIntoView,
   sendPromptInView,
+  stripEmojis, // Add this import
 } from "./utilities.js"; // Adjusted path
 import { createRequire } from "node:module"; // Import createRequire
 import { fileURLToPath } from "node:url"; // Import fileURLToPath
@@ -25,25 +26,26 @@ interface CustomBrowserView extends WebContentsView {
   id: string; // Make id optional as it's assigned after creation
 }
 
-if (require("electron-squirrel-startup")) app.quit();
+// if (require("electron-squirrel-startup")) app.quit();
 
 remote.initialize();
 
 let mainWindow: BrowserWindow;
+let overlayWindow: BrowserWindow;
 let formWindow: BrowserWindow | null; // Allow formWindow to be null
 let pendingRowSelectedKey: string | null = null; // Store the key of the selected row for later use
+let isInitialSetupComplete = false;
 
 const views: CustomBrowserView[] = [];
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-// require("electron-reload")(path.join(__dirname, "."));
+require("electron-reload")(path.join(__dirname, "."));
 
 const websites: string[] = [
   "https://chatgpt.com/",
-  "https://bard.google.com",
-  "https://www.perplexity.ai/",
+  "https://gemini.google.com",
 ];
 
 function createWindow(): void {
@@ -52,14 +54,23 @@ function createWindow(): void {
     height: 1100,
     center: true,
     backgroundColor: "#000000",
+    show: false, // Start hidden to prevent visual flash
     webPreferences: {
-      preload: path.join(__dirname, "preload.cjs"), // This will point to dist/preload.js at runtime
+      preload: path.join(__dirname, "..", "dist", "preload.cjs"), // Correct path to compiled preload
       nodeIntegration: true,
-      contextIsolation: false,
+      contextIsolation: true,
       offscreen: false,
     },
   });
   remote.enable(mainWindow.webContents);
+
+  // Use 'ready-to-show' to display windows gracefully.
+  mainWindow.once("ready-to-show", () => {
+    mainWindow.show();
+    setTimeout(() => {
+      isInitialSetupComplete = true;
+    }, 500);
+  });
 
   mainWindow.loadFile(path.join(__dirname, "..", "index.html")); // Changed to point to root index.html
 
@@ -72,6 +83,8 @@ function createWindow(): void {
       webPreferences: {
         nodeIntegration: false,
         contextIsolation: true,
+        // Add the preload script for the view
+        preload: path.join(__dirname, "..", "dist", "preload.cjs"), // Correct path to compiled preload
       },
     }) as CustomBrowserView; // Cast to CustomBrowserView
 
@@ -83,9 +96,12 @@ function createWindow(): void {
       width: viewWidth,
       height: height - 235,
     });
-    // view.webContents.openDevTools({ mode: "detach" });
+
     view.webContents.setZoomFactor(1);
     view.webContents.loadURL(url);
+
+    // Open DevTools for each view for debugging
+    // view.webContents.openDevTools({ mode: "detach" });
 
     views.push(view);
   });
@@ -94,28 +110,26 @@ function createWindow(): void {
     updateZoomFactor();
   });
 
-  mainWindow.on("focus", () => {
-    mainWindow.webContents.invalidate();
-  });
-
   let resizeTimeout: NodeJS.Timeout;
 
   mainWindow.on("resize", () => {
     clearTimeout(resizeTimeout);
     resizeTimeout = setTimeout(() => {
-      const { width, height } = mainWindow.getBounds();
-      const viewWidth = Math.floor(width / websites.length);
+      const bounds = mainWindow.getBounds();
+      const viewWidth = Math.floor(bounds.width / websites.length);
       views.forEach((view, index) => {
         view.setBounds({
           x: index * viewWidth,
           y: 0,
           width: viewWidth,
-          height: height - 200,
+          height: bounds.height - 200,
         });
       });
       updateZoomFactor();
     }, 200);
   });
+
+  // This logic has been moved up and placed inside the 'ready-to-show' event.
 }
 
 function createFormWindow() {
@@ -125,7 +139,7 @@ function createFormWindow() {
     parent: mainWindow,
     modal: true,
     webPreferences: {
-      preload: path.join(__dirname, "..", "dist", "form_preload.js"), // Use the same preload script
+      preload: path.join(__dirname, "..", "dist", "preload.cjs"), // Correct path to compiled preload
       nodeIntegration: false,
       contextIsolation: true,
     },
@@ -162,12 +176,49 @@ ipcMain.on("close-form-window", () => {
   }
 });
 
+
+ipcMain.on("enter-prompt", (_: IpcMainEvent, prompt: string) => {
+  const cleanPrompt = stripEmojis(prompt);
+  
+  views.forEach((view: CustomBrowserView) => {
+    injectPromptIntoView(view, cleanPrompt);
+  });
+});
+
+ipcMain.on("send-prompt", (_, prompt: string) => {
+  const cleanPrompt = stripEmojis(prompt);
+
+  views.forEach(async (view) => {
+    try {
+      await injectPromptIntoView(view, cleanPrompt);
+    } catch (error) {
+      console.error(`Error injecting prompt:`, error);
+    }
+
+    setTimeout(async () => {
+      try {
+        await sendPromptInView(view);
+      } catch (error) {
+        console.error(`Error sending prompt:`, error);
+      }
+    }, 100);
+  });
+});
+
 ipcMain.on("save-prompt", (event, promptValue: string) => {
+  // Strip emojis before saving
+  const cleanPrompt = stripEmojis(promptValue);
+  
   const timestamp = new Date().getTime().toString();
-  store.set(timestamp, promptValue);
+  store.set(timestamp, cleanPrompt);
 
   console.log("Prompt saved with key:", timestamp);
+  console.log("Original prompt:", promptValue);
+  console.log("Cleaned prompt:", cleanPrompt);
 });
+
+
+// ------------------------------------------------------------------------------
 
 // Add handler to get stored prompts
 ipcMain.handle("get-prompts", () => {
@@ -175,25 +226,23 @@ ipcMain.handle("get-prompts", () => {
 });
 
 ipcMain.on("paste-prompt", (_: IpcMainEvent, prompt: string) => {
-  mainWindow.webContents.send("inject-prompt", prompt);
-
+  // Strip emojis from the prompt
+  const cleanPrompt = stripEmojis(prompt);
+  
   views.forEach((view: CustomBrowserView) => {
-    injectPromptIntoView(view, prompt);
+    injectPromptIntoView(view, cleanPrompt);
   });
-});
-
-ipcMain.on("enter-prompt", (_: IpcMainEvent, prompt: string) => {
-  // Added type for prompt
-  views.forEach((view: CustomBrowserView) => {
-    injectPromptIntoView(view, prompt);
-  });
-});
-
-ipcMain.on("send-prompt", (_, prompt: string) => {
-  // Added type for prompt (though unused here)
-  views.forEach((view) => {
-    sendPromptInView(view);
-  });
+  
+  // Wrap in IIFE to avoid variable redeclaration errors
+  mainWindow.webContents.executeJavaScript(`
+    (function() {
+      const textarea = document.getElementById('prompt-input');
+      if (textarea) {
+        textarea.value = \`${cleanPrompt.replace(/\\/g, '\\\\').replace(/`/g, '\\`').replace(/\$/g, '\\$').replace(/\n/g, '\\n').replace(/\r/g, '\\r')}\`;
+        textarea.dispatchEvent(new Event('input', { bubbles: true }));
+      }
+    })();
+  `);
 });
 
 ipcMain.on("delete-prompt-by-value", (event, value: string) => {
@@ -214,23 +263,7 @@ ipcMain.on("delete-prompt-by-value", (event, value: string) => {
   }
 });
 
-ipcMain.on("open-lm-arena", (_, prompt: string) => {
-  if (prompt === "open lm arena now") {
-    console.log("Opening LMArena");
-    let url = "https://lmarena.ai/?mode=direct";
-    addBrowserView(mainWindow, url, websites, views);
-  }
-});
-
-ipcMain.on("close-lm-arena", (_, prompt: string) => {
-  if (prompt === "close lm arena now") {
-    console.log("Closing LMArena");
-    const lmArenaView = views.find((view) => view.id.match("lmarena"));
-    if (lmArenaView) {
-      removeBrowserView(mainWindow, lmArenaView, websites, views);
-    }
-  }
-});
+// ------------------------------------------------------------------------------
 
 ipcMain.on("open-claude", (_, prompt: string) => {
   if (prompt === "open claude now") {
@@ -296,7 +329,7 @@ ipcMain.on("open-edit-view", (_, prompt: string) => {
     parent: formWindow || mainWindow, // Use mainWindow as a fallback if formWindow is null
     modal: true, // Make it a modal window
     webPreferences: {
-      preload: path.join(__dirname, "..", "dist", "form_preload.js"), // Use the same preload script
+      preload: path.join(__dirname, "..", "dist", "preload.cjs"), // Correct path to compiled preload
       nodeIntegration: false,
       contextIsolation: true,
     },
@@ -363,13 +396,6 @@ ipcMain.handle("get-key-by-value", (_, value: string) => {
   } else {
     console.error(`No matching key found for value: "${value}"`);
     return null;
-  }
-});
-
-ipcMain.on("close-edit-window", (event) => {
-  const win = BrowserWindow.fromWebContents(event.sender);
-  if (win) {
-    win.close();
   }
 });
 

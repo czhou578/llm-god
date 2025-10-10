@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <style>
+      body {
+        margin: 0;
+        background: transparent; /* Ensure transparency */
+      }
+      #overlay {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        z-index: 1000; /* High z-index */
+        background: rgba(0, 0, 0, 0.5); /* Optional semi-transparent background */
+        display: flex;
+        justify-content: center;
+        align-items: center;
+      }
+      #overlay-content {
+        color: white;
+        padding: 20px;
+        background: #333;
+        border-radius: 5px;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="overlay">
+      <div id="overlay-content">
+        <h1>Overlay Content</h1>
+        <p>This is an overlay over the BrowserView!</p>
+        <button onclick="document.getElementById('overlay').style.display = 'none';">Close</button>
+      </div>
+    </div>
+    <script>
+      // Optional: Sync position with main window
+      require('electron').ipcRenderer.on('update-position', (event, position) => {
+        window.moveTo(position[0], position[1]);
+      });
+    </script>
+  </body>
+</html>

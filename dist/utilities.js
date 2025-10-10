@@ -1,9 +1,4 @@
-import { BrowserWindow, WebPreferences, WebContentsView } from "electron"; // Added WebPreferences type
-
-interface CustomBrowserView extends WebContentsView {
-  id?: string; // Make id optional as it's assigned after creation
-}
-
+import { WebContentsView } from "electron"; // Added WebPreferences type
 /**
  * Creates and configures a new BrowserView for the main window
  * @param mainWindow - The main Electron window
@@ -13,131 +8,100 @@ interface CustomBrowserView extends WebContentsView {
  * @param webPreferences - Optional web preferences for the BrowserView
  * @returns The newly created BrowserView
  */
-export function addBrowserView(
-  mainWindow: BrowserWindow,
-  url: string,
-  websites: string[],
-  views: CustomBrowserView[],
-  webPreferences: WebPreferences = {},
-): CustomBrowserView {
-  const view: CustomBrowserView = new WebContentsView({
-    webPreferences: {
-      nodeIntegration: false,
-      contextIsolation: true,
-      devTools: true,
-      ...webPreferences,
-    },
-  });
-
-  view.id = url;
-  mainWindow.contentView.addChildView(view);
-
-  const { width, height } = mainWindow.getBounds();
-
-  websites.push(url);
-  const viewWidth = Math.floor(width / websites.length);
-
-  views.forEach((v, index) => {
-    v.setBounds({
-      x: index * viewWidth,
-      y: 0,
-      width: viewWidth,
-      height: height - 235,
+export function addBrowserView(mainWindow, url, websites, views, webPreferences = {}) {
+    const view = new WebContentsView({
+        webPreferences: {
+            nodeIntegration: false,
+            contextIsolation: true,
+            devTools: true,
+            ...webPreferences,
+        },
     });
-  });
-
-  view.setBounds({
-    x: (websites.length - 1) * viewWidth,
-    y: 0,
-    width: viewWidth,
-    height: height - 235,
-  });
-
-  view.webContents.setZoomFactor(1.5);
-  view.webContents.loadURL(url);
-
-  // Open DevTools for debugging
-  // view.webContents.openDevTools({ mode: "detach" });
-
-  views.push(view);
-  return view;
-}
-
-export function removeBrowserView(
-  mainWindow: BrowserWindow,
-  viewToRemove: CustomBrowserView, // Changed to viewToRemove for clarity
-  websites: string[],
-  views: CustomBrowserView[],
-): void {
-  const viewIndex = views.indexOf(viewToRemove);
-  if (viewIndex === -1) return;
-
-  mainWindow.contentView.removeChildView(viewToRemove);
-
-  const urlIndex = websites.findIndex((url) => url === viewToRemove.id);
-  if (urlIndex !== -1) {
-    websites.splice(urlIndex, 1);
-  }
-
-  views.splice(viewIndex, 1);
-
-  if (views.length === 0) return;
-
-  const { width, height } = mainWindow.getBounds();
-  const viewWidth = Math.floor(width / views.length);
-
-  views.forEach((v, index) => {
-    v.setBounds({
-      x: index * viewWidth,
-      y: 0,
-      width: viewWidth,
-      height: height - 235,
+    view.id = url;
+    mainWindow.contentView.addChildView(view);
+    const { width, height } = mainWindow.getBounds();
+    websites.push(url);
+    const viewWidth = Math.floor(width / websites.length);
+    views.forEach((v, index) => {
+        v.setBounds({
+            x: index * viewWidth,
+            y: 0,
+            width: viewWidth,
+            height: height - 235,
+        });
     });
-  });
+    view.setBounds({
+        x: (websites.length - 1) * viewWidth,
+        y: 0,
+        width: viewWidth,
+        height: height - 235,
+    });
+    view.webContents.setZoomFactor(1.5);
+    view.webContents.loadURL(url);
+    // Open DevTools for debugging
+    // view.webContents.openDevTools({ mode: "detach" });
+    views.push(view);
+    return view;
 }
-
+export function removeBrowserView(mainWindow, viewToRemove, // Changed to viewToRemove for clarity
+websites, views) {
+    const viewIndex = views.indexOf(viewToRemove);
+    if (viewIndex === -1)
+        return;
+    mainWindow.contentView.removeChildView(viewToRemove);
+    const urlIndex = websites.findIndex((url) => url === viewToRemove.id);
+    if (urlIndex !== -1) {
+        websites.splice(urlIndex, 1);
+    }
+    views.splice(viewIndex, 1);
+    if (views.length === 0)
+        return;
+    const { width, height } = mainWindow.getBounds();
+    const viewWidth = Math.floor(width / views.length);
+    views.forEach((v, index) => {
+        v.setBounds({
+            x: index * viewWidth,
+            y: 0,
+            width: viewWidth,
+            height: height - 235,
+        });
+    });
+}
 /**
  * Removes all emojis and special Unicode characters from a string
  */
-export function stripEmojis(text: string): string {
-  return text
-    // Remove emojis (emoticons, symbols, pictographs, transport symbols, flags, etc.)
-    .replace(/[\u{1F600}-\u{1F64F}]/gu, '') // Emoticons
-    .replace(/[\u{1F300}-\u{1F5FF}]/gu, '') // Misc Symbols and Pictographs
-    .replace(/[\u{1F680}-\u{1F6FF}]/gu, '') // Transport and Map
-    .replace(/[\u{1F1E0}-\u{1F1FF}]/gu, '') // Flags
-    .replace(/[\u{2600}-\u{26FF}]/gu, '')   // Misc symbols
-    .replace(/[\u{2700}-\u{27BF}]/gu, '')   // Dingbats
-    .replace(/[\u{1F900}-\u{1F9FF}]/gu, '') // Supplemental Symbols and Pictographs
-    .replace(/[\u{1FA00}-\u{1FA6F}]/gu, '') // Chess Symbols
-    .replace(/[\u{1FA70}-\u{1FAFF}]/gu, '') // Symbols and Pictographs Extended-A
-    .replace(/[\u{FE00}-\u{FE0F}]/gu, '')   // Variation Selectors
-    .replace(/[\u{200D}]/gu, '')            // Zero Width Joiner (used in emoji sequences)
-    .trim();
+export function stripEmojis(text) {
+    return text
+        // Remove emojis (emoticons, symbols, pictographs, transport symbols, flags, etc.)
+        .replace(/[\u{1F600}-\u{1F64F}]/gu, '') // Emoticons
+        .replace(/[\u{1F300}-\u{1F5FF}]/gu, '') // Misc Symbols and Pictographs
+        .replace(/[\u{1F680}-\u{1F6FF}]/gu, '') // Transport and Map
+        .replace(/[\u{1F1E0}-\u{1F1FF}]/gu, '') // Flags
+        .replace(/[\u{2600}-\u{26FF}]/gu, '') // Misc symbols
+        .replace(/[\u{2700}-\u{27BF}]/gu, '') // Dingbats
+        .replace(/[\u{1F900}-\u{1F9FF}]/gu, '') // Supplemental Symbols and Pictographs
+        .replace(/[\u{1FA00}-\u{1FA6F}]/gu, '') // Chess Symbols
+        .replace(/[\u{1FA70}-\u{1FAFF}]/gu, '') // Symbols and Pictographs Extended-A
+        .replace(/[\u{FE00}-\u{FE0F}]/gu, '') // Variation Selectors
+        .replace(/[\u{200D}]/gu, '') // Zero Width Joiner (used in emoji sequences)
+        .trim();
 }
-
-export function injectPromptIntoView(
-  view: CustomBrowserView,
-  prompt: string,
-): void {
-  // Strip emojis from the prompt before injection
-  const cleanPrompt = stripEmojis(prompt);
-  
-  // Properly escape the prompt for use in template literals
-  const escapeForJS = (str: string): string => {
-    return str
-      .replace(/\\/g, '\\\\')
-      .replace(/`/g, '\\`')
-      .replace(/\$/g, '\\$')
-      .replace(/\n/g, '\\n')
-      .replace(/\r/g, '\\r')
-      .replace(/\t/g, '\\t');
-  };
-
-  const escapedPrompt = escapeForJS(cleanPrompt);
-
-  if (view.id && view.id.match("chatgpt")) {
-    view.webContents.executeJavaScript(`
+export function injectPromptIntoView(view, prompt) {
+    // Strip emojis from the prompt before injection
+    const cleanPrompt = stripEmojis(prompt);
+    // Properly escape the prompt for use in template literals
+    const escapeForJS = (str) => {
+        return str
+            .replace(/\\/g, '\\\\')
+            .replace(/`/g, '\\`')
+            .replace(/\$/g, '\\$')
+            .replace(/\n/g, '\\n')
+            .replace(/\r/g, '\\r')
+            .replace(/\t/g, '\\t');
+    };
+    const escapedPrompt = escapeForJS(cleanPrompt);
+    if (view.id && view.id.match("chatgpt")) {
+        view.webContents.executeJavaScript(`
             (function() {
                 const inputElement = document.querySelector('#prompt-textarea > p');
                 if (inputElement) {
@@ -147,8 +111,9 @@ export function injectPromptIntoView(
                 }
             })();
         `);
-  } else if (view.id && view.id.match("bard") || view.id && view.id.match("gemini")) {
-    view.webContents.executeJavaScript(`
+    }
+    else if (view.id && view.id.match("bard") || view.id && view.id.match("gemini")) {
+        view.webContents.executeJavaScript(`
             {
                 var inputElement = document.querySelector(".ql-editor.textarea");
                 if (!inputElement) {
@@ -168,8 +133,9 @@ export function injectPromptIntoView(
                 }
             }
         `);
-  } else if (view.id && view.id.match("claude")) {
-    view.webContents.executeJavaScript(`
+    }
+    else if (view.id && view.id.match("claude")) {
+        view.webContents.executeJavaScript(`
             {
                 var inputElement = document.querySelector('div.ProseMirror');
                 if (inputElement) {
@@ -177,8 +143,9 @@ export function injectPromptIntoView(
                 }
             }
         `);
-  } else if (view.id && view.id.match("grok")) {
-    view.webContents.executeJavaScript(`
+    }
+    else if (view.id && view.id.match("grok")) {
+        view.webContents.executeJavaScript(`
             {
                 var inputElement = document.querySelector('textarea');
                 if (inputElement) {
@@ -193,8 +160,9 @@ export function injectPromptIntoView(
                 }
             }
         `);
-  } else if (view.id && view.id.match("deepseek")) {
-    view.webContents.executeJavaScript(`
+    }
+    else if (view.id && view.id.match("deepseek")) {
+        view.webContents.executeJavaScript(`
             {
                 var inputElement = document.querySelector('textarea');
                 if (inputElement) {
@@ -205,12 +173,11 @@ export function injectPromptIntoView(
                 }
             }
         `);
-  } 
+    }
 }
-
-export function sendPromptInView(view: CustomBrowserView) {
-  if (view.id && view.id.match("chatgpt")) {
-    view.webContents.executeJavaScript(`
+export function sendPromptInView(view) {
+    if (view.id && view.id.match("chatgpt")) {
+        view.webContents.executeJavaScript(`
             (function() {
                 var btn = document.querySelector('button[data-testid="send-button"]');
                 if (!btn) btn = document.querySelector('button[aria-label*="Send"]');
@@ -229,8 +196,9 @@ export function sendPromptInView(view: CustomBrowserView) {
                 }
             })();
         `);
-  } else if (view.id && view.id.match("bard") || view.id && view.id.match("gemini")) {
-    view.webContents.executeJavaScript(`
+    }
+    else if (view.id && view.id.match("bard") || view.id && view.id.match("gemini")) {
+        view.webContents.executeJavaScript(`
       (function() {
         var btn = document.querySelector("button[aria-label*='Send message']");
         if (!btn) btn = document.querySelector("button[aria-label*='Send']");
@@ -257,8 +225,9 @@ export function sendPromptInView(view: CustomBrowserView) {
         }
       })();
     `);
-  } else if (view.id && view.id.match("claude")) {
-    view.webContents.executeJavaScript(`
+    }
+    else if (view.id && view.id.match("claude")) {
+        view.webContents.executeJavaScript(`
       (function() {
         var btn = document.querySelector("button[aria-label*='Send message']");
         if (!btn) btn = document.querySelector("button[aria-label*='Send Message']");
@@ -284,8 +253,9 @@ export function sendPromptInView(view: CustomBrowserView) {
         }
       })();
     `);
-  } else if (view.id && view.id.match("grok")) {
-    view.webContents.executeJavaScript(`
+    }
+    else if (view.id && view.id.match("grok")) {
+        view.webContents.executeJavaScript(`
       (function() {
         const textarea = document.querySelector('textarea');
         var btn = document.querySelector('button[aria-label*="Submit"]');
@@ -330,8 +300,9 @@ export function sendPromptInView(view: CustomBrowserView) {
         }
       })();
     `);
-  } else if (view.id && view.id.match("deepseek")) {
-    view.webContents.executeJavaScript(`
+    }
+    else if (view.id && view.id.match("deepseek")) {
+        view.webContents.executeJavaScript(`
       (function() {
         var btn = null;
         const textarea = document.querySelector('textarea');
@@ -382,5 +353,5 @@ export function sendPromptInView(view: CustomBrowserView) {
         }
       })();
     `);
-  }
+    }
 }
