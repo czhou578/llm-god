@@ -214,7 +214,7 @@ ipcMain.on("paste-prompt", (_, prompt) => {
     (function() {
       const textarea = document.getElementById('prompt-input');
       if (textarea) {
-        textarea.value = \`${cleanPrompt.replace(/\\/g, '\\\\').replace(/`/g, '\\`').replace(/\$/g, '\\$').replace(/\n/g, '\\n').replace(/\r/g, '\\r')}\`;
+        textarea.value = \`${cleanPrompt.replace(/\\/g, "\\\\").replace(/`/g, "\\`").replace(/\$/g, "\\$").replace(/\n/g, "\\n").replace(/\r/g, "\\r")}\`;
         textarea.dispatchEvent(new Event('input', { bubbles: true }));
       }
     })();
