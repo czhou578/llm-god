@@ -30,9 +30,9 @@ Use the dropdown at the bottom right corner to add and remove LLM web consoles. 
 
 \*Note that if you are on free tier, then you will face the typical usage limits as specified by the LLM provider.
 
-To launch the prompt to all the LLM's, press Ctrl + Enter on your keyboard
+To launch the prompt to all the LLM's, press `Ctrl + Enter` on your keyboard
 
-If you want to close the app, press Ctrl + W on your keyboard.
+If you want to close the app, press `Ctrl + W` on your keyboard.
 
 ## Disclaimer
 
@@ -94,8 +94,13 @@ While developing, I liked to have the devtools of the app be visible and also ha
  require("electron-reload")(path.join(__dirname, "."));
 ```
 
+## Relevant links:
+
+- Quick App Demo: https://www.youtube.com/watch?v=YxqWUp0Wmi0
+- Code Walkthrough Video: https://www.youtube.com/watch?v=bkSRSUMsh10
+
 ## Updates
 
-5/17: Migrated to using TypeScript across the app.
-6/15: Added support for LMArena and also for adding custom prompts that can be saved.
-10/10: Removed support for Perplexity and LMArena (due to incompatibility) and added more contextual searching for JavaScript injection logic. Added Copilot support.
+- 5/17: Migrated to using TypeScript across the app.
+- 6/15: Added support for LMArena and also for adding custom prompts that can be saved.
+- 10/10: Removed support for Perplexity and LMArena (due to incompatibility) and added more contextual searching for JavaScript injection logic. Added Copilot support.
