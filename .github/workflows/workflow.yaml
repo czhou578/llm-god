@@ -2,7 +2,6 @@ name: Build and Release
 
 on:
   push:
-    branches: [master]
     tags:
       - "v*.*.*" # Trigger on tags like v1.0.0 for releases
   pull_request:
@@ -51,14 +50,23 @@ jobs:
 
       - name: Create GitHub Release
         id: create_release
+        if: startsWith(github.ref, 'refs/tags/')
         uses: actions/create-release@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          tag_name: ${{ github.run_number }} # Use the workflow run number as the tag
-          release_name: "Release ${{ github.run_number }}"
+          tag_name: ${{ github.ref_name }}
+          release_name: "Release ${{ github.ref_name }}"
           draft: false
           prerelease: false
+
+      - name: Create or Update Draft Release
+        uses: ncipollo/release-action@v1
+        with:
+          draft: true
+          tag: "next"
+          name: "Unreleased (next)"
+          body: "Changes since last release:"
 
       - name: Upload Setup.exe
         uses: actions/upload-release-asset@v1
