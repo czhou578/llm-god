@@ -57,6 +57,22 @@ export function closeCopilotMessage(message: string): void {
   ipcRenderer.send("close-copilot", message);
 }
 
+export function openChatGPTMessage(message: string): void {
+  ipcRenderer.send("open-chatgpt", message);
+}
+
+export function closeChatGPTMessage(message: string): void {
+  ipcRenderer.send("close-chatgpt", message);
+}
+
+export function openGeminiMessage(message: string): void {
+  ipcRenderer.send("open-gemini", message);
+}
+
+export function closeGeminiMessage(message: string): void {
+  ipcRenderer.send("close-gemini", message);
+}
+
 const textArea = document.getElementById(
   "prompt-input",
 ) as HTMLTextAreaElement | null;
@@ -72,10 +88,59 @@ const openDeepSeekButton = document.getElementById(
 const openCopilotButton = document.getElementById(
   "showCopilot",
 ) as HTMLButtonElement | null;
+const openChatGPTButton = document.getElementById(
+  "showChatGPT",
+) as HTMLButtonElement | null;
+const openGeminiButton = document.getElementById(
+  "showGemini",
+) as HTMLButtonElement | null;
 
 const promptDropdownButton = document.querySelector(
   ".prompt-select",
 ) as HTMLButtonElement | null;
+const modelSelectButton = document.querySelector(
+  ".model-select",
+) as HTMLButtonElement | null;
+
+// Check if ChatGPT is in default models and set initial button text
+window.addEventListener("DOMContentLoaded", async () => {
+  const ipc = window.electron.ipcRenderer;
+  const defaultModels = await ipc.invoke("get-default-models");
+
+  if (openChatGPTButton) {
+    const hasChatGPT = defaultModels && defaultModels.some((url: string) => url.includes("chatgpt"));
+    openChatGPTButton.textContent = hasChatGPT ? "Hide ChatGPT" : "Show ChatGPT";
+  }
+
+  if (openGeminiButton) {
+    const hasGemini = defaultModels && defaultModels.some((url: string) => url.includes("gemini"));
+    openGeminiButton.textContent = hasGemini ? "Hide Gemini" : "Show Gemini";
+  }
+});
+
+if (openChatGPTButton) {
+  openChatGPTButton.addEventListener("click", (event: MouseEvent) => {
+    if (openChatGPTButton.textContent === "Show ChatGPT") {
+      openChatGPTMessage("open chatgpt now");
+      openChatGPTButton.textContent = "Hide ChatGPT";
+    } else {
+      closeChatGPTMessage("close chatgpt now");
+      openChatGPTButton.textContent = "Show ChatGPT";
+    }
+  });
+}
+
+if (openGeminiButton) {
+  openGeminiButton.addEventListener("click", (event: MouseEvent) => {
+    if (openGeminiButton.textContent === "Show Gemini") {
+      openGeminiMessage("open gemini now");
+      openGeminiButton.textContent = "Hide Gemini";
+    } else {
+      closeGeminiMessage("close gemini now");
+      openGeminiButton.textContent = "Show Gemini";
+    }
+  });
+}
 
 if (openClaudeButton) {
   openClaudeButton.addEventListener("click", (event: MouseEvent) => {
@@ -150,6 +215,14 @@ if (promptDropdownButton) {
     console.log("Prompt dropdown button clicked");
     event.stopPropagation();
     ipcRenderer.send("open-form-window");
+  });
+}
+
+if (modelSelectButton) {
+  modelSelectButton.addEventListener("click", (event: MouseEvent) => {
+    console.log("Model select button clicked");
+    event.stopPropagation();
+    ipcRenderer.send("open-model-selection-window");
   });
 }
 
