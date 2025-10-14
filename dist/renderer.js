@@ -66,17 +66,33 @@ const openChatGPTButton = document.getElementById("showChatGPT");
 const openGeminiButton = document.getElementById("showGemini");
 const promptDropdownButton = document.querySelector(".prompt-select");
 const modelSelectButton = document.querySelector(".model-select");
-// Check if ChatGPT is in default models and set initial button text
+// Check if views are currently open and set initial button text
 window.addEventListener("DOMContentLoaded", async () => {
     const ipc = window.electron.ipcRenderer;
-    const defaultModels = await ipc.invoke("get-default-models");
+    const openViews = await ipc.invoke("get-open-views");
     if (openChatGPTButton) {
-        const hasChatGPT = defaultModels && defaultModels.some((url) => url.includes("chatgpt"));
-        openChatGPTButton.textContent = hasChatGPT ? "Hide ChatGPT" : "Show ChatGPT";
+        const isChatGPTOpen = openViews && openViews.some((url) => url.includes("chatgpt"));
+        openChatGPTButton.textContent = isChatGPTOpen ? "Hide ChatGPT" : "Show ChatGPT";
     }
     if (openGeminiButton) {
-        const hasGemini = defaultModels && defaultModels.some((url) => url.includes("gemini"));
-        openGeminiButton.textContent = hasGemini ? "Hide Gemini" : "Show Gemini";
+        const isGeminiOpen = openViews && openViews.some((url) => url.includes("gemini"));
+        openGeminiButton.textContent = isGeminiOpen ? "Hide Gemini" : "Show Gemini";
+    }
+    if (openClaudeButton) {
+        const isClaudeOpen = openViews && openViews.some((url) => url.includes("claude"));
+        openClaudeButton.textContent = isClaudeOpen ? "Hide Claude" : "Show Claude";
+    }
+    if (openGrokButton) {
+        const isGrokOpen = openViews && openViews.some((url) => url.includes("grok"));
+        openGrokButton.textContent = isGrokOpen ? "Hide Grok" : "Show Grok";
+    }
+    if (openDeepSeekButton) {
+        const isDeepSeekOpen = openViews && openViews.some((url) => url.includes("deepseek"));
+        openDeepSeekButton.textContent = isDeepSeekOpen ? "Hide DeepSeek" : "Show DeepSeek";
+    }
+    if (openCopilotButton) {
+        const isCopilotOpen = openViews && openViews.some((url) => url.includes("copilot"));
+        openCopilotButton.textContent = isCopilotOpen ? "Hide Copilot" : "Show Copilot";
     }
 });
 if (openChatGPTButton) {
