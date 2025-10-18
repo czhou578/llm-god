@@ -45,12 +45,80 @@ export function openCopilotMessage(message) {
 export function closeCopilotMessage(message) {
     ipcRenderer.send("close-copilot", message);
 }
+export function openChatGPTMessage(message) {
+    ipcRenderer.send("open-chatgpt", message);
+}
+export function closeChatGPTMessage(message) {
+    ipcRenderer.send("close-chatgpt", message);
+}
+export function openGeminiMessage(message) {
+    ipcRenderer.send("open-gemini", message);
+}
+export function closeGeminiMessage(message) {
+    ipcRenderer.send("close-gemini", message);
+}
 const textArea = document.getElementById("prompt-input");
 const openClaudeButton = document.getElementById("showClaude");
 const openGrokButton = document.getElementById("showGrok");
 const openDeepSeekButton = document.getElementById("showDeepSeek");
 const openCopilotButton = document.getElementById("showCopilot");
+const openChatGPTButton = document.getElementById("showChatGPT");
+const openGeminiButton = document.getElementById("showGemini");
 const promptDropdownButton = document.querySelector(".prompt-select");
+const modelSelectButton = document.querySelector(".model-select");
+// Check if views are currently open and set initial button text
+window.addEventListener("DOMContentLoaded", async () => {
+    const ipc = window.electron.ipcRenderer;
+    const openViews = await ipc.invoke("get-open-views");
+    if (openChatGPTButton) {
+        const isChatGPTOpen = openViews && openViews.some((url) => url.includes("chatgpt"));
+        openChatGPTButton.textContent = isChatGPTOpen ? "Hide ChatGPT" : "Show ChatGPT";
+    }
+    if (openGeminiButton) {
+        const isGeminiOpen = openViews && openViews.some((url) => url.includes("gemini"));
+        openGeminiButton.textContent = isGeminiOpen ? "Hide Gemini" : "Show Gemini";
+    }
+    if (openClaudeButton) {
+        const isClaudeOpen = openViews && openViews.some((url) => url.includes("claude"));
+        openClaudeButton.textContent = isClaudeOpen ? "Hide Claude" : "Show Claude";
+    }
+    if (openGrokButton) {
+        const isGrokOpen = openViews && openViews.some((url) => url.includes("grok"));
+        openGrokButton.textContent = isGrokOpen ? "Hide Grok" : "Show Grok";
+    }
+    if (openDeepSeekButton) {
+        const isDeepSeekOpen = openViews && openViews.some((url) => url.includes("deepseek"));
+        openDeepSeekButton.textContent = isDeepSeekOpen ? "Hide DeepSeek" : "Show DeepSeek";
+    }
+    if (openCopilotButton) {
+        const isCopilotOpen = openViews && openViews.some((url) => url.includes("copilot"));
+        openCopilotButton.textContent = isCopilotOpen ? "Hide Copilot" : "Show Copilot";
+    }
+});
+if (openChatGPTButton) {
+    openChatGPTButton.addEventListener("click", (event) => {
+        if (openChatGPTButton.textContent === "Show ChatGPT") {
+            openChatGPTMessage("open chatgpt now");
+            openChatGPTButton.textContent = "Hide ChatGPT";
+        }
+        else {
+            closeChatGPTMessage("close chatgpt now");
+            openChatGPTButton.textContent = "Show ChatGPT";
+        }
+    });
+}
+if (openGeminiButton) {
+    openGeminiButton.addEventListener("click", (event) => {
+        if (openGeminiButton.textContent === "Show Gemini") {
+            openGeminiMessage("open gemini now");
+            openGeminiButton.textContent = "Hide Gemini";
+        }
+        else {
+            closeGeminiMessage("close gemini now");
+            openGeminiButton.textContent = "Show Gemini";
+        }
+    });
+}
 if (openClaudeButton) {
     openClaudeButton.addEventListener("click", (event) => {
         if (openClaudeButton.textContent === "Show Claude") {
@@ -122,6 +190,13 @@ if (promptDropdownButton) {
         console.log("Prompt dropdown button clicked");
         event.stopPropagation();
         ipcRenderer.send("open-form-window");
+    });
+}
+if (modelSelectButton) {
+    modelSelectButton.addEventListener("click", (event) => {
+        console.log("Model select button clicked");
+        event.stopPropagation();
+        ipcRenderer.send("open-model-selection-window");
     });
 }
 // Update the inject-prompt handler
