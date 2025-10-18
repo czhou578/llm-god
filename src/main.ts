@@ -550,6 +550,10 @@ ipcMain.handle("get-default-models", () => {
   return store.get("defaultModels") || [];
 });
 
+ipcMain.handle("get-open-views", () => {
+  return views.map(view => view.id);
+});
+
 ipcMain.on("save-default-models", (_, models: string[]) => {
   store.set("defaultModels", models);
   console.log("Saved default models:", models);
