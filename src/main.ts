@@ -109,7 +109,7 @@ function createWindow(): void {
       x: index * viewWidth,
       y: 0,
       width: viewWidth,
-      height: height - 280,
+      height: height - 235,
     });
 
     view.webContents.setZoomFactor(1);
@@ -137,7 +137,7 @@ function createWindow(): void {
           x: index * viewWidth,
           y: 0,
           width: viewWidth,
-          height: bounds.height - 280,
+          height: bounds.height - 200,
         });
       });
       updateZoomFactor();
