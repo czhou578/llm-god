@@ -39,15 +39,22 @@ const getDefaultWebsites = () => {
     return ["https://chatgpt.com", "https://gemini.google.com"];
 };
 const websites = getDefaultWebsites();
+// Add this helper function near the top of your file, after imports
+function getViewHeight(windowHeight) {
+    // Calculate the height for browser views
+    // This leaves space for the textarea and controls at the bottom
+    const controlsHeight = 235; // Height reserved for textarea and buttons
+    return windowHeight - controlsHeight;
+}
 function createWindow() {
     mainWindow = new BrowserWindow({
         width: 2000,
         height: 1100,
         center: true,
         backgroundColor: "#000000",
-        show: false, // Start hidden to prevent visual flash
+        show: false,
         webPreferences: {
-            preload: path.join(__dirname, "..", "dist", "preload.cjs"), // Correct path to compiled preload
+            preload: path.join(__dirname, "..", "dist", "preload.cjs"),
             nodeIntegration: true,
             contextIsolation: true,
             offscreen: false,
@@ -61,10 +68,10 @@ function createWindow() {
             isInitialSetupComplete = true;
         }, 500);
     });
-    mainWindow.loadFile(path.join(__dirname, "..", "index.html")); // Changed to point to root index.html
-    // mainWindow.webContents.openDevTools({ mode: "detach" });
-    const viewWidth = Math.floor(mainWindow.getBounds().width / websites.length);
-    const { height } = mainWindow.getBounds();
+    mainWindow.loadFile(path.join(__dirname, "..", "index.html"));
+    const bounds = mainWindow.getBounds();
+    const viewWidth = Math.floor(bounds.width / websites.length);
+    const viewHeight = getViewHeight(bounds.height); // Use helper function
     websites.forEach((url, index) => {
         const view = new WebContentsView({
             webPreferences: {
@@ -80,7 +87,7 @@ function createWindow() {
             x: index * viewWidth,
             y: 0,
             width: viewWidth,
-            height: height - 280,
+            height: viewHeight, // Use calculated height
         });
         view.webContents.setZoomFactor(1);
         view.webContents.loadURL(url);
@@ -90,23 +97,17 @@ function createWindow() {
     });
     mainWindow.on("enter-full-screen", () => {
         updateZoomFactor();
+        updateViewBounds(); // Update bounds when entering fullscreen
+    });
+    mainWindow.on("leave-full-screen", () => {
+        updateViewBounds(); // Update bounds when leaving fullscreen
     });
     let resizeTimeout;
     mainWindow.on("resize", () => {
         clearTimeout(resizeTimeout);
         resizeTimeout = setTimeout(() => {
-            const bounds = mainWindow.getBounds();
-            const viewWidth = Math.floor(bounds.width / websites.length);
-            views.forEach((view, index) => {
-                view.setBounds({
-                    x: index * viewWidth,
-                    y: 0,
-                    width: viewWidth,
-                    height: bounds.height - 280,
-                });
-            });
-            updateZoomFactor();
-        }, 200);
+            updateViewBounds(); // Use helper function
+        }, 200); // Debounce to avoid too many updates
     });
     // This logic has been moved up and placed inside the 'ready-to-show' event.
 }
@@ -142,6 +143,21 @@ function updateZoomFactor() {
     views.forEach((view) => {
         view.webContents.setZoomFactor(1);
     });
+}
+// Add this helper function to update view bounds consistently
+function updateViewBounds() {
+    const bounds = mainWindow.getBounds();
+    const viewWidth = Math.floor(bounds.width / websites.length);
+    const viewHeight = getViewHeight(bounds.height);
+    views.forEach((view, index) => {
+        view.setBounds({
+            x: index * viewWidth,
+            y: 0,
+            width: viewWidth,
+            height: viewHeight,
+        });
+    });
+    updateZoomFactor();
 }
 app.whenReady().then(createWindow);
 app.whenReady().then(() => {
