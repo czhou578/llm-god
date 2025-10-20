@@ -32,6 +32,7 @@ jobs:
 
       # Step 5: Security audit
       - name: Security audit
+        continue-on-error: true
         run: npm audit --production || echo "npm audit failed but continuing..."
 
       # Step 6: Build the Electron app for Windows using electron-forge
