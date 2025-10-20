@@ -62,6 +62,7 @@ jobs:
           prerelease: false
 
       - name: Create or Update Draft Release
+        if: startsWith(github.ref, 'refs/tags/')
         uses: ncipollo/release-action@v1
         with:
           draft: true
@@ -70,6 +71,7 @@ jobs:
           body: "Changes since last release:"
 
       - name: Upload Setup.exe
+        if: startsWith(github.ref, 'refs/tags/')
         uses: actions/upload-release-asset@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -81,6 +83,7 @@ jobs:
 
       # Step 7: Upload the .nupkg file to the release
       - name: Upload .nupkg File
+        if: startsWith(github.ref, 'refs/tags/')
         uses: actions/upload-release-asset@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
