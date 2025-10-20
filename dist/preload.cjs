@@ -41,8 +41,15 @@ if (hasContextBridge && canAccessWindow) {
                     "close-grok",
                     "open-copilot",
                     "close-copilot",
+                    "open-chatgpt",
+                    "close-chatgpt",
+                    "open-gemini",
+                    "close-gemini",
                     "open-lm-arena",
                     "close-lm-arena",
+                    "open-model-selection-window",
+                    "close-model-selection-window",
+                    "save-default-models",
                     "content-copied", // Add this for view contexts too
                 ];
                 if (validChannels.includes(channel)) {
@@ -50,7 +57,7 @@ if (hasContextBridge && canAccessWindow) {
                 }
             },
             invoke: (channel, data) => {
-                const validChannels = ["get-prompts", "get-key-by-value"];
+                const validChannels = ["get-prompts", "get-key-by-value", "get-default-models", "get-open-views"];
                 if (validChannels.includes(channel)) {
                     return ipcRenderer.invoke(channel, data);
                 }

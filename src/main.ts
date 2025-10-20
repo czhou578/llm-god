@@ -33,6 +33,7 @@ remote.initialize();
 let mainWindow: BrowserWindow;
 let overlayWindow: BrowserWindow;
 let formWindow: BrowserWindow | null; // Allow formWindow to be null
+let modelSelectionWindow: BrowserWindow | null = null;
 let pendingRowSelectedKey: string | null = null; // Store the key of the selected row for later use
 let isInitialSetupComplete = false;
 
@@ -41,12 +42,34 @@ const views: CustomBrowserView[] = [];
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-require("electron-reload")(path.join(__dirname, "."));
+// Only use electron-reload in development
+if (process.env.NODE_ENV !== 'production') {
+  try {
+    require("electron-reload")(path.join(__dirname, "."));
+  } catch (e) {
+    // electron-reload not available in production, skip it
+  }
+}
 
-const websites: string[] = [
-  "https://chatgpt.com",
-  "https://gemini.google.com",
-];
+// Load default models from store, or use defaults
+const getDefaultWebsites = (): string[] => {
+  const savedModels = store.get("defaultModels") as string[] | undefined;
+  if (savedModels && savedModels.length > 0) {
+    return savedModels;
+  }
+  // Default models if none are saved
+  return ["https://chatgpt.com", "https://gemini.google.com"];
+};
+
+const websites: string[] = getDefaultWebsites();
+
+// Add this helper function near the top of your file, after imports
+function getViewHeight(windowHeight: number): number {
+  // Calculate the height for browser views
+  // This leaves space for the textarea and controls at the bottom
+  const controlsHeight = 235; // Height reserved for textarea and buttons
+  return windowHeight - controlsHeight;
+}
 
 function createWindow(): void {
   mainWindow = new BrowserWindow({
@@ -54,9 +77,9 @@ function createWindow(): void {
     height: 1100,
     center: true,
     backgroundColor: "#000000",
-    show: false, // Start hidden to prevent visual flash
+    show: false,
     webPreferences: {
-      preload: path.join(__dirname, "..", "dist", "preload.cjs"), // Correct path to compiled preload
+      preload: path.join(__dirname, "..", "dist", "preload.cjs"),
       nodeIntegration: true,
       contextIsolation: true,
       offscreen: false,
@@ -72,11 +95,11 @@ function createWindow(): void {
     }, 500);
   });
 
-  mainWindow.loadFile(path.join(__dirname, "..", "index.html")); // Changed to point to root index.html
+  mainWindow.loadFile(path.join(__dirname, "..", "index.html"));
 
-  // mainWindow.webContents.openDevTools({ mode: "detach" });
-  const viewWidth = Math.floor(mainWindow.getBounds().width / websites.length);
-  const { height } = mainWindow.getBounds();
+  const bounds = mainWindow.getBounds();
+  const viewWidth = Math.floor(bounds.width / websites.length);
+  const viewHeight = getViewHeight(bounds.height); // Use helper function
 
   websites.forEach((url: string, index: number) => {
     const view = new WebContentsView({
@@ -94,7 +117,7 @@ function createWindow(): void {
       x: index * viewWidth,
       y: 0,
       width: viewWidth,
-      height: height - 235,
+      height: viewHeight, // Use calculated height
     });
 
     view.webContents.setZoomFactor(1);
@@ -108,6 +131,11 @@ function createWindow(): void {
 
   mainWindow.on("enter-full-screen", () => {
     updateZoomFactor();
+    updateViewBounds(); // Update bounds when entering fullscreen
+  });
+
+  mainWindow.on("leave-full-screen", () => {
+    updateViewBounds(); // Update bounds when leaving fullscreen
   });
 
   let resizeTimeout: NodeJS.Timeout;
@@ -115,18 +143,8 @@ function createWindow(): void {
   mainWindow.on("resize", () => {
     clearTimeout(resizeTimeout);
     resizeTimeout = setTimeout(() => {
-      const bounds = mainWindow.getBounds();
-      const viewWidth = Math.floor(bounds.width / websites.length);
-      views.forEach((view, index) => {
-        view.setBounds({
-          x: index * viewWidth,
-          y: 0,
-          width: viewWidth,
-          height: bounds.height - 200,
-        });
-      });
-      updateZoomFactor();
-    }, 200);
+      updateViewBounds(); // Use helper function
+    }, 200); // Debounce to avoid too many updates
   });
 
   // This logic has been moved up and placed inside the 'ready-to-show' event.
@@ -148,10 +166,46 @@ function createFormWindow() {
   formWindow.loadFile(path.join(__dirname, "..", "src", "form.html"));
 }
 
+function createModelSelectionWindow() {
+  modelSelectionWindow = new BrowserWindow({
+    width: 600,
+    height: 700,
+    parent: mainWindow,
+    modal: true,
+    webPreferences: {
+      preload: path.join(__dirname, "..", "dist", "preload.cjs"),
+      nodeIntegration: false,
+      contextIsolation: true,
+    },
+  });
+
+  modelSelectionWindow.loadFile(
+    path.join(__dirname, "..", "src", "select_models.html")
+  );
+}
+
 function updateZoomFactor(): void {
   views.forEach((view) => {
     view.webContents.setZoomFactor(1);
   });
+}
+
+// Add this helper function to update view bounds consistently
+function updateViewBounds(): void {
+  const bounds = mainWindow.getBounds();
+  const viewWidth = Math.floor(bounds.width / websites.length);
+  const viewHeight = getViewHeight(bounds.height);
+  
+  views.forEach((view, index) => {
+    view.setBounds({
+      x: index * viewWidth,
+      y: 0,
+      width: viewWidth,
+      height: viewHeight,
+    });
+  });
+  
+  updateZoomFactor();
 }
 
 app.whenReady().then(createWindow);
@@ -269,7 +323,13 @@ ipcMain.on("open-claude", (_, prompt: string) => {
   if (prompt === "open claude now") {
     console.log("Opening Claude");
     let url = "https://claude.ai/chats/";
-    addBrowserView(mainWindow, url, websites, views);
+    // Check if Claude is already open
+    const alreadyOpen = views.some((view) => view.id.match("claude"));
+    if (!alreadyOpen) {
+      addBrowserView(mainWindow, url, websites, views);
+    } else {
+      console.log("Claude is already open");
+    }
   }
 });
 
@@ -287,7 +347,13 @@ ipcMain.on("open-grok", (_, prompt: string) => {
   if (prompt === "open grok now") {
     console.log("Opening Grok");
     let url = "https://grok.com/";
-    addBrowserView(mainWindow, url, websites, views);
+    // Check if Grok is already open
+    const alreadyOpen = views.some((view) => view.id.match("grok"));
+    if (!alreadyOpen) {
+      addBrowserView(mainWindow, url, websites, views);
+    } else {
+      console.log("Grok is already open");
+    }
   }
 });
 
@@ -305,7 +371,13 @@ ipcMain.on("open-deepseek", (_, prompt: string) => {
   if (prompt === "open deepseek now") {
     console.log("Opening DeepSeek");
     let url = "https://chat.deepseek.com/";
-    addBrowserView(mainWindow, url, websites, views);
+    // Check if DeepSeek is already open
+    const alreadyOpen = views.some((view) => view.id.match("deepseek"));
+    if (!alreadyOpen) {
+      addBrowserView(mainWindow, url, websites, views);
+    } else {
+      console.log("DeepSeek is already open");
+    }
   }
 });
 
@@ -323,7 +395,13 @@ ipcMain.on("open-copilot", (_, prompt: string) => {
   if (prompt === "open copilot now") {
     console.log("Opening Copilot");
     let url = "https://copilot.microsoft.com/";
-    addBrowserView(mainWindow, url, websites, views);
+    // Check if Copilot is already open
+    const alreadyOpen = views.some((view) => view.id.match("copilot"));
+    if (!alreadyOpen) {
+      addBrowserView(mainWindow, url, websites, views);
+    } else {
+      console.log("Copilot is already open");
+    }
   }
 });
 
@@ -333,6 +411,54 @@ ipcMain.on("close-copilot", (_, prompt: string) => {
     const copilotView = views.find((view) => view.id.match("copilot"));
     if (copilotView) {
       removeBrowserView(mainWindow, copilotView, websites, views);
+    }
+  }
+});
+
+ipcMain.on("open-chatgpt", (_, prompt: string) => {
+  if (prompt === "open chatgpt now") {
+    console.log("Opening ChatGPT");
+    let url = "https://chatgpt.com";
+    // Check if ChatGPT is already open
+    const alreadyOpen = views.some((view) => view.id.match("chatgpt"));
+    if (!alreadyOpen) {
+      addBrowserView(mainWindow, url, websites, views);
+    } else {
+      console.log("ChatGPT is already open");
+    }
+  }
+});
+
+ipcMain.on("close-chatgpt", (_, prompt: string) => {
+  if (prompt === "close chatgpt now") {
+    console.log("Closing ChatGPT");
+    const chatgptView = views.find((view) => view.id.match("chatgpt"));
+    if (chatgptView) {
+      removeBrowserView(mainWindow, chatgptView, websites, views);
+    }
+  }
+});
+
+ipcMain.on("open-gemini", (_, prompt: string) => {
+  if (prompt === "open gemini now") {
+    console.log("Opening Gemini");
+    let url = "https://gemini.google.com";
+    // Check if Gemini is already open
+    const alreadyOpen = views.some((view) => view.id.match("gemini"));
+    if (!alreadyOpen) {
+      addBrowserView(mainWindow, url, websites, views);
+    } else {
+      console.log("Gemini is already open");
+    }
+  }
+});
+
+ipcMain.on("close-gemini", (_, prompt: string) => {
+  if (prompt === "close gemini now") {
+    console.log("Closing Gemini");
+    const geminiView = views.find((view) => view.id.match("gemini"));
+    if (geminiView) {
+      removeBrowserView(mainWindow, geminiView, websites, views);
     }
   }
 });
@@ -427,4 +553,39 @@ ipcMain.on("close-edit-window", (event) => {
       formWindow.webContents.send("refresh-prompt-table");
     }
   }
+});
+
+// Model selection window handlers
+ipcMain.on("open-model-selection-window", () => {
+  createModelSelectionWindow();
+});
+
+ipcMain.on("close-model-selection-window", () => {
+  if (modelSelectionWindow) {
+    modelSelectionWindow.close();
+    modelSelectionWindow = null;
+  }
+});
+
+ipcMain.handle("get-default-models", () => {
+  return store.get("defaultModels") || [];
+});
+
+ipcMain.handle("get-open-views", () => {
+  return views.map(view => view.id);
+});
+
+ipcMain.on("save-default-models", (_, models: string[]) => {
+  store.set("defaultModels", models);
+  console.log("Saved default models:", models);
+
+  // Show a message and restart the app
+  if (modelSelectionWindow) {
+    modelSelectionWindow.close();
+    modelSelectionWindow = null;
+  }
+
+  // Restart the application
+  app.relaunch();
+  app.exit(0);
 });
