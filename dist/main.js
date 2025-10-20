@@ -43,7 +43,7 @@ const websites = getDefaultWebsites();
 function getViewHeight(windowHeight) {
     // Calculate the height for browser views
     // This leaves space for the textarea and controls at the bottom
-    const controlsHeight = 235; // Height reserved for textarea and buttons
+    const controlsHeight = 235; // Height reserved for textarea and buttons (min 180px + padding 20px + buttons ~35px)
     return windowHeight - controlsHeight;
 }
 function createWindow() {
@@ -109,6 +109,10 @@ function createWindow() {
             updateViewBounds(); // Use helper function
         }, 200); // Debounce to avoid too many updates
     });
+    // Add zoom change listener
+    mainWindow.webContents.on("zoom-changed", () => {
+        updateViewBounds();
+    });
     // This logic has been moved up and placed inside the 'ready-to-show' event.
 }
 function createFormWindow() {
@@ -146,16 +150,20 @@ function updateZoomFactor() {
 }
 // Add this helper function to update view bounds consistently
 function updateViewBounds() {
+    if (!mainWindow || mainWindow.isDestroyed())
+        return;
     const bounds = mainWindow.getBounds();
     const viewWidth = Math.floor(bounds.width / websites.length);
     const viewHeight = getViewHeight(bounds.height);
     views.forEach((view, index) => {
-        view.setBounds({
-            x: index * viewWidth,
-            y: 0,
-            width: viewWidth,
-            height: viewHeight,
-        });
+        if (view && view.webContents && !view.webContents.isDestroyed()) {
+            view.setBounds({
+                x: index * viewWidth,
+                y: 0,
+                width: viewWidth,
+                height: viewHeight,
+            });
+        }
     });
     updateZoomFactor();
 }

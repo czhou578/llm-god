@@ -67,7 +67,7 @@ const websites: string[] = getDefaultWebsites();
 function getViewHeight(windowHeight: number): number {
   // Calculate the height for browser views
   // This leaves space for the textarea and controls at the bottom
-  const controlsHeight = 235; // Height reserved for textarea and buttons
+  const controlsHeight = 235; // Height reserved for textarea and buttons (min 180px + padding 20px + buttons ~35px)
   return windowHeight - controlsHeight;
 }
 
@@ -195,7 +195,7 @@ function updateViewBounds(): void {
   const bounds = mainWindow.getBounds();
   const viewWidth = Math.floor(bounds.width / websites.length);
   const viewHeight = getViewHeight(bounds.height);
-  
+
   views.forEach((view, index) => {
     view.setBounds({
       x: index * viewWidth,
@@ -204,7 +204,7 @@ function updateViewBounds(): void {
       height: viewHeight,
     });
   });
-  
+
   updateZoomFactor();
 }
 
