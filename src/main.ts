@@ -43,8 +43,9 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 // Only use electron-reload in development
-if (process.env.NODE_ENV !== 'production') {
+if (process.env.NODE_ENV !== "production") {
   try {
+    console.log("→ electron-reload is active");
     require("electron-reload")(path.join(__dirname, "."));
   } catch (e) {
     // electron-reload not available in production, skip it
@@ -180,7 +181,7 @@ function createModelSelectionWindow() {
   });
 
   modelSelectionWindow.loadFile(
-    path.join(__dirname, "..", "src", "select_models.html")
+    path.join(__dirname, "..", "src", "select_models.html"),
   );
 }
 
@@ -572,7 +573,7 @@ ipcMain.handle("get-default-models", () => {
 });
 
 ipcMain.handle("get-open-views", () => {
-  return views.map(view => view.id);
+  return views.map((view) => view.id);
 });
 
 ipcMain.on("save-default-models", (_, models: string[]) => {

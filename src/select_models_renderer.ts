@@ -6,7 +6,7 @@ window.addEventListener("DOMContentLoaded", async () => {
   if (defaultModels && defaultModels.length > 0) {
     defaultModels.forEach((url: string) => {
       const checkbox = document.querySelector(
-        `input[value="${url}"]`
+        `input[value="${url}"]`,
       ) as HTMLInputElement;
       if (checkbox) {
         checkbox.checked = true;
@@ -14,8 +14,12 @@ window.addEventListener("DOMContentLoaded", async () => {
     });
   } else {
     // If no models are saved, default to ChatGPT and Gemini
-    const chatgptCheckbox = document.getElementById("chatgpt") as HTMLInputElement;
-    const geminiCheckbox = document.getElementById("gemini") as HTMLInputElement;
+    const chatgptCheckbox = document.getElementById(
+      "chatgpt",
+    ) as HTMLInputElement;
+    const geminiCheckbox = document.getElementById(
+      "gemini",
+    ) as HTMLInputElement;
     if (chatgptCheckbox) chatgptCheckbox.checked = true;
     if (geminiCheckbox) geminiCheckbox.checked = true;
   }
@@ -24,7 +28,9 @@ window.addEventListener("DOMContentLoaded", async () => {
 // Make clicking on the model item also toggle the checkbox
 document.querySelectorAll(".model-item").forEach((item) => {
   item.addEventListener("click", (event) => {
-    const checkbox = item.querySelector("input[type='checkbox']") as HTMLInputElement;
+    const checkbox = item.querySelector(
+      "input[type='checkbox']",
+    ) as HTMLInputElement;
     if (checkbox && event.target !== checkbox) {
       checkbox.checked = !checkbox.checked;
     }
@@ -38,7 +44,7 @@ if (saveButton) {
   saveButton.addEventListener("click", () => {
     const ipc = window.electron.ipcRenderer;
     const checkboxes = document.querySelectorAll(
-      'input[type="checkbox"]:checked'
+      'input[type="checkbox"]:checked',
     ) as NodeListOf<HTMLInputElement>;
 
     const selectedModels = Array.from(checkboxes).map((cb) => cb.value);

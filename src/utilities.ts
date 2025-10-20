@@ -149,7 +149,10 @@ export function injectPromptIntoView(
                 }
             })();
         `);
-  } else if (view.id && view.id.match("bard") || view.id && view.id.match("gemini")) {
+  } else if (
+    (view.id && view.id.match("bard")) ||
+    (view.id && view.id.match("gemini"))
+  ) {
     view.webContents.executeJavaScript(`
             {
                 var inputElement = document.querySelector(".ql-editor.textarea");
@@ -244,7 +247,10 @@ export function sendPromptInView(view: CustomBrowserView) {
                 }
             })();
         `);
-  } else if (view.id && view.id.match("bard") || view.id && view.id.match("gemini")) {
+  } else if (
+    (view.id && view.id.match("bard")) ||
+    (view.id && view.id.match("gemini"))
+  ) {
     view.webContents.executeJavaScript(`
       (function() {
         var btn = document.querySelector("button[aria-label*='Send message']");

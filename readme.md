@@ -87,11 +87,23 @@ When submitting pull requests, please make sure to list the changes made using b
 
 ## Debugging Tools
 
-While developing, I liked to have the devtools of the app be visible and also have the option to have hot reloading on every save. Uncomment the following two lines to do so:
+While developing, I liked to have the devtools of the app be visible and also have the option to have hot reloading on every save.
+For hot reloading, we are using the `electron-reload` package. On windows, you will need to have the `cross-env` package installed as a dev dependency to set the NODE_ENV variable properly.
+
+```npm install --save-dev cross-env
+
+```
+
+Then, in the `package.json` file, set the start script to the following:
+
+```json
+"start": "cross-env NODE_ENV=development electron .",
+```
+
+Finally, in the `src/main.ts` file, uncomment the following code to open the devtools and enable hot reloading:
 
 ```
  mainWindow.webContents.openDevTools({ mode: "detach" });
- require("electron-reload")(path.join(__dirname, "."));
 ```
 
 ## Relevant links:
