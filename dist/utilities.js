@@ -27,14 +27,14 @@ export function addBrowserView(mainWindow, url, websites, views, webPreferences 
             x: index * viewWidth,
             y: 0,
             width: viewWidth,
-            height: height - 280,
+            height: height - 235,
         });
     });
     view.setBounds({
         x: (websites.length - 1) * viewWidth,
         y: 0,
         width: viewWidth,
-        height: height - 280,
+        height: height - 235,
     });
     view.webContents.setZoomFactor(1.5);
     view.webContents.loadURL(url);
@@ -63,7 +63,7 @@ websites, views) {
             x: index * viewWidth,
             y: 0,
             width: viewWidth,
-            height: height - 280,
+            height: height - 235,
         });
     });
 }
