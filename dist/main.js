@@ -21,7 +21,7 @@ const views = [];
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 // Only use electron-reload in development
-if (process.env.NODE_ENV !== 'production') {
+if (process.env.NODE_ENV !== "production") {
     try {
         console.log("→ electron-reload is active");
         require("electron-reload")(path.join(__dirname, "."));
@@ -54,6 +54,7 @@ function createWindow() {
         center: true,
         backgroundColor: "#000000",
         show: false,
+        icon: path.join(__dirname, "..", "favicon.ico"),
         webPreferences: {
             preload: path.join(__dirname, "..", "dist", "preload.cjs"),
             nodeIntegration: true,
@@ -118,6 +119,7 @@ function createFormWindow() {
         height: 900,
         parent: mainWindow,
         modal: true,
+        icon: path.join(__dirname, "..", "favicon.ico"),
         webPreferences: {
             preload: path.join(__dirname, "..", "dist", "preload.cjs"), // Correct path to compiled preload
             nodeIntegration: false,
@@ -132,6 +134,7 @@ function createModelSelectionWindow() {
         height: 700,
         parent: mainWindow,
         modal: true,
+        icon: path.join(__dirname, "..", "favicon.ico"),
         webPreferences: {
             preload: path.join(__dirname, "..", "dist", "preload.cjs"),
             nodeIntegration: false,
@@ -398,6 +401,7 @@ ipcMain.on("open-edit-view", (_, prompt) => {
         height: 600,
         parent: formWindow || mainWindow, // Use mainWindow as a fallback if formWindow is null
         modal: true, // Make it a modal window
+        icon: path.join(__dirname, "..", "favicon.ico"),
         webPreferences: {
             preload: path.join(__dirname, "..", "dist", "preload.cjs"), // Correct path to compiled preload
             nodeIntegration: false,
@@ -479,7 +483,7 @@ ipcMain.handle("get-default-models", () => {
     return store.get("defaultModels") || [];
 });
 ipcMain.handle("get-open-views", () => {
-    return views.map(view => view.id);
+    return views.map((view) => view.id);
 });
 ipcMain.on("save-default-models", (_, models) => {
     store.set("defaultModels", models);

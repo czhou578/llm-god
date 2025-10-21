@@ -57,7 +57,12 @@ if (hasContextBridge && canAccessWindow) {
                 }
             },
             invoke: (channel, data) => {
-                const validChannels = ["get-prompts", "get-key-by-value", "get-default-models", "get-open-views"];
+                const validChannels = [
+                    "get-prompts",
+                    "get-key-by-value",
+                    "get-default-models",
+                    "get-open-views",
+                ];
                 if (validChannels.includes(channel)) {
                     return ipcRenderer.invoke(channel, data);
                 }

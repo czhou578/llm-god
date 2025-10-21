@@ -72,7 +72,9 @@ window.addEventListener("DOMContentLoaded", async () => {
     const openViews = await ipc.invoke("get-open-views");
     if (openChatGPTButton) {
         const isChatGPTOpen = openViews && openViews.some((url) => url.includes("chatgpt"));
-        openChatGPTButton.textContent = isChatGPTOpen ? "Hide ChatGPT" : "Show ChatGPT";
+        openChatGPTButton.textContent = isChatGPTOpen
+            ? "Hide ChatGPT"
+            : "Show ChatGPT";
     }
     if (openGeminiButton) {
         const isGeminiOpen = openViews && openViews.some((url) => url.includes("gemini"));
@@ -88,11 +90,15 @@ window.addEventListener("DOMContentLoaded", async () => {
     }
     if (openDeepSeekButton) {
         const isDeepSeekOpen = openViews && openViews.some((url) => url.includes("deepseek"));
-        openDeepSeekButton.textContent = isDeepSeekOpen ? "Hide DeepSeek" : "Show DeepSeek";
+        openDeepSeekButton.textContent = isDeepSeekOpen
+            ? "Hide DeepSeek"
+            : "Show DeepSeek";
     }
     if (openCopilotButton) {
         const isCopilotOpen = openViews && openViews.some((url) => url.includes("copilot"));
-        openCopilotButton.textContent = isCopilotOpen ? "Hide Copilot" : "Show Copilot";
+        openCopilotButton.textContent = isCopilotOpen
+            ? "Hide Copilot"
+            : "Show Copilot";
     }
 });
 if (openChatGPTButton) {

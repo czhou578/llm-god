@@ -79,6 +79,7 @@ function createWindow(): void {
     center: true,
     backgroundColor: "#000000",
     show: false,
+    icon: path.join(__dirname, "..", "favicon.ico"),
     webPreferences: {
       preload: path.join(__dirname, "..", "dist", "preload.cjs"),
       nodeIntegration: true,
@@ -157,6 +158,7 @@ function createFormWindow() {
     height: 900,
     parent: mainWindow,
     modal: true,
+    icon: path.join(__dirname, "..", "favicon.ico"),
     webPreferences: {
       preload: path.join(__dirname, "..", "dist", "preload.cjs"), // Correct path to compiled preload
       nodeIntegration: false,
@@ -173,6 +175,7 @@ function createModelSelectionWindow() {
     height: 700,
     parent: mainWindow,
     modal: true,
+    icon: path.join(__dirname, "..", "favicon.ico"),
     webPreferences: {
       preload: path.join(__dirname, "..", "dist", "preload.cjs"),
       nodeIntegration: false,
@@ -473,6 +476,7 @@ ipcMain.on("open-edit-view", (_, prompt: string) => {
     height: 600,
     parent: formWindow || mainWindow, // Use mainWindow as a fallback if formWindow is null
     modal: true, // Make it a modal window
+    icon: path.join(__dirname, "..", "favicon.ico"),
     webPreferences: {
       preload: path.join(__dirname, "..", "dist", "preload.cjs"), // Correct path to compiled preload
       nodeIntegration: false,
