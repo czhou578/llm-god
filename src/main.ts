@@ -43,8 +43,9 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 // Only use electron-reload in development
-if (process.env.NODE_ENV !== 'production') {
+if (process.env.NODE_ENV !== "production") {
   try {
+    console.log("→ electron-reload is active");
     require("electron-reload")(path.join(__dirname, "."));
   } catch (e) {
     // electron-reload not available in production, skip it
@@ -67,7 +68,7 @@ const websites: string[] = getDefaultWebsites();
 function getViewHeight(windowHeight: number): number {
   // Calculate the height for browser views
   // This leaves space for the textarea and controls at the bottom
-  const controlsHeight = 235; // Height reserved for textarea and buttons
+  const controlsHeight = 235; // Height reserved for textarea and buttons (min 180px + padding 20px + buttons ~35px)
   return windowHeight - controlsHeight;
 }
 
@@ -180,7 +181,7 @@ function createModelSelectionWindow() {
   });
 
   modelSelectionWindow.loadFile(
-    path.join(__dirname, "..", "src", "select_models.html")
+    path.join(__dirname, "..", "src", "select_models.html"),
   );
 }
 
@@ -195,7 +196,7 @@ function updateViewBounds(): void {
   const bounds = mainWindow.getBounds();
   const viewWidth = Math.floor(bounds.width / websites.length);
   const viewHeight = getViewHeight(bounds.height);
-  
+
   views.forEach((view, index) => {
     view.setBounds({
       x: index * viewWidth,
@@ -204,7 +205,7 @@ function updateViewBounds(): void {
       height: viewHeight,
     });
   });
-  
+
   updateZoomFactor();
 }
 
@@ -572,7 +573,7 @@ ipcMain.handle("get-default-models", () => {
 });
 
 ipcMain.handle("get-open-views", () => {
-  return views.map(view => view.id);
+  return views.map((view) => view.id);
 });
 
 ipcMain.on("save-default-models", (_, models: string[]) => {

@@ -23,6 +23,7 @@ const __dirname = path.dirname(__filename);
 // Only use electron-reload in development
 if (process.env.NODE_ENV !== 'production') {
     try {
+        console.log("→ electron-reload is active");
         require("electron-reload")(path.join(__dirname, "."));
     }
     catch (e) {
@@ -43,7 +44,7 @@ const websites = getDefaultWebsites();
 function getViewHeight(windowHeight) {
     // Calculate the height for browser views
     // This leaves space for the textarea and controls at the bottom
-    const controlsHeight = 235; // Height reserved for textarea and buttons
+    const controlsHeight = 235; // Height reserved for textarea and buttons (min 180px + padding 20px + buttons ~35px)
     return windowHeight - controlsHeight;
 }
 function createWindow() {

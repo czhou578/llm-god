@@ -42,7 +42,7 @@ export function addBrowserView(
       x: index * viewWidth,
       y: 0,
       width: viewWidth,
-      height: height - 280,
+      height: height - 235,
     });
   });
 
@@ -50,7 +50,7 @@ export function addBrowserView(
     x: (websites.length - 1) * viewWidth,
     y: 0,
     width: viewWidth,
-    height: height - 280,
+    height: height - 235,
   });
 
   view.webContents.setZoomFactor(1.5);
@@ -91,7 +91,7 @@ export function removeBrowserView(
       x: index * viewWidth,
       y: 0,
       width: viewWidth,
-      height: height - 280,
+      height: height - 235,
     });
   });
 }
@@ -149,7 +149,10 @@ export function injectPromptIntoView(
                 }
             })();
         `);
-  } else if (view.id && view.id.match("bard") || view.id && view.id.match("gemini")) {
+  } else if (
+    (view.id && view.id.match("bard")) ||
+    (view.id && view.id.match("gemini"))
+  ) {
     view.webContents.executeJavaScript(`
             {
                 var inputElement = document.querySelector(".ql-editor.textarea");
@@ -244,7 +247,10 @@ export function sendPromptInView(view: CustomBrowserView) {
                 }
             })();
         `);
-  } else if (view.id && view.id.match("bard") || view.id && view.id.match("gemini")) {
+  } else if (
+    (view.id && view.id.match("bard")) ||
+    (view.id && view.id.match("gemini"))
+  ) {
     view.webContents.executeJavaScript(`
       (function() {
         var btn = document.querySelector("button[aria-label*='Send message']");

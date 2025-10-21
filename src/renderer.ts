@@ -108,33 +108,45 @@ window.addEventListener("DOMContentLoaded", async () => {
   const openViews = await ipc.invoke("get-open-views");
 
   if (openChatGPTButton) {
-    const isChatGPTOpen = openViews && openViews.some((url: string) => url.includes("chatgpt"));
-    openChatGPTButton.textContent = isChatGPTOpen ? "Hide ChatGPT" : "Show ChatGPT";
+    const isChatGPTOpen =
+      openViews && openViews.some((url: string) => url.includes("chatgpt"));
+    openChatGPTButton.textContent = isChatGPTOpen
+      ? "Hide ChatGPT"
+      : "Show ChatGPT";
   }
 
   if (openGeminiButton) {
-    const isGeminiOpen = openViews && openViews.some((url: string) => url.includes("gemini"));
+    const isGeminiOpen =
+      openViews && openViews.some((url: string) => url.includes("gemini"));
     openGeminiButton.textContent = isGeminiOpen ? "Hide Gemini" : "Show Gemini";
   }
 
   if (openClaudeButton) {
-    const isClaudeOpen = openViews && openViews.some((url: string) => url.includes("claude"));
+    const isClaudeOpen =
+      openViews && openViews.some((url: string) => url.includes("claude"));
     openClaudeButton.textContent = isClaudeOpen ? "Hide Claude" : "Show Claude";
   }
 
   if (openGrokButton) {
-    const isGrokOpen = openViews && openViews.some((url: string) => url.includes("grok"));
+    const isGrokOpen =
+      openViews && openViews.some((url: string) => url.includes("grok"));
     openGrokButton.textContent = isGrokOpen ? "Hide Grok" : "Show Grok";
   }
 
   if (openDeepSeekButton) {
-    const isDeepSeekOpen = openViews && openViews.some((url: string) => url.includes("deepseek"));
-    openDeepSeekButton.textContent = isDeepSeekOpen ? "Hide DeepSeek" : "Show DeepSeek";
+    const isDeepSeekOpen =
+      openViews && openViews.some((url: string) => url.includes("deepseek"));
+    openDeepSeekButton.textContent = isDeepSeekOpen
+      ? "Hide DeepSeek"
+      : "Show DeepSeek";
   }
 
   if (openCopilotButton) {
-    const isCopilotOpen = openViews && openViews.some((url: string) => url.includes("copilot"));
-    openCopilotButton.textContent = isCopilotOpen ? "Hide Copilot" : "Show Copilot";
+    const isCopilotOpen =
+      openViews && openViews.some((url: string) => url.includes("copilot"));
+    openCopilotButton.textContent = isCopilotOpen
+      ? "Hide Copilot"
+      : "Show Copilot";
   }
 });
 
