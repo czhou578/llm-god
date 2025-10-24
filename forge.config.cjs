@@ -1,11 +1,12 @@
 module.exports = {
   packagerConfig: {
     asar: true,
+    icon: "./icon",
   },
   makers: [
     {
       name: "@electron-forge/maker-zip",
-      platforms: ["linux"],
+      platforms: ["linux", "darwin"],
     },
     {
       name: "@electron-forge/maker-squirrel",
@@ -17,6 +18,7 @@ module.exports = {
         exe: "llm-god.exe",
         setupExe: "llm-god-setup.exe",
         setupPackage: "llm-god-package.nupkg",
+        setupIcon: "./icon.ico",
       },
     },
   ],
