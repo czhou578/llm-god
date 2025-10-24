@@ -23,6 +23,12 @@ window.addEventListener("DOMContentLoaded", async () => {
     if (chatgptCheckbox) chatgptCheckbox.checked = true;
     if (geminiCheckbox) geminiCheckbox.checked = true;
   }
+
+  // Apply dark mode from localStorage
+  const savedTheme = localStorage.getItem("theme");
+  if (savedTheme === "dark") {
+    document.body.classList.add("dark-mode");
+  }
 });
 
 // Make clicking on the model item also toggle the checkbox

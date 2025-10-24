@@ -18,11 +18,22 @@
         font-family: Arial, sans-serif;
         padding: 20px;
         background-color: #f5f5f5;
+        transition: background-color 0.3s, color 0.3s;
+      }
+
+      body.dark-mode {
+        background-color: #1e1e1e;
+        color: #e0e0e0;
       }
 
       h2 {
         margin-bottom: 20px;
         color: #333;
+        transition: color 0.3s;
+      }
+
+      body.dark-mode h2 {
+        color: #e0e0e0;
       }
 
       .instructions {
@@ -31,6 +42,12 @@
         background-color: #e3f2fd;
         border-left: 4px solid #2196f3;
         color: #1976d2;
+        transition: background-color 0.3s, color 0.3s;
+      }
+
+      body.dark-mode .instructions {
+        background-color: #1a3a52;
+        color: #64b5f6;
       }
 
       .model-list {
@@ -39,6 +56,12 @@
         border-radius: 8px;
         box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
         margin-bottom: 20px;
+        transition: background-color 0.3s, box-shadow 0.3s;
+      }
+
+      body.dark-mode .model-list {
+        background-color: #2d2d2d;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
       }
 
       .model-item {
@@ -52,8 +75,18 @@
         transition: all 0.2s;
       }
 
+      body.dark-mode .model-item {
+        border-color: #444;
+        background-color: #2d2d2d;
+      }
+
       .model-item:hover {
         background-color: #f5f5f5;
+        border-color: #2196f3;
+      }
+
+      body.dark-mode .model-item:hover {
+        background-color: #3a3a3a;
         border-color: #2196f3;
       }
 
@@ -69,6 +102,11 @@
         font-size: 16px;
         color: #333;
         user-select: none;
+        transition: color 0.3s;
+      }
+
+      body.dark-mode .model-item label {
+        color: #e0e0e0;
       }
 
       .button-group {
