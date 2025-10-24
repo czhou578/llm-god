@@ -1,6 +1,7 @@
 module.exports = {
   packagerConfig: {
     asar: true,
+    icon: "./icon",
   },
   makers: [
     {
@@ -17,6 +18,7 @@ module.exports = {
         exe: "llm-god.exe",
         setupExe: "llm-god-setup.exe",
         setupPackage: "llm-god-package.nupkg",
+        setupIcon: "./icon.ico",
       },
     },
   ],
