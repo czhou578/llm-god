@@ -15,13 +15,13 @@ declare global {
 // we're in context isolation mode
 const canAccessWindow = (() => {
   try {
-    return typeof window !== 'undefined';
+    return typeof window !== "undefined";
   } catch (e) {
     return false;
   }
 })();
 
-const hasContextBridge = typeof contextBridge !== 'undefined';
+const hasContextBridge = typeof contextBridge !== "undefined";
 
 if (hasContextBridge && canAccessWindow) {
   // We're in context isolation mode (secure contexts)
@@ -67,7 +67,12 @@ if (hasContextBridge && canAccessWindow) {
         }
       },
       invoke: (channel: string, data?: any) => {
-        const validChannels = ["get-prompts", "get-key-by-value", "get-default-models"];
+        const validChannels = [
+          "get-prompts",
+          "get-key-by-value",
+          "get-default-models",
+          "get-open-views",
+        ];
         if (validChannels.includes(channel)) {
           return ipcRenderer.invoke(channel, data);
         }

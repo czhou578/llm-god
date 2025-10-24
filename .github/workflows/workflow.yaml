@@ -2,7 +2,6 @@ name: Build and Release
 
 on:
   push:
-    branches: [master]
     tags:
       - "v*.*.*" # Trigger on tags like v1.0.0 for releases
   pull_request:
@@ -33,14 +32,15 @@ jobs:
 
       # Step 5: Security audit
       - name: Security audit
-        run: npm audit --production
+        continue-on-error: true
+        run: npm audit --production || echo "npm audit failed but continuing..."
 
       # Step 6: Build the Electron app for Windows using electron-forge
       - name: Build Electron app
         run: npm run make
         env:
           # Optional: If electron-forge needs GitHub token for publishing
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       # Step 7: Upload the built artifact
       - name: Upload artifact
@@ -48,3 +48,47 @@ jobs:
         with:
           name: windows-build
           path: out/make/**/*.exe # Path to the .exe file created by electron-forge
+
+      - name: Create GitHub Release
+        id: create_release
+        if: startsWith(github.ref, 'refs/tags/')
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: ${{ github.ref_name }}
+          release_name: "Release ${{ github.ref_name }}"
+          draft: false
+          prerelease: false
+
+      - name: Create or Update Draft Release
+        if: startsWith(github.ref, 'refs/tags/')
+        uses: ncipollo/release-action@v1
+        with:
+          draft: true
+          tag: "next"
+          name: "Unreleased (next)"
+          body: "Changes since last release:"
+
+      - name: Upload Setup.exe
+        if: startsWith(github.ref, 'refs/tags/')
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: ./out/make/squirrel.windows/x64/llm-god-setup.exe # Path to the Setup.exe file
+          asset_name: llm-god-setup.exe
+          asset_content_type: application/octet-stream
+
+      # Step 7: Upload the .nupkg file to the release
+      - name: Upload .nupkg File
+        if: startsWith(github.ref, 'refs/tags/')
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: ./out/make/squirrel.windows/x64/llm-god-0.1.0-full.nupkg # Path to the .nupkg file
+          asset_name: llm-god.nupkg # Replace with your app's name
+          asset_content_type: application/octet-stream

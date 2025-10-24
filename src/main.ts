@@ -43,8 +43,9 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 // Only use electron-reload in development
-if (process.env.NODE_ENV !== 'production') {
+if (process.env.NODE_ENV !== "production") {
   try {
+    console.log("→ electron-reload is active");
     require("electron-reload")(path.join(__dirname, "."));
   } catch (e) {
     // electron-reload not available in production, skip it
@@ -63,15 +64,24 @@ const getDefaultWebsites = (): string[] => {
 
 const websites: string[] = getDefaultWebsites();
 
+// Add this helper function near the top of your file, after imports
+function getViewHeight(windowHeight: number): number {
+  // Calculate the height for browser views
+  // This leaves space for the textarea and controls at the bottom
+  const controlsHeight = 235; // Height reserved for textarea and buttons (min 180px + padding 20px + buttons ~35px)
+  return windowHeight - controlsHeight;
+}
+
 function createWindow(): void {
   mainWindow = new BrowserWindow({
     width: 2000,
     height: 1100,
     center: true,
     backgroundColor: "#000000",
-    show: false, // Start hidden to prevent visual flash
+    show: false,
+    icon: path.join(__dirname, "..", "favicon.ico"),
     webPreferences: {
-      preload: path.join(__dirname, "..", "dist", "preload.cjs"), // Correct path to compiled preload
+      preload: path.join(__dirname, "..", "dist", "preload.cjs"),
       nodeIntegration: true,
       contextIsolation: true,
       offscreen: false,
@@ -87,11 +97,11 @@ function createWindow(): void {
     }, 500);
   });
 
-  mainWindow.loadFile(path.join(__dirname, "..", "index.html")); // Changed to point to root index.html
+  mainWindow.loadFile(path.join(__dirname, "..", "index.html"));
 
-  // mainWindow.webContents.openDevTools({ mode: "detach" });
-  const viewWidth = Math.floor(mainWindow.getBounds().width / websites.length);
-  const { height } = mainWindow.getBounds();
+  const bounds = mainWindow.getBounds();
+  const viewWidth = Math.floor(bounds.width / websites.length);
+  const viewHeight = getViewHeight(bounds.height); // Use helper function
 
   websites.forEach((url: string, index: number) => {
     const view = new WebContentsView({
@@ -109,7 +119,7 @@ function createWindow(): void {
       x: index * viewWidth,
       y: 0,
       width: viewWidth,
-      height: height - 280,
+      height: viewHeight, // Use calculated height
     });
 
     view.webContents.setZoomFactor(1);
@@ -123,6 +133,11 @@ function createWindow(): void {
 
   mainWindow.on("enter-full-screen", () => {
     updateZoomFactor();
+    updateViewBounds(); // Update bounds when entering fullscreen
+  });
+
+  mainWindow.on("leave-full-screen", () => {
+    updateViewBounds(); // Update bounds when leaving fullscreen
   });
 
   let resizeTimeout: NodeJS.Timeout;
@@ -130,18 +145,8 @@ function createWindow(): void {
   mainWindow.on("resize", () => {
     clearTimeout(resizeTimeout);
     resizeTimeout = setTimeout(() => {
-      const bounds = mainWindow.getBounds();
-      const viewWidth = Math.floor(bounds.width / websites.length);
-      views.forEach((view, index) => {
-        view.setBounds({
-          x: index * viewWidth,
-          y: 0,
-          width: viewWidth,
-          height: bounds.height - 280,
-        });
-      });
-      updateZoomFactor();
-    }, 200);
+      updateViewBounds(); // Use helper function
+    }, 200); // Debounce to avoid too many updates
   });
 
   // This logic has been moved up and placed inside the 'ready-to-show' event.
@@ -153,6 +158,7 @@ function createFormWindow() {
     height: 900,
     parent: mainWindow,
     modal: true,
+    icon: path.join(__dirname, "..", "favicon.ico"),
     webPreferences: {
       preload: path.join(__dirname, "..", "dist", "preload.cjs"), // Correct path to compiled preload
       nodeIntegration: false,
@@ -169,6 +175,7 @@ function createModelSelectionWindow() {
     height: 700,
     parent: mainWindow,
     modal: true,
+    icon: path.join(__dirname, "..", "favicon.ico"),
     webPreferences: {
       preload: path.join(__dirname, "..", "dist", "preload.cjs"),
       nodeIntegration: false,
@@ -177,7 +184,7 @@ function createModelSelectionWindow() {
   });
 
   modelSelectionWindow.loadFile(
-    path.join(__dirname, "..", "src", "select_models.html")
+    path.join(__dirname, "..", "src", "select_models.html"),
   );
 }
 
@@ -185,6 +192,24 @@ function updateZoomFactor(): void {
   views.forEach((view) => {
     view.webContents.setZoomFactor(1);
   });
+}
+
+// Add this helper function to update view bounds consistently
+function updateViewBounds(): void {
+  const bounds = mainWindow.getBounds();
+  const viewWidth = Math.floor(bounds.width / websites.length);
+  const viewHeight = getViewHeight(bounds.height);
+
+  views.forEach((view, index) => {
+    view.setBounds({
+      x: index * viewWidth,
+      y: 0,
+      width: viewWidth,
+      height: viewHeight,
+    });
+  });
+
+  updateZoomFactor();
 }
 
 app.whenReady().then(createWindow);
@@ -209,10 +234,9 @@ ipcMain.on("close-form-window", () => {
   }
 });
 
-
 ipcMain.on("enter-prompt", (_: IpcMainEvent, prompt: string) => {
   const cleanPrompt = stripEmojis(prompt);
-  
+
   views.forEach((view: CustomBrowserView) => {
     injectPromptIntoView(view, cleanPrompt);
   });
@@ -243,7 +267,7 @@ ipcMain.on("send-prompt", (_, prompt: string) => {
 ipcMain.on("save-prompt", (event, promptValue: string) => {
   // Strip emojis before saving
   const cleanPrompt = stripEmojis(promptValue);
-  
+
   const timestamp = new Date().getTime().toString();
   store.set(timestamp, cleanPrompt);
 
@@ -251,7 +275,6 @@ ipcMain.on("save-prompt", (event, promptValue: string) => {
   console.log("Original prompt:", promptValue);
   console.log("Cleaned prompt:", cleanPrompt);
 });
-
 
 // ------------------------------------------------------------------------------
 
@@ -263,17 +286,17 @@ ipcMain.handle("get-prompts", () => {
 ipcMain.on("paste-prompt", (_: IpcMainEvent, prompt: string) => {
   // Strip emojis from the prompt
   const cleanPrompt = stripEmojis(prompt);
-  
+
   views.forEach((view: CustomBrowserView) => {
     injectPromptIntoView(view, cleanPrompt);
   });
-  
+
   // Wrap in IIFE to avoid variable redeclaration errors
   mainWindow.webContents.executeJavaScript(`
     (function() {
       const textarea = document.getElementById('prompt-input');
       if (textarea) {
-        textarea.value = \`${cleanPrompt.replace(/\\/g, '\\\\').replace(/`/g, '\\`').replace(/\$/g, '\\$').replace(/\n/g, '\\n').replace(/\r/g, '\\r')}\`;
+        textarea.value = \`${cleanPrompt.replace(/\\/g, "\\\\").replace(/`/g, "\\`").replace(/\$/g, "\\$").replace(/\n/g, "\\n").replace(/\r/g, "\\r")}\`;
         textarea.dispatchEvent(new Event('input', { bubbles: true }));
       }
     })();
@@ -453,6 +476,7 @@ ipcMain.on("open-edit-view", (_, prompt: string) => {
     height: 600,
     parent: formWindow || mainWindow, // Use mainWindow as a fallback if formWindow is null
     modal: true, // Make it a modal window
+    icon: path.join(__dirname, "..", "favicon.ico"),
     webPreferences: {
       preload: path.join(__dirname, "..", "dist", "preload.cjs"), // Correct path to compiled preload
       nodeIntegration: false,
@@ -550,6 +574,10 @@ ipcMain.on("close-model-selection-window", () => {
 
 ipcMain.handle("get-default-models", () => {
   return store.get("defaultModels") || [];
+});
+
+ipcMain.handle("get-open-views", () => {
+  return views.map((view) => view.id);
 });
 
 ipcMain.on("save-default-models", (_, models: string[]) => {

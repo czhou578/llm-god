@@ -8,10 +8,10 @@
   "description": "Prompt multiple LLM's at the same time!",
   "scripts": {
     "build": "tsc",
-    "start": "npm run build && electron .",
+    "start": "cross-env NODE_ENV=development npm run build && electron .",
     "prettier": "prettier -w .",
-    "make": "npm run build && electron-forge make",
-    "package": "npm run build && electron-forge package",
+    "make": "cross-env NODE_ENV=production npm run build && electron-forge make",
+    "package": "cross-env NODE_ENV=production npm run build && electron-forge package",
     "test": "jest"
   },
   "dependencies": {
@@ -30,6 +30,7 @@
     "@types/electron": "^1.4.38",
     "@types/electron-localshortcut": "^3.1.3",
     "@types/node": "^22.15.18",
+    "cross-env": "^7.0.3",
     "electron": "^38.0.0",
     "electron-reload": "^2.0.0-alpha.1",
     "electronmon": "^2.0.3",
