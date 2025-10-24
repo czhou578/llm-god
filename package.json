@@ -14,25 +14,6 @@
     "package": "cross-env NODE_ENV=production npm run build && electron-forge package",
     "test": "jest"
   },
-  "config": {
-    "forge": {
-      "packagerConfig": {
-        "icon": "./icon"
-      },
-      "makers": [
-        {
-          "name": "@electron-forge/maker-squirrel",
-          "config": {
-            "setupIcon": "./icon.ico"
-          }
-        },
-        {
-          "name": "@electron-forge/maker-zip",
-          "platforms": ["darwin"]
-        }
-      ]
-    }
-  },
   "dependencies": {
     "@electron-forge/maker-zip": "^7.4.0",
     "@electron/remote": "^2.1.2",
