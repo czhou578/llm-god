@@ -38,14 +38,16 @@
       }
 
       #prompt-area {
-        display: flex;
+        display: grid;
+        grid-template-columns: 1fr auto auto;
+        gap: 15px;
         background-color: #f0f0f0;
         height: auto;
         padding: 10px;
         min-height: 180px;
         max-height: 50%;
         position: relative;
-        align-items: flex-start;
+        align-items: center;
         z-index: 10; /* Ensure prompt area is above the header */
         transition: background-color 0.3s, color 0.3s;
       }
@@ -60,7 +62,7 @@
         font-size: 30px;
         font-family: "Times New Roman", Times, serif;
         line-height: 1.5;
-        width: 88%;
+        width: 100%;
         height: 100%;
         transition: background-color 0.3s, color 0.3s, border-color 0.3s;
       }
@@ -75,22 +77,17 @@
         display: flex;
         flex-direction: column;
         align-items: flex-start;
-        width: 8%;
-        margin-left: auto;
-        margin-right: 10px;
+        width: 180px;
         gap: 10px;
       }
 
       .theme-toggle {
-        width: 40px !important;
-        height: 40px !important;
-        font-size: 20px !important;
-        padding: 5px !important;
-        position: absolute;
-        right: calc(8% + 50px);
-        top: 50%;
-        transform: translateY(-50%);
+        width: 40px;
+        height: 40px;
+        font-size: 20px;
+        padding: 5px;
         border-radius: 50%;
+        align-self: center;
       }
 
       .dropdown,
