@@ -3,14 +3,6 @@ edit_ipcRenderer.send("edit-prompt-ready"); // Open the edit view when this scri
 
 let selectedKey: string | null = null; // Store the key of the selected row
 
-// Apply dark mode from localStorage
-window.addEventListener("DOMContentLoaded", () => {
-  const savedTheme = localStorage.getItem("theme");
-  if (savedTheme === "dark") {
-    document.body.classList.add("dark-mode");
-  }
-});
-
 const edit_form = document.getElementById("form") as HTMLFormElement;
 const edit_templateContent = document.getElementById(
   "template-content",

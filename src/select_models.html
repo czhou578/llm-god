@@ -8,6 +8,36 @@
     />
     <title>Select Default Models</title>
     <style>
+      /* Critical CSS - Prevent white flash by defaulting to dark theme */
+      html {
+        background-color: #1e1e1e;
+      }
+      body {
+        background-color: #1e1e1e;
+        color: #e0e0e0;
+        margin: 0;
+        padding: 20px;
+      }
+      /* Critical: Set dark backgrounds for all elements immediately */
+      h2 {
+        color: #e0e0e0 !important;
+      }
+      .instructions {
+        background-color: #1a3a52 !important;
+        color: #64b5f6 !important;
+      }
+      .model-list {
+        background-color: #2d2d2d !important;
+      }
+      .model-item {
+        background-color: #2d2d2d !important;
+        border-color: #444 !important;
+      }
+      .model-item label {
+        color: #e0e0e0 !important;
+      }
+    </style>
+    <style>
       * {
         margin: 0;
         padding: 0;
@@ -17,13 +47,39 @@
       body {
         font-family: Arial, sans-serif;
         padding: 20px;
-        background-color: #f5f5f5;
         transition: background-color 0.3s, color 0.3s;
       }
 
       body.dark-mode {
         background-color: #1e1e1e;
         color: #e0e0e0;
+      }
+
+      body.light-mode {
+        background-color: #f5f5f5;
+        color: #333;
+      }
+
+      body.light-mode h2 {
+        color: #333 !important;
+      }
+
+      body.light-mode .instructions {
+        background-color: #e3f2fd !important;
+        color: #1976d2 !important;
+      }
+
+      body.light-mode .model-list {
+        background-color: white !important;
+      }
+
+      body.light-mode .model-item {
+        background-color: transparent !important;
+        border-color: #e0e0e0 !important;
+      }
+
+      body.light-mode .model-item label {
+        color: #333 !important;
       }
 
       h2 {

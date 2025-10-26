@@ -4,9 +4,34 @@
     <meta charset="utf-8" />
     <title>Prompt Templates</title>
     <style>
+      /* Critical CSS - Prevent white flash by defaulting to dark theme */
+      html {
+        background-color: #1e1e1e;
+      }
+      body {
+        background-color: #1e1e1e;
+        color: #e0e0e0;
+        margin: 0;
+        padding: 0;
+      }
+      /* Critical: Set dark background for container immediately */
+      .form-container {
+        background-color: #2d2d2d !important;
+        color: #e0e0e0 !important;
+      }
+      .form-container h1,
+      .form-container h2 {
+        color: #e0e0e0 !important;
+      }
+      .form-container textarea {
+        background-color: #3a3a3a !important;
+        color: #e0e0e0 !important;
+        border-color: #555 !important;
+      }
+    </style>
+    <style>
       body {
         font-family: "Segoe UI", Arial, sans-serif;
-        background-color: #f0f0f0;
         margin: 0;
         padding: 0;
         display: flex;
@@ -18,9 +43,32 @@
         transition: background-color 0.3s, color 0.3s;
       }
 
+      /* Dark mode styles - apply when dark-mode class IS present */
       body.dark-mode {
         background-color: #1e1e1e;
         color: #e0e0e0;
+      }
+
+      /* Light mode styles - only apply when light-mode class is present */
+      body.light-mode {
+        background-color: #f0f0f0;
+        color: #333;
+      }
+
+      body.light-mode .form-container {
+        background-color: white !important;
+        color: #333 !important;
+      }
+
+      body.light-mode .form-container h1,
+      body.light-mode .form-container h2 {
+        color: #333 !important;
+      }
+
+      body.light-mode .form-container textarea {
+        background-color: white !important;
+        color: #333 !important;
+        border-color: #e0e0e0 !important;
       }
 
       .form-container {

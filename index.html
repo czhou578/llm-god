@@ -8,6 +8,47 @@
     />
     <title>Multi-LLM Interface</title>
     <style>
+      /* Critical CSS - Prevent white flash by defaulting to dark theme */
+      html {
+        background-color: #000000;
+      }
+      body {
+        background-color: #000000;
+        color: #e0e0e0;
+        margin: 0;
+        padding: 0;
+      }
+      #prompt-area {
+        background-color: #1e1e1e !important;
+        color: #e0e0e0 !important;
+      }
+      #prompt-input {
+        background-color: #2d2d2d !important;
+        color: #e0e0e0 !important;
+        border: 1px solid #444 !important;
+      }
+      #dropdown-button,
+      .prompt-select,
+      .model-select,
+      .diff-select,
+      .theme-toggle {
+        background-color: #2d2d2d !important;
+        color: #e0e0e0 !important;
+        border-color: #444 !important;
+      }
+      .dropdown-content {
+        background-color: #2d2d2d !important;
+        border-color: #0078d7 !important;
+      }
+      .dropdown-item {
+        background-color: #3a3a3a !important;
+        color: #e0e0e0 !important;
+      }
+      #no-chats-header {
+        color: #999 !important;
+      }
+    </style>
+    <style>
       * {
         margin: 0;
         padding: 0;
@@ -20,7 +61,6 @@
         justify-content: flex-end;
         height: 100vh;
         margin: 0;
-        background-color: #f0f0f0;
         position: relative; /* Add this to create positioning context */
       }
 
@@ -41,7 +81,6 @@
         display: grid;
         grid-template-columns: 1fr auto auto;
         gap: 15px;
-        background-color: #f0f0f0;
         height: auto;
         padding: 10px;
         min-height: 180px;
@@ -55,6 +94,12 @@
       #prompt-area.dark-mode {
         background-color: #1e1e1e;
         color: #e0e0e0;
+      }
+
+      /* Light mode overrides - restore light theme when dark-mode is removed */
+      #prompt-area:not(.dark-mode) {
+        background-color: #f0f0f0 !important;
+        color: #333 !important;
       }
 
       #prompt-input {
@@ -71,6 +116,12 @@
         background-color: #2d2d2d;
         color: #e0e0e0;
         border: 1px solid #444;
+      }
+
+      #prompt-area:not(.dark-mode) #prompt-input {
+        background-color: white !important;
+        color: #333 !important;
+        border: 1px solid #ccc !important;
       }
 
       .button-group {
@@ -128,6 +179,16 @@
         border-color: #444;
       }
 
+      #prompt-area:not(.dark-mode) #dropdown-button,
+      #prompt-area:not(.dark-mode) .prompt-select,
+      #prompt-area:not(.dark-mode) .model-select,
+      #prompt-area:not(.dark-mode) .diff-select,
+      #prompt-area:not(.dark-mode) .theme-toggle {
+        background-color: #f0f0f0 !important;
+        color: #333 !important;
+        border-color: #ccc !important;
+      }
+
       .dropdown-content {
         display: none;
         position: absolute;
@@ -179,6 +240,24 @@
         background-color: #4a4a4a;
       }
 
+      #prompt-area:not(.dark-mode) .dropdown-content {
+        background-color: #f9f9f9 !important;
+        border-color: #0078d7 !important;
+      }
+
+      #prompt-area:not(.dark-mode) .dropdown-item {
+        background-color: #e6e6e6 !important;
+        color: #333 !important;
+      }
+
+      #prompt-area:not(.dark-mode) .dropdown-item:hover {
+        background-color: #ddd !important;
+      }
+
+      body:not(.dark-mode) #no-chats-header {
+        color: #666 !important;
+      }
+
       .prompt-picker,
       .model-picker {
         margin: 0;
@@ -189,11 +268,6 @@
         position: absolute;
       }
     </style>
-    <script>
-      document.addEventListener("DOMContentLoaded", () => {
-        document.body.style.backgroundColor = "#f0f0f0";
-      });
-    </script>
     <script type="module" src="./dist/renderer.js"></script>
   </head>
 

@@ -6,13 +6,6 @@ const templateContent = document.getElementById(
 ) as HTMLTextAreaElement;
 let selectedRow: HTMLTableRowElement | null = null;
 
-// Apply dark mode from localStorage
-window.addEventListener("DOMContentLoaded", () => {
-  const savedTheme = localStorage.getItem("theme");
-  if (savedTheme === "dark") {
-    document.body.classList.add("dark-mode");
-  }
-});
 
 const saveTemplateButton = document.querySelector(
   'button[type="submit"]',
