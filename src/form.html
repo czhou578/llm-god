@@ -4,9 +4,34 @@
     <meta charset="utf-8" />
     <title>Prompt Templates</title>
     <style>
+      /* Critical CSS - Prevent white flash by defaulting to dark theme */
+      html {
+        background-color: #1e1e1e;
+      }
+      body {
+        background-color: #1e1e1e;
+        color: #e0e0e0;
+        margin: 0;
+        padding: 0;
+      }
+      /* Critical: Set dark background for container immediately */
+      .form-container {
+        background-color: #2d2d2d !important;
+        color: #e0e0e0 !important;
+      }
+      .form-container h1,
+      .form-container h2 {
+        color: #e0e0e0 !important;
+      }
+      .form-container textarea {
+        background-color: #3a3a3a !important;
+        color: #e0e0e0 !important;
+        border-color: #555 !important;
+      }
+    </style>
+    <style>
       body {
         font-family: "Segoe UI", Arial, sans-serif;
-        background-color: #f0f0f0;
         margin: 0;
         padding: 0;
         display: flex;
@@ -14,7 +39,36 @@
         align-items: center;
         height: 100vh;
         width: 100vw;
-        overflow-x: hidden; /* Remove horizontal scrollbar */
+        overflow-x: hidden;
+        transition: background-color 0.3s, color 0.3s;
+      }
+
+      /* Dark mode styles - apply when dark-mode class IS present */
+      body.dark-mode {
+        background-color: #1e1e1e;
+        color: #e0e0e0;
+      }
+
+      /* Light mode styles - only apply when light-mode class is present */
+      body.light-mode {
+        background-color: #f0f0f0;
+        color: #333;
+      }
+
+      body.light-mode .form-container {
+        background-color: white !important;
+        color: #333 !important;
+      }
+
+      body.light-mode .form-container h1,
+      body.light-mode .form-container h2 {
+        color: #333 !important;
+      }
+
+      body.light-mode .form-container textarea {
+        background-color: white !important;
+        color: #333 !important;
+        border-color: #e0e0e0 !important;
       }
 
       .form-container {
@@ -23,12 +77,18 @@
         border-radius: 8px;
         box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
         width: 100%;
-        height: 100%; /* Cover entire modal window */
-        max-width: none; /* Remove max-width constraint */
+        height: 100%;
+        max-width: none;
         display: flex;
         flex-direction: column;
         align-items: center;
-        justify-content: flex-start; /* Align items to the top */
+        justify-content: flex-start;
+        transition: background-color 0.3s, box-shadow 0.3s;
+      }
+
+      body.dark-mode .form-container {
+        background-color: #2d2d2d;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.5);
       }
 
       h1 {
@@ -36,6 +96,11 @@
         margin-bottom: 20px;
         font-size: 24px;
         text-align: center;
+        transition: color 0.3s;
+      }
+
+      body.dark-mode h1 {
+        color: #e0e0e0;
       }
 
       h2 {
@@ -43,6 +108,11 @@
         margin-bottom: 15px;
         font-size: 20px;
         text-align: center;
+        transition: color 0.3s;
+      }
+
+      body.dark-mode h2 {
+        color: #e0e0e0;
       }
 
       form,
@@ -61,11 +131,19 @@
         border: 2px solid #e0e0e0;
         border-radius: 6px;
         font-size: 16px;
-        transition: border-color 0.3s ease;
+        transition: border-color 0.3s ease, background-color 0.3s, color 0.3s;
         resize: vertical;
         font-family: "Segoe UI", Arial, sans-serif;
         line-height: 1.5;
         margin: 15px 0;
+        background-color: white;
+        color: #333;
+      }
+
+      body.dark-mode textarea {
+        background-color: #3a3a3a;
+        color: #e0e0e0;
+        border-color: #555;
       }
 
       textarea:focus {
@@ -122,15 +200,25 @@
         border: 1px solid #ddd;
         padding: 8px;
         text-align: left;
+        transition: border-color 0.3s, background-color 0.3s;
+      }
+
+      body.dark-mode .prompt-table th,
+      body.dark-mode .prompt-table td {
+        border-color: #555;
       }
 
       .prompt-table td {
-        position: relative; /* Position relative to contain the action buttons */
-        width: 100%; /* Ensure cells take full width */
-        word-wrap: break-word; /* Wrap long text to prevent overflow */
-        text-align: left; /* Align text to the left */
-        padding: 8px; /* Add padding for better readability */
-        border: 1px solid #ddd; /* Add border for better visibility */
+        position: relative;
+        width: 100%;
+        word-wrap: break-word;
+        text-align: left;
+        padding: 8px;
+        border: 1px solid #ddd;
+      }
+
+      body.dark-mode .prompt-table td {
+        border-color: #555;
       }
 
       .row-actions {
@@ -166,12 +254,20 @@
       }
 
       .prompt-table tr.selected {
-        background-color: #d1e7fd; /* Highlight color for selected row */
+        background-color: #d1e7fd;
+      }
+
+      body.dark-mode .prompt-table tr.selected {
+        background-color: #1a4a6e;
       }
 
       .prompt-table tr:hover {
         background-color: #f1f1f1;
         cursor: pointer;
+      }
+
+      body.dark-mode .prompt-table tr:hover {
+        background-color: #3a3a3a;
       }
 
       .choose-prompt-button:hover {

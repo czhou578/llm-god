@@ -29,6 +29,9 @@ export function addBrowserView(
     },
   });
 
+  // Set background color to prevent white flash while loading
+  view.setBackgroundColor('#000000');
+
   view.id = url;
   mainWindow.contentView.addChildView(view);
 
