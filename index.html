@@ -276,11 +276,16 @@
     <h2 id="no-chats-header">No Chats Shown. Please add a Chat</h2>
 
     <div id="prompt-area">
-      <textarea
-        id="prompt-input"
-        rows="3"
-        placeholder="Press Ctrl + Enter to send prompt"
-      ></textarea>
+      <div style="position: relative; width: 100%; height: 100%;">
+        <textarea
+          id="prompt-input"
+          rows="3"
+          placeholder="Press Ctrl + Enter to send prompt"
+        ></textarea>
+        <div id="char-counter" style="position: absolute; bottom: 5px; right: 10px; font-size: 12px; opacity: 0.6; pointer-events: none;">
+          0 chars / 0 words
+        </div>
+      </div>
       <button class="theme-toggle">🌙</button>
       <div class="button-group">
         <div class="dropdown">

@@ -235,9 +235,21 @@ if (openCopilotButton) {
   });
 }
 
+// Function to update character and word counter
+function updateCharCounter(text: string): void {
+  const charCounterElement = document.getElementById("char-counter");
+  if (charCounterElement) {
+    const charCount = text.length;
+    const wordCount = text.trim().length === 0 ? 0 : text.trim().split(/\s+/).length;
+    charCounterElement.textContent = `${charCount} chars / ${wordCount} words`;
+  }
+}
+
 if (textArea) {
   textArea.addEventListener("input", (event: Event) => {
-    logToWebPage((event.target as HTMLTextAreaElement).value);
+    const value = (event.target as HTMLTextAreaElement).value;
+    logToWebPage(value);
+    updateCharCounter(value);
   });
 
   textArea.addEventListener("keydown", (event: KeyboardEvent) => {
@@ -249,6 +261,7 @@ if (textArea) {
           console.log("Ctrl + Enter pressed, sending prompt:", promptText);
           ipcRenderer.send("send-prompt", promptText);
           textArea.value = "";
+          updateCharCounter("");
         }
       }
     }
@@ -307,6 +320,8 @@ ipcRenderer.on("inject-prompt", (_: any, selectedPrompt: string) => {
 
       const inputEvent = new Event("input", { bubbles: true });
       promptInput.dispatchEvent(inputEvent);
+
+      updateCharCounter(cleanPrompt);
 
       console.log("Prompt injected successfully");
     } else {
