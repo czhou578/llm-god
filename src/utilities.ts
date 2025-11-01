@@ -30,7 +30,7 @@ export function addBrowserView(
   });
 
   // Set background color to prevent white flash while loading
-  view.setBackgroundColor('#000000');
+  view.setBackgroundColor("#000000");
 
   view.id = url;
   mainWindow.contentView.addChildView(view);
@@ -119,6 +119,67 @@ export function stripEmojis(text: string): string {
       .replace(/[\u{200D}]/gu, "") // Zero Width Joiner (used in emoji sequences)
       .trim()
   );
+}
+
+export function openNewChatInView(view: CustomBrowserView): void {
+  if (view.id && view.id.match("chatgpt")) {
+    view.webContents.executeJavaScript(`
+            (function() {
+                const newChatButton = document.querySelector('a[aria-label="New chat"]');
+                if (newChatButton) {
+                    newChatButton.click();
+                }
+            })();
+        `);
+  } else if (
+    (view.id && view.id.match("bard")) ||
+    (view.id && view.id.match("gemini"))
+  ) {
+    view.webContents.executeJavaScript(`
+            (function() {
+                const newChatButton = document.querySelector('button[aria-label="New chat"]');
+                if (newChatButton) {
+                    newChatButton.click();
+                }
+            })();
+        `);
+  } else if (view.id && view.id.match("claude")) {
+    view.webContents.executeJavaScript(`
+            (function() {
+                const newChatButton = document.querySelector('a[aria-label="New chat"]');
+                if (newChatButton) {
+                    newChatButton.click();
+                }
+            })();
+        `);
+  } else if (view.id && view.id.match("grok")) {
+    view.webContents.executeJavaScript(`
+            (function() {
+                const newChatButton = document.querySelectorAll('a[data-sidebar="menu-button"]')[0];
+                if (newChatButton) {
+                    newChatButton.click();
+                }
+            })();
+        `);
+  } else if (view.id && view.id.match("deepseek")) {
+    view.webContents.executeJavaScript(`
+            (function() {
+                const newChatButton = document.getElementsByClassName('ds-icon-button')[1];
+                if (newChatButton) {
+                    newChatButton.click();
+                }
+            })();
+        `);
+  } else if (view.id && view.id.match("copilot")) {
+    view.webContents.executeJavaScript(`
+            (function() {
+                const newChatButton = document.querySelector('button[aria-label="Start new chat"]');
+                if (newChatButton) {
+                    newChatButton.click();
+                }
+            })();
+        `);
+  }
 }
 
 export function injectPromptIntoView(

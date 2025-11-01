@@ -88,7 +88,9 @@
         position: relative;
         align-items: center;
         z-index: 10; /* Ensure prompt area is above the header */
-        transition: background-color 0.3s, color 0.3s;
+        transition:
+          background-color 0.3s,
+          color 0.3s;
       }
 
       #prompt-area.dark-mode {
@@ -109,7 +111,10 @@
         line-height: 1.5;
         width: 100%;
         height: 100%;
-        transition: background-color 0.3s, color 0.3s, border-color 0.3s;
+        transition:
+          background-color 0.3s,
+          color 0.3s,
+          border-color 0.3s;
       }
 
       #prompt-area.dark-mode #prompt-input {
@@ -132,7 +137,8 @@
         gap: 10px;
       }
 
-      .theme-toggle {
+      .theme-toggle,
+      .new-chat-toggle {
         width: 40px;
         height: 40px;
         font-size: 20px;
@@ -153,7 +159,8 @@
       .prompt-select,
       .model-select,
       .diff-select,
-      .theme-toggle {
+      .theme-toggle,
+      .new-chat-toggle {
         width: 100%;
         height: 50px;
         font-size: 18px;
@@ -166,7 +173,10 @@
         display: block;
         text-align: center;
         font-weight: bold;
-        transition: background-color 0.3s, color 0.3s, border-color 0.3s;
+        transition:
+          background-color 0.3s,
+          color 0.3s,
+          border-color 0.3s;
       }
 
       #prompt-area.dark-mode #dropdown-button,
@@ -276,17 +286,37 @@
     <h2 id="no-chats-header">No Chats Shown. Please add a Chat</h2>
 
     <div id="prompt-area">
-      <div style="position: relative; width: 100%; height: 100%;">
+      <div style="position: relative; width: 100%; height: 100%">
         <textarea
           id="prompt-input"
           rows="3"
           placeholder="Press Ctrl + Enter to send prompt"
         ></textarea>
-        <div id="char-counter" style="position: absolute; bottom: 5px; right: 10px; font-size: 12px; opacity: 0.6; pointer-events: none;">
+        <div
+          id="char-counter"
+          style="
+            position: absolute;
+            bottom: 5px;
+            right: 10px;
+            font-size: 12px;
+            opacity: 0.6;
+            pointer-events: none;
+          "
+        >
           0 chars / 0 words
         </div>
       </div>
-      <button class="theme-toggle">🌙</button>
+      <div
+        style="
+          display: flex;
+          flex-direction: column;
+          gap: 10px;
+          align-items: center;
+        "
+      >
+        <button class="new-chat-toggle">➕</button>
+        <button class="theme-toggle">🌙</button>
+      </div>
       <div class="button-group">
         <div class="dropdown">
           <button id="dropdown-button">Show Models ▼</button>
