@@ -266,6 +266,26 @@ if (textArea) {
       }
     }
   });
+
+  textArea.addEventListener("paste", (event: ClipboardEvent) => {
+    const items = event.clipboardData?.items;
+    if (!items) return;
+
+    for (const item of items) {
+      if (item.type.startsWith("image/")) {
+        event.preventDefault();
+        const file = item.getAsFile();
+        if (file) {
+          const reader = new FileReader();
+          reader.onload = () => {
+            const base64Data = reader.result;
+            ipcRenderer.send("paste-image", base64Data);
+          };
+          reader.readAsDataURL(file);
+        }
+      };
+    };
+  });
 }
 
 if (promptDropdownButton) {

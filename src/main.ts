@@ -14,6 +14,7 @@ import {
   injectPromptIntoView,
   sendPromptInView,
   stripEmojis, // Add this import
+  injectImageIntoView,
 } from "./utilities.js"; // Adjusted path
 import { createRequire } from "node:module"; // Import createRequire
 import { fileURLToPath } from "node:url"; // Import fileURLToPath
@@ -658,4 +659,11 @@ ipcMain.on("save-default-models", (_, models: string[]) => {
   // Restart the application
   app.relaunch();
   app.exit(0);
+});
+
+ipcMain.on("paste-image", (_, imageData: string) => {
+  // Paste image data into all views that support it
+  views.forEach((view: CustomBrowserView) => {
+    injectImageIntoView(view, imageData);
+  });
 });

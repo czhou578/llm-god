@@ -447,3 +447,42 @@ export function sendPromptInView(view: CustomBrowserView) {
     `);
   }
 }
+
+export function injectImageIntoView(
+  view: CustomBrowserView,
+  imageData: string,
+) {
+  const base64Data = imageData.includes('base64,')
+  ? imageData.split('base64,')[1]
+  : imageData;
+
+  if (view.id && view.id.match("chatgpt")) {
+    view.webContents.executeJavaScript(`
+      (async function() {
+        const base64toBlob = (base64) => {
+          const byteString = atob(base64);
+          const ab = new ArrayBuffer(byteString.length);
+          const ia = new Uint8Array(ab);
+          for (let i = 0; i < byteString.length; i++) {
+            ia[i] = byteString.charCodeAt(i);
+          }
+          return new Blob([ab], { type: 'image/png' });
+        };
+
+        const blob = base64toBlob('${base64Data}');
+        const file = new File([blob], 'pasted-image.png', { type: 'image/png' });
+        
+        // Find the file input (ChatGPT usually has a hidden file input)
+        const fileInput = document.querySelector('input[type="file"]');
+        if (fileInput) {
+          const dataTransfer = new DataTransfer();
+          dataTransfer.items.add(file);
+          fileInput.files = dataTransfer.files;
+          
+          const changeEvent = new Event('change', { bubbles: true });
+          fileInput.dispatchEvent(changeEvent);
+        }
+      })();
+    `);
+  }
+}
