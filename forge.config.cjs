@@ -5,11 +5,8 @@ module.exports = {
   },
   makers: [
     {
-      name: "@electron-forge/maker-zip",
-      platforms: ["linux", "darwin"],
-    },
-    {
       name: "@electron-forge/maker-squirrel",
+      platforms: ["win32"],
       config: {
         name: "llm-god",
         authors: "Colin Zhou",
@@ -20,6 +17,29 @@ module.exports = {
         setupPackage: "llm-god-package.nupkg",
         setupIcon: "./icon.ico",
       },
+    },
+    {
+      name: "@electron-forge/maker-deb",
+      platforms: ["linux"],
+      config: {
+        options: {
+          maintainer: "Colin Zhou",
+          homepage: "https://github.com/czhou578/llm-god",
+        },
+      },
+    },
+    {
+      name: "@electron-forge/maker-rpm",
+      platforms: ["linux"],
+      config: {
+        options: {
+          homepage: "https://github.com/czhou578/llm-god",
+        },
+      },
+    },
+    {
+      name: "@electron-forge/maker-zip",
+      platforms: ["darwin", "linux"],
     },
   ],
   files: ["**/*", "!*.log"],
