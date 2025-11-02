@@ -240,7 +240,8 @@ function updateCharCounter(text: string): void {
   const charCounterElement = document.getElementById("char-counter");
   if (charCounterElement) {
     const charCount = text.length;
-    const wordCount = text.trim().length === 0 ? 0 : text.trim().split(/\s+/).length;
+    const wordCount =
+      text.trim().length === 0 ? 0 : text.trim().split(/\s+/).length;
     charCounterElement.textContent = `${charCount} chars / ${wordCount} words`;
   }
 }
@@ -283,8 +284,8 @@ if (textArea) {
           };
           reader.readAsDataURL(file);
         }
-      };
-    };
+      }
+    }
   });
 }
 

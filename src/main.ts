@@ -115,7 +115,7 @@ function createWindow(): void {
     }) as CustomBrowserView; // Cast to CustomBrowserView
 
     // Set background color to prevent white flash while loading
-    view.setBackgroundColor('#000000');
+    view.setBackgroundColor("#000000");
 
     view.id = `${url}`;
     mainWindow.contentView.addChildView(view);
@@ -130,7 +130,7 @@ function createWindow(): void {
     view.webContents.loadURL(url);
 
     // Open DevTools for each view for debugging
-    // view.webContents.openDevTools({ mode: "detach" });
+    view.webContents.openDevTools({ mode: "detach" });
 
     views.push(view);
   });
@@ -159,7 +159,7 @@ function createWindow(): void {
 async function createFormWindow() {
   // Get current theme from main window first
   const currentTheme = await mainWindow.webContents.executeJavaScript(
-    'localStorage.getItem("theme")'
+    'localStorage.getItem("theme")',
   );
 
   formWindow = new BrowserWindow({
@@ -168,7 +168,7 @@ async function createFormWindow() {
     parent: mainWindow,
     modal: true,
     show: false, // Don't show window until theme is applied
-    backgroundColor: currentTheme === 'dark' ? '#1e1e1e' : '#f0f0f0',
+    backgroundColor: currentTheme === "dark" ? "#1e1e1e" : "#f0f0f0",
     icon: path.join(__dirname, "..", "favicon.ico"),
     webPreferences: {
       preload: path.join(__dirname, "..", "dist", "preload.cjs"), // Correct path to compiled preload
@@ -178,15 +178,15 @@ async function createFormWindow() {
   });
 
   // Apply theme immediately when DOM is ready, before showing
-  formWindow.webContents.on('dom-ready', async () => {
-    const themeClass = currentTheme === 'dark' ? 'dark-mode' : 'light-mode';
+  formWindow.webContents.on("dom-ready", async () => {
+    const themeClass = currentTheme === "dark" ? "dark-mode" : "light-mode";
     await formWindow!.webContents.executeJavaScript(`
       document.body.classList.add('${themeClass}');
     `);
   });
 
   // Use ready-to-show event for smoother display
-  formWindow.once('ready-to-show', () => {
+  formWindow.once("ready-to-show", () => {
     formWindow!.show();
   });
 
@@ -196,7 +196,7 @@ async function createFormWindow() {
 async function createModelSelectionWindow() {
   // Get current theme from main window first
   const currentTheme = await mainWindow.webContents.executeJavaScript(
-    'localStorage.getItem("theme")'
+    'localStorage.getItem("theme")',
   );
 
   modelSelectionWindow = new BrowserWindow({
@@ -205,7 +205,7 @@ async function createModelSelectionWindow() {
     parent: mainWindow,
     modal: true,
     show: false, // Don't show window until theme is applied
-    backgroundColor: currentTheme === 'dark' ? '#1e1e1e' : '#f5f5f5',
+    backgroundColor: currentTheme === "dark" ? "#1e1e1e" : "#f5f5f5",
     icon: path.join(__dirname, "..", "favicon.ico"),
     webPreferences: {
       preload: path.join(__dirname, "..", "dist", "preload.cjs"),
@@ -215,15 +215,15 @@ async function createModelSelectionWindow() {
   });
 
   // Apply theme immediately when DOM is ready, before showing
-  modelSelectionWindow.webContents.on('dom-ready', async () => {
-    const themeClass = currentTheme === 'dark' ? 'dark-mode' : 'light-mode';
+  modelSelectionWindow.webContents.on("dom-ready", async () => {
+    const themeClass = currentTheme === "dark" ? "dark-mode" : "light-mode";
     await modelSelectionWindow!.webContents.executeJavaScript(`
       document.body.classList.add('${themeClass}');
     `);
   });
 
   // Use ready-to-show event for smoother display
-  modelSelectionWindow.once('ready-to-show', () => {
+  modelSelectionWindow.once("ready-to-show", () => {
     modelSelectionWindow!.show();
   });
 
@@ -517,7 +517,7 @@ ipcMain.on("open-edit-view", async (_, prompt: string) => {
 
   // Get current theme from main window first
   const currentTheme = await mainWindow.webContents.executeJavaScript(
-    'localStorage.getItem("theme")'
+    'localStorage.getItem("theme")',
   );
 
   const editWindow = new BrowserWindow({
@@ -526,7 +526,7 @@ ipcMain.on("open-edit-view", async (_, prompt: string) => {
     parent: formWindow || mainWindow, // Use mainWindow as a fallback if formWindow is null
     modal: true, // Make it a modal window
     show: false, // Don't show window until theme is applied
-    backgroundColor: currentTheme === 'dark' ? '#1e1e1e' : '#f0f0f0',
+    backgroundColor: currentTheme === "dark" ? "#1e1e1e" : "#f0f0f0",
     icon: path.join(__dirname, "..", "favicon.ico"),
     webPreferences: {
       preload: path.join(__dirname, "..", "dist", "preload.cjs"), // Correct path to compiled preload
@@ -536,9 +536,12 @@ ipcMain.on("open-edit-view", async (_, prompt: string) => {
   });
 
   // Apply theme and inject prompt when DOM is ready
-  const escapedPrompt = prompt.replace(/\\/g, '\\\\').replace(/`/g, '\\`').replace(/\$/g, '\\$');
-  const themeClass = currentTheme === 'dark' ? 'dark-mode' : 'light-mode';
-  editWindow.webContents.on('dom-ready', async () => {
+  const escapedPrompt = prompt
+    .replace(/\\/g, "\\\\")
+    .replace(/`/g, "\\`")
+    .replace(/\$/g, "\\$");
+  const themeClass = currentTheme === "dark" ? "dark-mode" : "light-mode";
+  editWindow.webContents.on("dom-ready", async () => {
     await editWindow.webContents.executeJavaScript(`
       document.body.classList.add('${themeClass}');
       const textarea = document.getElementById('template-content');
@@ -549,11 +552,13 @@ ipcMain.on("open-edit-view", async (_, prompt: string) => {
   });
 
   // Use ready-to-show event for smoother display
-  editWindow.once('ready-to-show', () => {
+  editWindow.once("ready-to-show", () => {
     editWindow.show();
   });
 
-  await editWindow.loadFile(path.join(__dirname, "..", "src", "edit_prompt.html"));
+  await editWindow.loadFile(
+    path.join(__dirname, "..", "src", "edit_prompt.html"),
+  );
 
   console.log("Edit window created.");
 });
@@ -638,7 +643,7 @@ ipcMain.handle("get-default-models", () => {
 
 ipcMain.handle("get-current-theme", () => {
   return mainWindow.webContents.executeJavaScript(
-    'localStorage.getItem("theme")'
+    'localStorage.getItem("theme")',
   );
 });
 
