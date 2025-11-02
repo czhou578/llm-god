@@ -34,6 +34,7 @@ module.exports = {
       config: {
         options: {
           homepage: "https://github.com/czhou578/llm-god",
+          license: "MIT",
         },
       },
     },

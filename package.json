@@ -6,6 +6,7 @@
   "main": "dist/main.js",
   "author": "Colin Zhou",
   "description": "Prompt multiple LLM's at the same time!",
+  "license": "MIT",
   "scripts": {
     "build": "tsc",
     "start": "cross-env NODE_ENV=development npm run build && electron .",
