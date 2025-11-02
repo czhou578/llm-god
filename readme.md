@@ -4,7 +4,9 @@
 
 ![alt text](image-1.png)
 
-This is a desktop app for Windows machines only (currently) that allows users to simultaneously prompt multiple LLM's at once in one environment. I use this app every day, for coding or non coding purposes. It has saved me countless hours of copypasting and is just so much more efficient.
+This is a desktop app for Windows machines only\* that allows users to simultaneously prompt multiple LLM's at once in one environment. I use this app every day, for coding or non coding purposes. It has saved me countless hours of copypasting and is just so much more efficient.
+
+\*Linux version is currently being tested. The app is packaged for Mac but I do not have a Mac to test it on. If any Mac developers want to help test, please do! File any issues you find in the Issues tab.
 
 Currently, the following LLM web interfaces are supported:
 
