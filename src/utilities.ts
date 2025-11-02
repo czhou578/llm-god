@@ -124,13 +124,49 @@ export function stripEmojis(text: string): string {
 export function openNewChatInView(view: CustomBrowserView): void {
   if (view.id && view.id.match("chatgpt")) {
     view.webContents.executeJavaScript(`
-            (function() {
-                const newChatButton = document.querySelector('a[aria-label="New chat"]');
-                if (newChatButton) {
-                    newChatButton.click();
+      (function() {
+        const selectors = [
+          'a[aria-label="New chat"]',
+          'button[aria-label="New chat"]',
+          'a[href*="/"]', // ChatGPT new chat links
+          'button:has(svg[class*="icon"])'
+        ];
+        
+        for (const selector of selectors) {
+          try {
+            const elements = document.querySelectorAll(selector);
+            for (const element of elements) {
+              // Check if visible and interactable
+              if (element.offsetParent !== null && 
+                  element.getBoundingClientRect().width > 0) {
+                const text = element.textContent?.toLowerCase() || '';
+                const label = element.getAttribute('aria-label')?.toLowerCase() || '';
+                
+                if (label.includes('new') || text.includes('new chat')) {
+                  element.click();
+                  return true;
                 }
-            })();
-        `);
+              }
+            }
+          } catch (e) {
+            continue;
+          }
+        }
+        
+        // Final fallback: look for any clickable element with "new chat" text
+        const allClickable = document.querySelectorAll('a, button');
+        for (const el of allClickable) {
+          if (el.offsetParent !== null) {
+            const text = (el.textContent || '').toLowerCase();
+            const label = (el.getAttribute('aria-label') || '').toLowerCase();
+            if (label === 'new chat' || text.trim() === 'new chat') {
+              el.click();
+              return true;
+            }
+          }
+        }
+      })();
+    `);
   } else if (
     (view.id && view.id.match("bard")) ||
     (view.id && view.id.match("gemini"))
@@ -145,22 +181,73 @@ export function openNewChatInView(view: CustomBrowserView): void {
         `);
   } else if (view.id && view.id.match("claude")) {
     view.webContents.executeJavaScript(`
-            (function() {
-                const newChatButton = document.querySelector('a[aria-label="New chat"]');
-                if (newChatButton) {
-                    newChatButton.click();
-                }
-            })();
-        `);
+      (function() {
+        const selectors = [
+          'a[aria-label="New chat"]',
+          'button[aria-label="New chat"]',
+          'a[href*="new"]',
+          'div[role="button"]:has-text("New")'
+        ];
+        
+        for (const selector of selectors) {
+          try {
+            const element = document.querySelector(selector);
+            if (element && element.offsetParent !== null && 
+                element.getBoundingClientRect().width > 0) {
+              element.click();
+              return true;
+            }
+          } catch (e) {
+            continue;
+          }
+        }
+        
+        // Fallback
+        const clickables = Array.from(document.querySelectorAll('a, button, div[role="button"]'));
+        const newChatBtn = clickables.find(el => {
+          if (el.offsetParent === null) return false;
+          const label = (el.getAttribute('aria-label') || '').toLowerCase();
+          const text = (el.textContent || '').toLowerCase();
+          return label.includes('new') || text.trim().includes('new chat');
+        });
+        if (newChatBtn) {
+          newChatBtn.click();
+        }
+      })();
+    `);
   } else if (view.id && view.id.match("grok")) {
     view.webContents.executeJavaScript(`
-            (function() {
-                const newChatButton = document.querySelectorAll('a[data-sidebar="menu-button"]')[0];
-                if (newChatButton) {
-                    newChatButton.click();
-                }
-            })();
-        `);
+      (function() {
+        // Try specific selector first
+        let element = document.querySelector('a[data-sidebar="menu-button"]');
+        if (element && element.offsetParent !== null && 
+            element.getBoundingClientRect().width > 0) {
+          element.click();
+          return true;
+        }
+        
+        // Try all menu buttons
+        const menuButtons = document.querySelectorAll('a[data-sidebar="menu-button"]');
+        for (const btn of menuButtons) {
+          if (btn.offsetParent !== null && btn.getBoundingClientRect().width > 0) {
+            btn.click();
+            return true;
+          }
+        }
+        
+        // Fallback: look for "new" in links
+        const links = Array.from(document.querySelectorAll('a'));
+        const newChatLink = links.find(link => {
+          if (link.offsetParent === null) return false;
+          const text = (link.textContent || '').toLowerCase();
+          const label = (link.getAttribute('aria-label') || '').toLowerCase();
+          return text.includes('new') || label.includes('new');
+        });
+        if (newChatLink) {
+          newChatLink.click();
+        }
+      })();
+    `);
   } else if (view.id && view.id.match("deepseek")) {
     view.webContents.executeJavaScript(`
             (function() {
@@ -172,13 +259,45 @@ export function openNewChatInView(view: CustomBrowserView): void {
         `);
   } else if (view.id && view.id.match("copilot")) {
     view.webContents.executeJavaScript(`
-            (function() {
-                const newChatButton = document.querySelector('button[aria-label="Start new chat"]');
-                if (newChatButton) {
-                    newChatButton.click();
+      (function() {
+        const selectors = [
+          'button[aria-label="Start new chat"]',
+          'button[aria-label*="new chat" i]',
+          'button[aria-label*="New" i]',
+          'button:has(svg)'
+        ];
+        
+        for (const selector of selectors) {
+          try {
+            const elements = document.querySelectorAll(selector);
+            for (const element of elements) {
+              if (element.offsetParent !== null && 
+                  element.getBoundingClientRect().width > 0 &&
+                  !element.disabled) {
+                const label = (element.getAttribute('aria-label') || '').toLowerCase();
+                if (label.includes('new') || label.includes('start')) {
+                  element.click();
+                  return true;
                 }
-            })();
-        `);
+              }
+            }
+          } catch (e) {
+            continue;
+          }
+        }
+        
+        // Fallback
+        const buttons = Array.from(document.querySelectorAll('button'));
+        const newChatBtn = buttons.find(btn => {
+          if (btn.disabled || btn.offsetParent === null) return false;
+          const label = (btn.getAttribute('aria-label') || '').toLowerCase();
+          return label.includes('new') || label.includes('start');
+        });
+        if (newChatBtn) {
+          newChatBtn.click();
+        }
+      })();
+    `);
   }
 }
 
