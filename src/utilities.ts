@@ -456,24 +456,24 @@ export function injectImageIntoView(
     ? imageData.split("base64,")[1]
     : imageData;
 
-  // Define the helper function as a string to be injected into the browser context
+  // Wrap the helper function in an IIFE to avoid redeclaration errors
   const base64toBlobFnString = `
-    const base64toBlob = (base64, type = 'image/png') => {
-      const byteString = atob(base64);
-      const ab = new ArrayBuffer(byteString.length);
-      const ia = new Uint8Array(ab);
-      for (let i = 0; i < byteString.length; i++) {
-        ia[i] = byteString.charCodeAt(i);
-      }
-      return new Blob([ab], { type });
-    };
+    (async function() {
+      const base64toBlob = (base64, type = 'image/png') => {
+        const byteString = atob(base64);
+        const ab = new ArrayBuffer(byteString.length);
+        const ia = new Uint8Array(ab);
+        for (let i = 0; i < byteString.length; i++) {
+          ia[i] = byteString.charCodeAt(i);
+        }
+        return new Blob([ab], { type });
+      };
   `;
 
   if (view.id && view.id.match("chatgpt")) {
     view.webContents.executeJavaScript(
       base64toBlobFnString +
         `
-      (async function() {
         const blob = base64toBlob('${base64Data}');
         const file = new File([blob], 'pasted-image.png', { type: 'image/png' });
         
@@ -511,6 +511,7 @@ export function injectImageIntoView(
           console.error('Paste event strategy failed:', e);
         }
 
+
         // --- Fallback Strategy: Use the file input ---
         console.log('Paste strategy may have failed, trying file input fallback...');
         try {
@@ -538,7 +539,7 @@ export function injectImageIntoView(
 
         console.error('All image injection strategies for ChatGPT failed.');
         return false;
-      })();
+      })(); // Close the IIFE
     `,
     );
   } else if (
@@ -548,7 +549,6 @@ export function injectImageIntoView(
     view.webContents.executeJavaScript(
       base64toBlobFnString +
         `
-      (async function() {
         const blob = base64toBlob('${base64Data}');
         const file = new File([blob], 'pasted-image.png', { type: 'image/png' });
         
@@ -577,35 +577,57 @@ export function injectImageIntoView(
           inputElement.dispatchEvent(pasteEvent);
           console.log('Paste event dispatched.');
           
-          await new Promise(resolve => setTimeout(resolve, 200));
+          // Wait for the UI to update
+          await new Promise(resolve => setTimeout(resolve, 300));
 
-          if (inputElement.querySelector('img')) {
+          // Check if the image was successfully added
+          const imageAdded = inputElement.querySelector('img') ||
+                           document.querySelector('img[alt*="pasted" i]') ||
+                           document.querySelector('[data-testid*="image" i]');
+          
+          if (imageAdded) {
             console.log('Image injection successful (verified by thumbnail).');
             return true;
+          } else {
+            console.log('Primary paste strategy did not add image, trying fallback...');
           }
         } catch (e) {
           console.error('Paste event strategy failed:', e);
         }
 
-        // --- Fallback Strategy: Use the file input ---
-        console.log('Paste strategy may have failed, trying file input fallback...');
+        // --- Fallback Strategy: Use the file input directly (no button click) ---
+        console.log('Trying file input fallback...');
         try {
-          const uploadButton = document.querySelector('button[aria-label*="Upload" i]') || document.querySelector('button[aria-label*="Attach" i]');
-          if (uploadButton) {
-            console.log('Clicking upload/attach button...');
-            uploadButton.click();
-            await new Promise(resolve => setTimeout(resolve, 100));
+          const fileInput = document.querySelector('input[type="file"]');
+          
+          if (!fileInput) {
+            console.error('File input not found for fallback strategy.');
+            return false;
           }
 
-          const fileInput = document.querySelector('input[type="file"]');
-          if (fileInput) {
-            const dataTransfer = new DataTransfer();
-            dataTransfer.items.add(file);
-            fileInput.files = dataTransfer.files;
+          console.log('Found file input. Assigning file directly...');
 
-            const changeEvent = new Event('change', { bubbles: true });
-            fileInput.dispatchEvent(changeEvent);
-            console.log('File input strategy dispatched.');
+          const dataTransfer = new DataTransfer();
+          dataTransfer.items.add(file);
+          fileInput.files = dataTransfer.files;
+
+          const changeEvent = new Event('change', { bubbles: true });
+          fileInput.dispatchEvent(changeEvent);
+          
+          // Also try dispatching 'input' event
+          const inputEvent = new Event('input', { bubbles: true });
+          fileInput.dispatchEvent(inputEvent);
+          
+          console.log('File input strategy dispatched.');
+          
+          // Verify fallback success
+          await new Promise(resolve => setTimeout(resolve, 300));
+          const imageAddedFallback = inputElement.querySelector('img') ||
+                                    document.querySelector('img[alt*="pasted" i]') ||
+                                    document.querySelector('[data-testid*="image" i]');
+          
+          if (imageAddedFallback) {
+            console.log('Fallback strategy successful.');
             return true;
           }
         } catch(e) {
@@ -614,7 +636,7 @@ export function injectImageIntoView(
 
         console.error('All image injection strategies for Gemini/Bard failed.');
         return false;
-      })();
+      })(); // Close the IIFE
     `,
     );
   } else if (view.id && view.id.match("claude")) {
@@ -687,7 +709,7 @@ export function injectImageIntoView(
 
         console.error('All image injection strategies for Claude failed.');
         return false;
-      })();
+      })(); // Close the IIFE
     `,
     );
   } else if (view.id && view.id.match("grok")) {
@@ -730,7 +752,7 @@ export function injectImageIntoView(
 
         console.error('All image injection strategies for Grok failed.');
         return false;
-      })();
+      })(); // Close the IIFE
     `,
     );
   } else if (view.id && view.id.match("deepseek")) {
@@ -768,7 +790,7 @@ export function injectImageIntoView(
 
         console.error('All image injection strategies for DeepSeek failed.');
         return false;
-      })();
+      })(); // Close the IIFE
     `,
     );
   } else if (view.id && view.id.match("copilot")) {
@@ -806,7 +828,7 @@ export function injectImageIntoView(
 
         console.error('All image injection strategies for Copilot failed.');
         return false;
-      })();
+      })(); // Close the IIFE
     `,
     );
   }
