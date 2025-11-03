@@ -130,7 +130,7 @@ function createWindow(): void {
     view.webContents.loadURL(url);
 
     // Open DevTools for each view for debugging
-    view.webContents.openDevTools({ mode: "detach" });
+    // view.webContents.openDevTools({ mode: "detach" });
 
     views.push(view);
   });
