@@ -468,6 +468,11 @@ export function injectImageIntoView(
         }
         return new Blob([ab], { type });
       };
+      
+      // Generate unique filename
+      const timestamp = Date.now();
+      const randomId = Math.random().toString(36).substring(2, 9);
+      const uniqueFilename = \`pasted-image-\${timestamp}-\${randomId}.png\`;
   `;
 
   if (view.id && view.id.match("chatgpt")) {
@@ -475,7 +480,7 @@ export function injectImageIntoView(
       base64toBlobFnString +
         `
         const blob = base64toBlob('${base64Data}');
-        const file = new File([blob], 'pasted-image.png', { type: 'image/png' });
+        const file = new File([blob], uniqueFilename, { type: 'image/png' });
         
         // Find the primary input area
         const textarea = document.querySelector('#prompt-textarea');
@@ -550,7 +555,7 @@ export function injectImageIntoView(
       base64toBlobFnString +
         `
         const blob = base64toBlob('${base64Data}');
-        const file = new File([blob], 'pasted-image.png', { type: 'image/png' });
+        const file = new File([blob], uniqueFilename, { type: 'image/png' });
         
         console.log('Attempting to inject image into Gemini/Bard...');
 
@@ -598,7 +603,7 @@ export function injectImageIntoView(
         // --- Fallback Strategy: Use the file input directly (no button click) ---
         console.log('Trying file input fallback...');
         try {
-          const fileInput = document.querySelector('input[type="file"]');
+          const fileInput = document.querySelector('images-files-uploader');
           
           if (!fileInput) {
             console.error('File input not found for fallback strategy.');
@@ -643,9 +648,8 @@ export function injectImageIntoView(
     view.webContents.executeJavaScript(
       base64toBlobFnString +
         `
-      (async function() {
         const blob = base64toBlob('${base64Data}');
-        const file = new File([blob], 'pasted-image.png', { type: 'image/png' });
+        const file = new File([blob], uniqueFilename, { type: 'image/png' });
         
         console.log('Attempting to inject image into Claude...');
 
@@ -685,12 +689,6 @@ export function injectImageIntoView(
         // --- Fallback Strategy: Use the file input ---
         console.log('Paste strategy may have failed, trying file input fallback...');
         try {
-          const uploadButton = document.querySelector('button[aria-label*="Attach" i]') || document.querySelector('button[aria-label*="Upload" i]');
-          if (uploadButton) {
-            console.log('Clicking upload/attach button...');
-            uploadButton.click();
-            await new Promise(resolve => setTimeout(resolve, 100));
-          }
 
           const fileInput = document.querySelector('input[type="file"]');
           if (fileInput) {
@@ -716,7 +714,6 @@ export function injectImageIntoView(
     view.webContents.executeJavaScript(
       base64toBlobFnString +
         `
-      (async function() {
         // Pre-flight check for upload capability
         const uploadButton = document.querySelector('button[aria-label*="Attach" i]') || document.querySelector('button[aria-label*="Upload" i]');
         if (!uploadButton) {
@@ -725,7 +722,7 @@ export function injectImageIntoView(
         }
 
         const blob = base64toBlob('${base64Data}');
-        const file = new File([blob], 'pasted-image.png', { type: 'image/png' });
+        const file = new File([blob], uniqueFilename, { type: 'image/png' });
         
         console.log('Attempting to inject image into Grok...');
 
@@ -759,9 +756,8 @@ export function injectImageIntoView(
     view.webContents.executeJavaScript(
       base64toBlobFnString +
         `
-      (async function() {
         const blob = base64toBlob('${base64Data}');
-        const file = new File([blob], 'pasted-image.png', { type: 'image/png' });
+        const file = new File([blob], uniqueFilename, { type: 'image/png' });
         
         console.log('Attempting to inject image into DeepSeek...');
 
@@ -797,9 +793,8 @@ export function injectImageIntoView(
     view.webContents.executeJavaScript(
       base64toBlobFnString +
         `
-      (async function() {
         const blob = base64toBlob('${base64Data}');
-        const file = new File([blob], 'pasted-image.png', { type: 'image/png' });
+        const file = new File([blob], uniqueFilename, { type: 'image/png' });
         
         console.log('Attempting to inject image into Copilot...');
 
