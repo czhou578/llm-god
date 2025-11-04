@@ -510,10 +510,8 @@ export function injectImageIntoView(
           await new Promise(resolve => setTimeout(resolve, 500));
 
           // Check for image preview with updated selectors
-          const imagePreview = document.querySelector('div[class*="file-upload-indicator" i]') || 
-                              document.querySelector('img[alt*="pasted-image"]') ||
-                              document.querySelector('img[src*="blob:"]') ||
-                              document.querySelector('[data-testid*="attachment"]');
+          
+          const imagePreview = document.querySelector('span[style*="background-image"]');
           
           if (imagePreview) {
             console.log('Image injection successful (verified by thumbnail).');
