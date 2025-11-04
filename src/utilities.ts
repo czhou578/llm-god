@@ -506,12 +506,21 @@ export function injectImageIntoView(
           textarea.dispatchEvent(pasteEvent);
           console.log('Paste event dispatched.');
           
-          await new Promise(resolve => setTimeout(resolve, 200));
+          // Wait longer for UI to update and check for image preview
+          await new Promise(resolve => setTimeout(resolve, 500));
 
-          if (document.querySelector('div[class*="file-upload-indicator" i]') || document.querySelector('img[alt="pasted-image.png"]')) {
+          // Check for image preview with updated selectors
+          const imagePreview = document.querySelector('div[class*="file-upload-indicator" i]') || 
+                              document.querySelector('img[alt*="pasted-image"]') ||
+                              document.querySelector('img[src*="blob:"]') ||
+                              document.querySelector('[data-testid*="attachment"]');
+          
+          if (imagePreview) {
             console.log('Image injection successful (verified by thumbnail).');
             return true;
           }
+          
+          console.log('Paste event verification did not detect image, trying fallback...');
         } catch (e) {
           console.error('Paste event strategy failed:', e);
         }
