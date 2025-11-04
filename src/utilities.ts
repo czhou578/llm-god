@@ -714,37 +714,46 @@ export function injectImageIntoView(
     view.webContents.executeJavaScript(
       base64toBlobFnString +
         `
-        // Pre-flight check for upload capability
-        const uploadButton = document.querySelector('button[aria-label*="Attach" i]') || document.querySelector('button[aria-label*="Upload" i]');
-        if (!uploadButton) {
-          console.error('Grok does not appear to support image uploads (no attach button found).');
-          return false;
-        }
-
         const blob = base64toBlob('${base64Data}');
         const file = new File([blob], uniqueFilename, { type: 'image/png' });
         
         console.log('Attempting to inject image into Grok...');
 
-        // --- Primary Strategy: Use the file input ---
+        // --- Primary Strategy: Directly manipulate the hidden file input ---
         try {
-          console.log('Clicking upload/attach button...');
-          uploadButton.click();
-          await new Promise(resolve => setTimeout(resolve, 100));
-
           const fileInput = document.querySelector('input[type="file"]');
-          if (fileInput) {
-            const dataTransfer = new DataTransfer();
-            dataTransfer.items.add(file);
-            fileInput.files = dataTransfer.files;
+          if (!fileInput) {
+            throw new Error('File input not found for Grok.');
+          }
 
-            const changeEvent = new Event('change', { bubbles: true });
-            fileInput.dispatchEvent(changeEvent);
-            console.log('File input strategy dispatched for Grok.');
+          console.log('Found file input. Assigning file directly...');
+
+          const dataTransfer = new DataTransfer();
+          dataTransfer.items.add(file);
+          fileInput.files = dataTransfer.files;
+
+          // Dispatch multiple events to ensure Grok detects the file
+          const changeEvent = new Event('change', { bubbles: true });
+          fileInput.dispatchEvent(changeEvent);
+          
+          const inputEvent = new Event('input', { bubbles: true });
+          fileInput.dispatchEvent(inputEvent);
+          
+          console.log('File input strategy dispatched for Grok.');
+          
+          // Verify success
+          await new Promise(resolve => setTimeout(resolve, 300));
+          const imageAdded = document.querySelector('img[src*="blob:"]') ||
+                           document.querySelector('[data-testid*="image" i]') ||
+                           document.querySelector('img[alt*="image" i]');
+          
+          if (imageAdded) {
+            console.log('Image injection successful for Grok.');
             return true;
           }
+
         } catch(e) {
-          console.error('File input strategy for Grok failed:', e);
+          console.error('Direct file input strategy for Grok failed:', e);
         }
 
         console.error('All image injection strategies for Grok failed.');
