@@ -30,7 +30,7 @@ export function addBrowserView(
   });
 
   // Set background color to prevent white flash while loading
-  view.setBackgroundColor('#000000');
+  view.setBackgroundColor("#000000");
 
   view.id = url;
   mainWindow.contentView.addChildView(view);
@@ -445,5 +445,402 @@ export function sendPromptInView(view: CustomBrowserView) {
         }
       })();
     `);
+  }
+}
+
+export function injectImageIntoView(
+  view: CustomBrowserView,
+  imageData: string,
+) {
+  const base64Data = imageData.includes("base64,")
+    ? imageData.split("base64,")[1]
+    : imageData;
+
+  // Wrap the helper function in an IIFE to avoid redeclaration errors
+  const base64toBlobFnString = `
+    (async function() {
+      const base64toBlob = (base64, type = 'image/png') => {
+        const byteString = atob(base64);
+        const ab = new ArrayBuffer(byteString.length);
+        const ia = new Uint8Array(ab);
+        for (let i = 0; i < byteString.length; i++) {
+          ia[i] = byteString.charCodeAt(i);
+        }
+        return new Blob([ab], { type });
+      };
+      
+      // Generate unique filename
+      const timestamp = Date.now();
+      const randomId = Math.random().toString(36).substring(2, 9);
+      const uniqueFilename = \`pasted-image-\${timestamp}-\${randomId}.png\`;
+  `;
+
+  if (view.id && view.id.match("chatgpt")) {
+    view.webContents.executeJavaScript(
+      base64toBlobFnString +
+        `
+        const blob = base64toBlob('${base64Data}');
+        const file = new File([blob], uniqueFilename, { type: 'image/png' });
+        
+        // Find the primary input area
+        const textarea = document.querySelector('#prompt-textarea');
+        if (!textarea) {
+          console.error('ChatGPT prompt textarea not found.');
+          return false;
+        }
+
+        // --- Primary Strategy: Simulate a paste event ---
+        try {
+          console.log('Focusing textarea and attempting paste event...');
+          textarea.focus();
+
+          const dataTransfer = new DataTransfer();
+          dataTransfer.items.add(file);
+
+          const pasteEvent = new ClipboardEvent('paste', {
+            bubbles: true,
+            cancelable: true,
+            clipboardData: dataTransfer,
+          });
+
+          textarea.dispatchEvent(pasteEvent);
+          console.log('Paste event dispatched.');
+          
+          // Wait longer for UI to update and check for image preview
+          await new Promise(resolve => setTimeout(resolve, 500));
+
+          // Check for image preview with updated selectors
+          
+          const imagePreview = document.querySelector('span[style*="background-image"]');
+          
+          if (imagePreview) {
+            console.log('Image injection successful (verified by thumbnail).');
+            return true;
+          }
+          
+          console.log('Paste event verification did not detect image, trying fallback...');
+        } catch (e) {
+          console.error('Paste event strategy failed:', e);
+        }
+
+
+        // --- Fallback Strategy: Use the file input ---
+        console.log('Paste strategy may have failed, trying file input fallback...');
+        try {
+          const uploadButton = document.querySelector('button[aria-label*="Attach" i]');
+          if (uploadButton) {
+            console.log('Clicking attach button...');
+            uploadButton.click();
+            await new Promise(resolve => setTimeout(resolve, 100));
+          }
+
+          const fileInput = document.querySelector('input[type="file"]');
+          if (fileInput) {
+            const dataTransfer = new DataTransfer();
+            dataTransfer.items.add(file);
+            fileInput.files = dataTransfer.files;
+
+            const changeEvent = new Event('change', { bubbles: true });
+            fileInput.dispatchEvent(changeEvent);
+            console.log('File input strategy dispatched.');
+            return true;
+          }
+        } catch(e) {
+          console.error('File input strategy failed:', e);
+        }
+
+        console.error('All image injection strategies for ChatGPT failed.');
+        return false;
+      })(); // Close the IIFE
+    `,
+    );
+  } else if (
+    (view.id && view.id.match("bard")) ||
+    (view.id && view.id.match("gemini"))
+  ) {
+    view.webContents.executeJavaScript(
+      base64toBlobFnString +
+        `
+        const blob = base64toBlob('${base64Data}');
+        const file = new File([blob], uniqueFilename, { type: 'image/png' });
+        
+        console.log('Attempting to inject image into Gemini/Bard...');
+
+        const inputElement = document.querySelector("[contenteditable='true']");
+        if (!inputElement) {
+          console.error('Gemini/Bard contenteditable input not found.');
+          return false;
+        }
+
+        // --- Primary Strategy: Simulate a paste event ---
+        try {
+          console.log('Focusing input and attempting paste event...');
+          inputElement.focus();
+
+          const dataTransfer = new DataTransfer();
+          dataTransfer.items.add(file);
+
+          const pasteEvent = new ClipboardEvent('paste', {
+            bubbles: true,
+            cancelable: true,
+            clipboardData: dataTransfer,
+          });
+
+          inputElement.dispatchEvent(pasteEvent);
+          console.log('Paste event dispatched.');
+          
+          // Wait for the UI to update
+          await new Promise(resolve => setTimeout(resolve, 300));
+
+          // Check if the image was successfully added
+          const imageAdded = inputElement.querySelector('img') ||
+                           document.querySelector('img[alt*="pasted" i]') ||
+                           document.querySelector('[data-testid*="image" i]');
+          
+          if (imageAdded) {
+            console.log('Image injection successful (verified by thumbnail).');
+            return true;
+          } else {
+            console.log('Primary paste strategy did not add image, trying fallback...');
+          }
+        } catch (e) {
+          console.error('Paste event strategy failed:', e);
+        }
+
+        // --- Fallback Strategy: Use the file input directly (no button click) ---
+        console.log('Trying file input fallback...');
+        try {
+          const fileInput = document.querySelector('images-files-uploader');
+          
+          if (!fileInput) {
+            console.error('File input not found for fallback strategy.');
+            return false;
+          }
+
+          console.log('Found file input. Assigning file directly...');
+
+          const dataTransfer = new DataTransfer();
+          dataTransfer.items.add(file);
+          fileInput.files = dataTransfer.files;
+
+          const changeEvent = new Event('change', { bubbles: true });
+          fileInput.dispatchEvent(changeEvent);
+          
+          // Also try dispatching 'input' event
+          const inputEvent = new Event('input', { bubbles: true });
+          fileInput.dispatchEvent(inputEvent);
+          
+          console.log('File input strategy dispatched.');
+          
+          // Verify fallback success
+          await new Promise(resolve => setTimeout(resolve, 300));
+          const imageAddedFallback = inputElement.querySelector('img') ||
+                                    document.querySelector('img[alt*="pasted" i]') ||
+                                    document.querySelector('[data-testid*="image" i]');
+          
+          if (imageAddedFallback) {
+            console.log('Fallback strategy successful.');
+            return true;
+          }
+        } catch(e) {
+          console.error('File input strategy failed:', e);
+        }
+
+        console.error('All image injection strategies for Gemini/Bard failed.');
+        return false;
+      })(); // Close the IIFE
+    `,
+    );
+  } else if (view.id && view.id.match("claude")) {
+    view.webContents.executeJavaScript(
+      base64toBlobFnString +
+        `
+        const blob = base64toBlob('${base64Data}');
+        const file = new File([blob], uniqueFilename, { type: 'image/png' });
+        
+        console.log('Attempting to inject image into Claude...');
+
+        const inputElement = document.querySelector('div.ProseMirror') || document.querySelector("[contenteditable='true']");
+        if (!inputElement) {
+          console.error('Claude contenteditable input not found.');
+          return false;
+        }
+
+        // --- Primary Strategy: Simulate a paste event ---
+        try {
+          console.log('Focusing input and attempting paste event...');
+          inputElement.focus();
+
+          const dataTransfer = new DataTransfer();
+          dataTransfer.items.add(file);
+
+          const pasteEvent = new ClipboardEvent('paste', {
+            bubbles: true,
+            cancelable: true,
+            clipboardData: dataTransfer,
+          });
+
+          inputElement.dispatchEvent(pasteEvent);
+          console.log('Paste event dispatched.');
+          
+          await new Promise(resolve => setTimeout(resolve, 200));
+
+          if (document.querySelector('[data-testid="file-previews"]')) {
+            console.log('Image injection successful (verified by thumbnail).');
+            return true;
+          }
+        } catch (e) {
+          console.error('Paste event strategy failed:', e);
+        }
+
+        // --- Fallback Strategy: Use the file input ---
+        console.log('Paste strategy may have failed, trying file input fallback...');
+        try {
+
+          const fileInput = document.querySelector('input[type="file"]');
+          if (fileInput) {
+            const dataTransfer = new DataTransfer();
+            dataTransfer.items.add(file);
+            fileInput.files = dataTransfer.files;
+
+            const changeEvent = new Event('change', { bubbles: true });
+            fileInput.dispatchEvent(changeEvent);
+            console.log('File input strategy dispatched.');
+            return true;
+          }
+        } catch(e) {
+          console.error('File input strategy failed:', e);
+        }
+
+        console.error('All image injection strategies for Claude failed.');
+        return false;
+      })(); // Close the IIFE
+    `,
+    );
+  } else if (view.id && view.id.match("grok")) {
+    view.webContents.executeJavaScript(
+      base64toBlobFnString +
+        `
+        const blob = base64toBlob('${base64Data}');
+        const file = new File([blob], uniqueFilename, { type: 'image/png' });
+        
+        console.log('Attempting to inject image into Grok...');
+
+        // --- Primary Strategy: Directly manipulate the hidden file input ---
+        try {
+          const fileInput = document.querySelector('input[type="file"]');
+          if (!fileInput) {
+            throw new Error('File input not found for Grok.');
+          }
+
+          console.log('Found file input. Assigning file directly...');
+
+          const dataTransfer = new DataTransfer();
+          dataTransfer.items.add(file);
+          fileInput.files = dataTransfer.files;
+
+          // Dispatch multiple events to ensure Grok detects the file
+          const changeEvent = new Event('change', { bubbles: true });
+          fileInput.dispatchEvent(changeEvent);
+          
+          const inputEvent = new Event('input', { bubbles: true });
+          fileInput.dispatchEvent(inputEvent);
+          
+          console.log('File input strategy dispatched for Grok.');
+          
+          // Verify success
+          await new Promise(resolve => setTimeout(resolve, 300));
+          const imageAdded = document.querySelector('img[src*="blob:"]') ||
+                           document.querySelector('[data-testid*="image" i]') ||
+                           document.querySelector('img[alt*="image" i]');
+          
+          if (imageAdded) {
+            console.log('Image injection successful for Grok.');
+            return true;
+          }
+
+        } catch(e) {
+          console.error('Direct file input strategy for Grok failed:', e);
+        }
+
+        console.error('All image injection strategies for Grok failed.');
+        return false;
+      })(); // Close the IIFE
+    `,
+    );
+  } else if (view.id && view.id.match("deepseek")) {
+    view.webContents.executeJavaScript(
+      base64toBlobFnString +
+        `
+        const blob = base64toBlob('${base64Data}');
+        const file = new File([blob], uniqueFilename, { type: 'image/png' });
+        
+        console.log('Attempting to inject image into DeepSeek...');
+
+        // --- Primary Strategy: Directly manipulate the hidden file input ---
+        try {
+          const fileInput = document.querySelector('input[type="file"]');
+          if (!fileInput) {
+            throw new Error('File input not found.');
+          }
+
+          console.log('Found file input. Assigning file directly...');
+
+          const dataTransfer = new DataTransfer();
+          dataTransfer.items.add(file);
+          fileInput.files = dataTransfer.files;
+
+          const changeEvent = new Event('change', { bubbles: true });
+          fileInput.dispatchEvent(changeEvent);
+          
+          console.log('File input strategy dispatched for DeepSeek.');
+          return true;
+
+        } catch(e) {
+          console.error('Direct file input strategy for DeepSeek failed:', e);
+        }
+
+        console.error('All image injection strategies for DeepSeek failed.');
+        return false;
+      })(); // Close the IIFE
+    `,
+    );
+  } else if (view.id && view.id.match("copilot")) {
+    view.webContents.executeJavaScript(
+      base64toBlobFnString +
+        `
+        const blob = base64toBlob('${base64Data}');
+        const file = new File([blob], uniqueFilename, { type: 'image/png' });
+        
+        console.log('Attempting to inject image into Copilot...');
+
+        // --- Primary Strategy: Directly manipulate the hidden file input ---
+        try {
+          const fileInput = document.querySelector('input[type="file"]');
+          if (!fileInput) {
+            throw new Error('File input not found for Copilot.');
+          }
+
+          console.log('Found file input. Assigning file directly...');
+
+          const dataTransfer = new DataTransfer();
+          dataTransfer.items.add(file);
+          fileInput.files = dataTransfer.files;
+
+          const changeEvent = new Event('change', { bubbles: true });
+          fileInput.dispatchEvent(changeEvent);
+          
+          console.log('File input strategy dispatched for Copilot.');
+          return true;
+
+        } catch(e) {
+          console.error('Direct file input strategy for Copilot failed:', e);
+        }
+
+        console.error('All image injection strategies for Copilot failed.');
+        return false;
+      })(); // Close the IIFE
+    `,
+    );
   }
 }

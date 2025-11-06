@@ -240,7 +240,8 @@ function updateCharCounter(text: string): void {
   const charCounterElement = document.getElementById("char-counter");
   if (charCounterElement) {
     const charCount = text.length;
-    const wordCount = text.trim().length === 0 ? 0 : text.trim().split(/\s+/).length;
+    const wordCount =
+      text.trim().length === 0 ? 0 : text.trim().split(/\s+/).length;
     charCounterElement.textContent = `${charCount} chars / ${wordCount} words`;
   }
 }
@@ -262,6 +263,26 @@ if (textArea) {
           ipcRenderer.send("send-prompt", promptText);
           textArea.value = "";
           updateCharCounter("");
+        }
+      }
+    }
+  });
+
+  textArea.addEventListener("paste", (event: ClipboardEvent) => {
+    const items = event.clipboardData?.items;
+    if (!items) return;
+
+    for (const item of items) {
+      if (item.type.startsWith("image/")) {
+        event.preventDefault();
+        const file = item.getAsFile();
+        if (file) {
+          const reader = new FileReader();
+          reader.onload = () => {
+            const base64Data = reader.result;
+            ipcRenderer.send("paste-image", base64Data);
+          };
+          reader.readAsDataURL(file);
         }
       }
     }
