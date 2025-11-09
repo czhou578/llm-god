@@ -325,8 +325,8 @@
         overflow: visible;
       }
 
-      /* Position dropdown tooltip to the left side of button */
-      .dropdown .tooltip {
+      /* Position button-group tooltips to the left side of buttons */
+      .button-group .tooltip {
         left: auto;
         right: 100%;
         bottom: 50%;
@@ -335,7 +335,7 @@
         margin-right: 10px;
       }
 
-      .dropdown .tooltip::after {
+      .button-group .tooltip::after {
         left: 100%;
         top: 50%;
         bottom: auto;
@@ -353,7 +353,7 @@
         border-color: #444 transparent transparent transparent;
       }
 
-      #prompt-area.dark-mode .dropdown .tooltip::after {
+      #prompt-area.dark-mode .button-group .tooltip::after {
         border-color: transparent transparent transparent #444;
       }
 
@@ -366,7 +366,7 @@
         border-color: #2d2d2d transparent transparent transparent !important;
       }
 
-      #prompt-area:not(.dark-mode) .dropdown .tooltip::after {
+      #prompt-area:not(.dark-mode) .button-group .tooltip::after {
         border-color: transparent transparent transparent #2d2d2d !important;
       }
     </style>
