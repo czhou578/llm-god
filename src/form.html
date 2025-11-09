@@ -40,7 +40,7 @@
         align-items: center;
         height: 100vh;
         width: 100vw;
-        overflow-x: hidden;
+        overflow: hidden;
         transition: background-color 0.3s, color 0.3s;
       }
 
@@ -114,6 +114,27 @@
 
       body.dark-mode h2 {
         color: #e0e0e0;
+      }
+
+      .instructions {
+        margin-bottom: 20px;
+        padding: 10px;
+        background-color: #e3f2fd;
+        border-left: 4px solid #2196f3;
+        color: #1976d2;
+        transition: background-color 0.3s, color 0.3s;
+        width: 90%;
+        text-align: left;
+      }
+
+      body.dark-mode .instructions {
+        background-color: #1a3a52;
+        color: #64b5f6;
+      }
+
+      body.light-mode .instructions {
+        background-color: #e3f2fd;
+        color: #1976d2;
       }
 
       form,
@@ -283,6 +304,9 @@
   <body>
     <div class="form-container">
       <h2>Existing Prompts</h2>
+      <div class="instructions">
+        Select an existing prompt from the table below or create a new prompt template.
+      </div>
       <div id="prompt-picker" class="prompt-picker">
         <table class="prompt-table"></table>
         <div class="tooltip-container">
