@@ -199,7 +199,7 @@ async function createModelSelectionWindow() {
   );
 
   modelSelectionWindow = new BrowserWindow({
-    width: 600,
+    width: 700,
     height: 700,
     parent: mainWindow,
     modal: true,

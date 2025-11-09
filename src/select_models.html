@@ -7,6 +7,7 @@
       content="default-src 'self'; style-src 'self' 'unsafe-inline';"
     />
     <title>Select Default Models</title>
+    <link rel="stylesheet" href="styles/tooltips.css" />
     <style>
       /* Critical CSS - Prevent white flash by defaulting to dark theme */
       html {
@@ -48,6 +49,7 @@
         font-family: Arial, sans-serif;
         padding: 20px;
         transition: background-color 0.3s, color 0.3s;
+        overflow-x: hidden;
       }
 
       body.dark-mode {
@@ -169,6 +171,7 @@
         display: flex;
         gap: 10px;
         justify-content: flex-end;
+        margin-right: 20px;
       }
 
       button {
@@ -196,57 +199,6 @@
 
       #cancel-button:hover {
         background-color: #da190b;
-      }
-
-      /* Tooltip Styles */
-      .tooltip-container {
-        position: relative;
-        display: inline-block;
-      }
-
-      .tooltip {
-        visibility: hidden;
-        opacity: 0;
-        position: absolute;
-        bottom: 125%;
-        left: 50%;
-        transform: translateX(-50%);
-        background-color: #2d2d2d;
-        color: #fff;
-        text-align: center;
-        padding: 8px 12px;
-        border-radius: 6px;
-        font-size: 14px;
-        white-space: nowrap;
-        z-index: 2000;
-        transition: opacity 0.3s ease, visibility 0.3s ease;
-        pointer-events: none;
-        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
-      }
-
-      .tooltip::after {
-        content: "";
-        position: absolute;
-        top: 100%;
-        left: 50%;
-        transform: translateX(-50%);
-        border-width: 6px;
-        border-style: solid;
-        border-color: #2d2d2d transparent transparent transparent;
-      }
-
-      .tooltip-container:hover .tooltip {
-        visibility: visible;
-        opacity: 1;
-      }
-
-      body.dark-mode .tooltip {
-        background-color: #444;
-        color: #e0e0e0;
-      }
-
-      body.dark-mode .tooltip::after {
-        border-color: #444 transparent transparent transparent;
       }
     </style>
   </head>

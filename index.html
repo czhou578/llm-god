@@ -7,6 +7,7 @@
       content="default-src 'self'; style-src 'self' 'unsafe-inline';"
     />
     <title>Multi-LLM Interface</title>
+    <link rel="stylesheet" href="src/styles/tooltips.css" />
     <style>
       /* Critical CSS - Prevent white flash by defaulting to dark theme */
       html {
@@ -266,108 +267,6 @@
       .show {
         display: block;
         position: absolute;
-      }
-
-      /* Tooltip Styles */
-      .tooltip-container {
-        position: relative;
-        display: inline-block;
-      }
-
-      .button-group .tooltip-container {
-        display: block;
-        width: 100%;
-      }
-
-      .tooltip {
-        visibility: hidden;
-        opacity: 0;
-        position: absolute;
-        bottom: 125%;
-        left: 50%;
-        transform: translateX(-50%);
-        background-color: #333;
-        color: #fff;
-        text-align: center;
-        padding: 8px 12px;
-        border-radius: 6px;
-        font-size: 14px;
-        white-space: nowrap;
-        z-index: 3000;
-        transition: opacity 0.3s ease, visibility 0.3s ease;
-        pointer-events: none;
-        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
-      }
-
-      .tooltip::after {
-        content: "";
-        position: absolute;
-        top: 100%;
-        left: 50%;
-        transform: translateX(-50%);
-        border-width: 6px;
-        border-style: solid;
-        border-color: #333 transparent transparent transparent;
-      }
-
-      .tooltip-container:hover .tooltip,
-      .tooltip-container button:hover + .tooltip {
-        visibility: visible !important;
-        opacity: 1 !important;
-      }
-
-      .dropdown .tooltip-container {
-        pointer-events: auto;
-        overflow: visible;
-      }
-
-      .dropdown {
-        overflow: visible;
-      }
-
-      /* Position button-group tooltips to the left side of buttons */
-      .button-group .tooltip {
-        left: auto;
-        right: 100%;
-        bottom: 50%;
-        top: auto;
-        transform: translateY(50%);
-        margin-right: 10px;
-      }
-
-      .button-group .tooltip::after {
-        left: 100%;
-        top: 50%;
-        bottom: auto;
-        transform: translateY(-50%);
-        border-width: 6px;
-        border-color: transparent transparent transparent #333;
-      }
-
-      #prompt-area.dark-mode .tooltip {
-        background-color: #444;
-        color: #e0e0e0;
-      }
-
-      #prompt-area.dark-mode .tooltip::after {
-        border-color: #444 transparent transparent transparent;
-      }
-
-      #prompt-area.dark-mode .button-group .tooltip::after {
-        border-color: transparent transparent transparent #444;
-      }
-
-      #prompt-area:not(.dark-mode) .tooltip {
-        background-color: #2d2d2d !important;
-        color: #fff !important;
-      }
-
-      #prompt-area:not(.dark-mode) .tooltip::after {
-        border-color: #2d2d2d transparent transparent transparent !important;
-      }
-
-      #prompt-area:not(.dark-mode) .button-group .tooltip::after {
-        border-color: transparent transparent transparent #2d2d2d !important;
       }
     </style>
     <script type="module" src="./dist/renderer.js"></script>
