@@ -7,6 +7,7 @@
       content="default-src 'self'; style-src 'self' 'unsafe-inline';"
     />
     <title>Multi-LLM Interface</title>
+    <link rel="stylesheet" href="src/styles/tooltips.css" />
     <style>
       /* Critical CSS - Prevent white flash by defaulting to dark theme */
       html {
@@ -286,10 +287,16 @@
           0 chars / 0 words
         </div>
       </div>
-      <button class="theme-toggle">🌙</button>
+      <div class="tooltip-container">
+        <button class="theme-toggle" aria-label="Toggle light/dark theme">🌙</button>
+        <span class="tooltip" role="tooltip">Toggle light/dark theme</span>
+      </div>
       <div class="button-group">
         <div class="dropdown">
-          <button id="dropdown-button">Show Models ▼</button>
+          <div class="tooltip-container">
+            <button id="dropdown-button" aria-label="Show or hide AI model chats">Show Models ▼</button>
+            <span class="tooltip" role="tooltip">Show or hide AI model chats</span>
+          </div>
           <div class="dropdown-content">
             <div class="dropdown-item" id="showChatGPT">Hide ChatGPT</div>
             <div class="dropdown-item" id="showGemini">Hide Gemini</div>
@@ -300,10 +307,16 @@
           </div>
         </div>
         <div class="prompt-picker">
-          <button class="prompt-select">Select Prompts</button>
+          <div class="tooltip-container">
+            <button class="prompt-select" aria-label="Choose from saved prompts">Select Prompts</button>
+            <span class="tooltip" role="tooltip">Choose from saved prompts</span>
+          </div>
         </div>
         <div class="model-picker">
-          <button class="model-select">Default Models</button>
+          <div class="tooltip-container">
+            <button class="model-select" aria-label="Configure default AI models">Default Models</button>
+            <span class="tooltip" role="tooltip">Configure default AI models</span>
+          </div>
         </div>
       </div>
     </div>
