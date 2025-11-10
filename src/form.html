@@ -185,7 +185,8 @@
         cursor: pointer;
         transition: background-color 0.3s ease;
         width: 50%; /* Make button width proportional */
-        min-width: 120px; /* Ensure minimum width */
+        min-width: 150px; /* Ensure minimum width to fit text on one line */
+        white-space: nowrap; /* Prevent text from wrapping to new line */
       }
 
       button:hover {
