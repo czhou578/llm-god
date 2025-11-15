@@ -3,6 +3,7 @@
   <head>
     <meta charset="utf-8" />
     <title>Edit Prompt</title>
+    <link rel="stylesheet" href="styles/tooltips.css" />
     <style>
       /* Critical CSS - Prevent white flash by defaulting to dark theme */
       html {
@@ -146,7 +147,7 @@
         cursor: pointer;
         transition: background-color 0.3s ease;
         width: 50%; /* Make button width proportional */
-        min-width: 120px; /* Ensure minimum width */
+        min-width: 150px; /* Ensure minimum width */
       }
 
       button:hover {
@@ -173,7 +174,10 @@
           placeholder="Enter your prompt template here..."
           spellcheck="true"
         ></textarea>
-        <button type="submit">Save Prompt</button>
+        <div class="tooltip-container">
+          <button type="submit" aria-label="Save changes to this prompt">Save Prompt</button>
+          <span class="tooltip" role="tooltip">Save changes to this prompt</span>
+        </div>
       </form>
     </div>
     <script src="../dist/save_edited_prompt.js"></script>

@@ -3,6 +3,7 @@
   <head>
     <meta charset="utf-8" />
     <title>Prompt Templates</title>
+    <link rel="stylesheet" href="styles/tooltips.css" />
     <style>
       /* Critical CSS - Prevent white flash by defaulting to dark theme */
       html {
@@ -39,7 +40,7 @@
         align-items: center;
         height: 100vh;
         width: 100vw;
-        overflow-x: hidden;
+        overflow: hidden;
         transition: background-color 0.3s, color 0.3s;
       }
 
@@ -115,6 +116,27 @@
         color: #e0e0e0;
       }
 
+      .instructions {
+        margin-bottom: 20px;
+        padding: 10px;
+        background-color: #e3f2fd;
+        border-left: 4px solid #2196f3;
+        color: #1976d2;
+        transition: background-color 0.3s, color 0.3s;
+        width: 90%;
+        text-align: left;
+      }
+
+      body.dark-mode .instructions {
+        background-color: #1a3a52;
+        color: #64b5f6;
+      }
+
+      body.light-mode .instructions {
+        background-color: #e3f2fd;
+        color: #1976d2;
+      }
+
       form,
       #prompt-picker {
         display: flex;
@@ -163,7 +185,8 @@
         cursor: pointer;
         transition: background-color 0.3s ease;
         width: 50%; /* Make button width proportional */
-        min-width: 120px; /* Ensure minimum width */
+        min-width: 150px; /* Ensure minimum width to fit text on one line */
+        white-space: nowrap; /* Prevent text from wrapping to new line */
       }
 
       button:hover {
@@ -282,9 +305,15 @@
   <body>
     <div class="form-container">
       <h2>Existing Prompts</h2>
+      <div class="instructions">
+        Select an existing prompt from the table below or create a new prompt template.
+      </div>
       <div id="prompt-picker" class="prompt-picker">
         <table class="prompt-table"></table>
-        <button class="choose-prompt-button" disabled>Choose Prompt</button>
+        <div class="tooltip-container">
+          <button class="choose-prompt-button" disabled aria-label="Select a prompt to use">Choose Prompt</button>
+          <span class="tooltip" role="tooltip">Select a prompt to use</span>
+        </div>
       </div>
       <h2 style="text-align: center">Create Prompt Template</h2>
       <form id="form">
@@ -294,7 +323,10 @@
           spellcheck="true"
           style="display: block; margin: 0 auto"
         ></textarea>
-        <button type="submit" disabled>Save Template</button>
+        <div class="tooltip-container">
+          <button type="submit" disabled aria-label="Save your prompt template">Save Template</button>
+          <span class="tooltip" role="tooltip">Save your prompt template</span>
+        </div>
       </form>
     </div>
     <script src="../dist/save_prompt.js"></script>
