@@ -172,13 +172,55 @@ export function openNewChatInView(view: CustomBrowserView): void {
     (view.id && view.id.match("gemini"))
   ) {
     view.webContents.executeJavaScript(`
-            (function() {
-                const newChatButton = document.querySelector('button[aria-label="New chat"]');
-                if (newChatButton) {
-                    newChatButton.click();
-                }
-            })();
-        `);
+      (function() {
+        // Try to find button with aria-label="Nowy czat" or text="Nowy czat"
+        const allButtons = document.querySelectorAll('button');
+
+        let foundButtons = [];
+        for (const btn of allButtons) {
+          const label = (btn.getAttribute('aria-label') || '').toLowerCase();
+          const text = (btn.textContent || '').toLowerCase().trim();
+
+          // Check for "new chat" in various languages
+          if (label.includes('nowy czat') || text.includes('nowy czat') ||
+              label.includes('new chat') || text.includes('new chat')) {
+
+            foundButtons.push({
+              visible: btn.offsetParent !== null,
+              disabled: btn.disabled,
+              element: btn
+            });
+          }
+        }
+
+        // Try to click ANY button (visible or not, enabled or disabled)
+        if (foundButtons.length > 0) {
+          const info = foundButtons[0]; // Take the first one
+
+          // Force enable the button if it's disabled
+          if (info.element.disabled) {
+            info.element.disabled = false;
+            info.element.removeAttribute('disabled');
+            info.element.removeAttribute('aria-disabled');
+          }
+
+          // Click the button
+          info.element.click();
+
+          // If normal click doesn't work, try dispatching event
+          const clickEvent = new MouseEvent('click', {
+            bubbles: true,
+            cancelable: true,
+            view: window
+          });
+          info.element.dispatchEvent(clickEvent);
+
+          return true;
+        }
+
+        return false;
+      })();
+    `);
   } else if (view.id && view.id.match("claude")) {
     view.webContents.executeJavaScript(`
       (function() {
@@ -218,34 +260,29 @@ export function openNewChatInView(view: CustomBrowserView): void {
   } else if (view.id && view.id.match("grok")) {
     view.webContents.executeJavaScript(`
       (function() {
-        // Try specific selector first
-        let element = document.querySelector('a[data-sidebar="menu-button"]');
-        if (element && element.offsetParent !== null && 
-            element.getBoundingClientRect().width > 0) {
-          element.click();
-          return true;
-        }
-        
-        // Try all menu buttons
-        const menuButtons = document.querySelectorAll('a[data-sidebar="menu-button"]');
-        for (const btn of menuButtons) {
-          if (btn.offsetParent !== null && btn.getBoundingClientRect().width > 0) {
-            btn.click();
-            return true;
+        // For Grok, clicking the "Home" link creates a new chat
+        const allLinks = document.querySelectorAll('a');
+
+        for (const link of allLinks) {
+          const label = (link.getAttribute('aria-label') || '').toLowerCase();
+          const href = link.href || '';
+
+          // Check for home page link (Polish: "Strona główna", English: "Home")
+          if ((label.includes('strona główna') || label.includes('home')) &&
+              href.includes('grok.com/') &&
+              !href.includes('sign-in') &&
+              !href.includes('sign-up')) {
+
+            if (link.offsetParent !== null) {
+              link.click();
+              return true;
+            }
           }
         }
-        
-        // Fallback: look for "new" in links
-        const links = Array.from(document.querySelectorAll('a'));
-        const newChatLink = links.find(link => {
-          if (link.offsetParent === null) return false;
-          const text = (link.textContent || '').toLowerCase();
-          const label = (link.getAttribute('aria-label') || '').toLowerCase();
-          return text.includes('new') || label.includes('new');
-        });
-        if (newChatLink) {
-          newChatLink.click();
-        }
+
+        // Fallback: just navigate to grok.com homepage
+        window.location.href = 'https://grok.com/';
+        return true;
       })();
     `);
   } else if (view.id && view.id.match("deepseek")) {
