@@ -7,6 +7,7 @@
       content="default-src 'self'; style-src 'self' 'unsafe-inline';"
     />
     <title>Select Default Models</title>
+    <link rel="stylesheet" href="styles/tooltips.css" />
     <style>
       /* Critical CSS - Prevent white flash by defaulting to dark theme */
       html {
@@ -47,9 +48,8 @@
       body {
         font-family: Arial, sans-serif;
         padding: 20px;
-        transition:
-          background-color 0.3s,
-          color 0.3s;
+        transition: background-color 0.3s, color 0.3s;
+        overflow-x: hidden;
       }
 
       body.dark-mode {
@@ -175,6 +175,7 @@
         display: flex;
         gap: 10px;
         justify-content: flex-end;
+        margin-right: 20px;
       }
 
       button {
@@ -248,8 +249,14 @@
     </div>
 
     <div class="button-group">
-      <button id="cancel-button">Cancel</button>
-      <button id="save-button">Save & Restart</button>
+      <div class="tooltip-container">
+        <button id="cancel-button" aria-label="Close without saving changes">Cancel</button>
+        <span class="tooltip" role="tooltip">Close without saving changes</span>
+      </div>
+      <div class="tooltip-container">
+        <button id="save-button" aria-label="Save settings and restart the app">Save & Restart</button>
+        <span class="tooltip" role="tooltip">Save settings and restart the app</span>
+      </div>
     </div>
 
     <script type="module" src="../dist/select_models_renderer.js"></script>

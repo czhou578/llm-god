@@ -1,0 +1,85 @@
+name: Build Multi-Platform
+
+on:
+  push:
+    branches: [master]
+    tags:
+      - '*'
+  pull_request:
+    branches: [master]
+  workflow_dispatch:
+
+jobs:
+  build:
+    strategy:
+      matrix:
+        os: [windows-latest, ubuntu-latest, macos-latest]
+        include:
+          - os: windows-latest
+            artifact_name: Windows
+            artifact_path: out/make/squirrel.windows/x64
+          - os: ubuntu-latest
+            artifact_name: Linux
+            artifact_path: out/make
+          - os: macos-latest
+            artifact_name: macOS
+            artifact_path: out/make
+
+    runs-on: ${{ matrix.os }}
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build application
+        run: npm run make
+        env:
+          NODE_ENV: production
+
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: llm-god-${{ matrix.artifact_name }}
+          path: ${{ matrix.artifact_path }}
+          if-no-files-found: error
+
+  release:
+    needs: build
+    runs-on: ubuntu-latest
+    if: startsWith(github.ref, 'refs/tags/') || github.event_name == 'workflow_dispatch'
+
+    steps:
+      - name: Download all artifacts
+        uses: actions/download-artifact@v4
+        with:
+          path: artifacts
+
+      - name: Create Release
+        uses: softprops/action-gh-release@v1
+        if: startsWith(github.ref, 'refs/tags/')
+        with:
+          files: |
+            artifacts/**/*.exe
+            artifacts/**/*.deb
+            artifacts/**/*.rpm
+            artifacts/**/*.zip
+          draft: false
+          prerelease: false
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Upload build artifacts (manual dispatch)
+        if: github.event_name == 'workflow_dispatch'
+        uses: actions/upload-artifact@v4
+        with:
+          name: manual-build-artifacts
+          path: artifacts/

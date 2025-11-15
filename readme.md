@@ -4,7 +4,9 @@
 
 ![alt text](image-1.png)
 
-This is a desktop app for Windows machines only (currently) that allows users to simultaneously prompt multiple LLM's at once in one environment. I use this app every day, for coding or non coding purposes. It has saved me countless hours of copypasting and is just so much more efficient.
+This is a desktop app for Windows machines only\* that allows users to simultaneously prompt multiple LLM's at once in one environment. I use this app every day, for coding or non coding purposes. It has saved me countless hours of copypasting and is just so much more efficient.
+
+\*Linux version is currently being tested. The app is packaged for Mac but I do not have a Mac to test it on. If any Mac developers want to help test, please do! File any issues you find in the Issues tab.
 
 Currently, the following LLM web interfaces are supported:
 
@@ -116,3 +118,8 @@ Finally, in the `src/main.ts` file, uncomment the following code to open the dev
 - 5/17: Migrated to using TypeScript across the app.
 - 6/15: Added support for LMArena and also for adding custom prompts that can be saved.
 - 10/10: Removed support for Perplexity and LMArena (due to incompatibility) and added more contextual searching for JavaScript injection logic. Added Copilot support.
+- 
+
+## Star History
+
+[![Star History Chart](https://api.star-history.com/svg?repos=czhou578/llm-god&type=date&legend=top-left)](https://www.star-history.com/#czhou578/llm-god&type=date&legend=top-left)
