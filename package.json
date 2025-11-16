@@ -9,7 +9,7 @@
   "license": "MIT",
   "scripts": {
     "build": "tsc",
-    "start": "cross-env NODE_ENV=development npm run build && electron .",
+    "start": "cross-env NODE_ENV=development node dev-runner.js",
     "prettier": "prettier -w .",
     "make": "cross-env NODE_ENV=production npm run build && electron-forge make",
     "package": "cross-env NODE_ENV=production npm run build && electron-forge package",
@@ -38,6 +38,7 @@
     "electron-reload": "^2.0.0-alpha.1",
     "electronmon": "^2.0.3",
     "jest": "^29.7.0",
+    "nodemon": "^3.1.11",
     "typescript": "^5.8.3"
   }
 }

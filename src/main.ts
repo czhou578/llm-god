@@ -656,6 +656,14 @@ ipcMain.on("save-default-models", (_, models: string[]) => {
   }
 
   // Restart the application
-  app.relaunch();
-  app.exit(0);
+  if (process.env.NODE_ENV === "production") {
+    // In production, use relaunch
+    app.relaunch();
+    app.exit(0);
+  } else {
+    // In development with npm run dev, use special exit code
+    // The dev-runner.js will detect this and restart
+    console.log("🔄 Development mode: Closing app for auto-restart...");
+    app.exit(42); // Special exit code 42 = intentional restart
+  }
 });
