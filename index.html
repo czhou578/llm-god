@@ -85,7 +85,7 @@
         height: auto;
         padding: 10px;
         min-height: 180px;
-        max-height: 48%;
+        max-height: 50%;
         position: relative;
         align-items: center;
         z-index: 10; /* Ensure prompt area is above the header */
@@ -146,6 +146,7 @@
         padding: 5px;
         border-radius: 50%;
         align-self: center;
+        margin-top: 5px;
       }
 
       .dropdown,
@@ -309,19 +310,15 @@
           0 chars / 0 words
         </div>
       </div>
-      <div
-        style="
-          display: flex;
-          flex-direction: column;
-          gap: 10px;
-          align-items: center;
-        "
-      >
-        <button class="new-chat-toggle">➕</button>
-        <button class="theme-toggle">🌙</button>
-      <div class="tooltip-container">
-        <button class="theme-toggle" aria-label="Toggle light/dark theme">🌙</button>
-        <span class="tooltip" role="tooltip">Toggle light/dark theme</span>
+      <div style="display: flex; flex-direction: column; gap: 10px; align-items: center;">
+        <div class="tooltip-container">
+          <button class="new-chat-toggle">➕</button>
+          <span class="tooltip" role="tooltip">Open New Chat In Displayed Windows</span>
+        </div>
+        <div class="tooltip-container">
+          <button class="theme-toggle" aria-label="Toggle light/dark theme">🌙</button>
+          <span class="tooltip" role="tooltip">Toggle light/dark theme</span>
+        </div>
       </div>
       <div class="button-group">
         <div class="dropdown">
