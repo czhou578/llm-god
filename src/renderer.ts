@@ -105,6 +105,10 @@ const themeToggleButton = document.querySelector(
   ".theme-toggle",
 ) as HTMLButtonElement | null;
 
+const newChatToggleButton = document.querySelector(
+  ".new-chat-toggle",
+) as HTMLButtonElement | null;
+
 // Check if views are currently open and set initial button text
 window.addEventListener("DOMContentLoaded", async () => {
   const ipc = window.electron.ipcRenderer;
@@ -240,7 +244,8 @@ function updateCharCounter(text: string): void {
   const charCounterElement = document.getElementById("char-counter");
   if (charCounterElement) {
     const charCount = text.length;
-    const wordCount = text.trim().length === 0 ? 0 : text.trim().split(/\s+/).length;
+    const wordCount =
+      text.trim().length === 0 ? 0 : text.trim().split(/\s+/).length;
     charCounterElement.textContent = `${charCount} chars / ${wordCount} words`;
   }
 }
@@ -265,6 +270,14 @@ if (textArea) {
         }
       }
     }
+  });
+}
+
+if (newChatToggleButton) {
+  newChatToggleButton.addEventListener("click", (event: MouseEvent) => {
+    console.log("New chat toggle button clicked");
+    event.stopPropagation();
+    ipcRenderer.send("new-chat");
   });
 }
 

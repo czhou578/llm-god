@@ -36,6 +36,8 @@ To launch the prompt to all the LLM's, press `Ctrl + Enter` on your keyboard
 
 If you want to close the app, press `Ctrl + W` on your keyboard.
 
+**Important Note:** If you experience issues with the "New Chat" button, make sure your AI chat interface is set to English language. The button may not work properly in other languages.
+
 ## Disclaimer
 
 I did find out about the [GodMode](https://github.com/smol-ai/GodMode) project, but I felt that people needed an app that just provided the models from the few big companies like OpenAI and Anthropic. Many of the other smaller models are not very useful. In addition, that project doesn't seem to be very well maintained anymore and doesn't have some of the new models like Grok.
