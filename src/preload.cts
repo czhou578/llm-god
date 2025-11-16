@@ -61,6 +61,7 @@ if (hasContextBridge && canAccessWindow) {
           "close-model-selection-window",
           "save-default-models",
           "content-copied", // Add this for view contexts too
+          "new-chat",
         ];
         if (validChannels.includes(channel)) {
           ipcRenderer.send(channel, data);

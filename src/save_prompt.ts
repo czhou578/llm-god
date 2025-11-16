@@ -6,7 +6,6 @@ const templateContent = document.getElementById(
 ) as HTMLTextAreaElement;
 let selectedRow: HTMLTableRowElement | null = null;
 
-
 const saveTemplateButton = document.querySelector(
   'button[type="submit"]',
 ) as HTMLButtonElement;

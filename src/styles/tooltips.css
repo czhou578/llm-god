@@ -13,7 +13,7 @@
   visibility: hidden;
   opacity: 0;
   position: absolute;
-  bottom: 125%;
+  bottom: 100%; /* Changed from 125% to 110% */
   left: 50%;
   transform: translateX(-50%);
   background-color: #333;

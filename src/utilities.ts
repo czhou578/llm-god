@@ -30,7 +30,7 @@ export function addBrowserView(
   });
 
   // Set background color to prevent white flash while loading
-  view.setBackgroundColor('#000000');
+  view.setBackgroundColor("#000000");
 
   view.id = url;
   mainWindow.contentView.addChildView(view);
@@ -119,6 +119,223 @@ export function stripEmojis(text: string): string {
       .replace(/[\u{200D}]/gu, "") // Zero Width Joiner (used in emoji sequences)
       .trim()
   );
+}
+
+export function openNewChatInView(view: CustomBrowserView): void {
+  if (view.id && view.id.match("chatgpt")) {
+    view.webContents.executeJavaScript(`
+      (function() {
+        const selectors = [
+          'a[aria-label="New chat"]',
+          'button[aria-label="New chat"]',
+          'a[href*="/"]', // ChatGPT new chat links
+          'button:has(svg[class*="icon"])'
+        ];
+        
+        for (const selector of selectors) {
+          try {
+            const elements = document.querySelectorAll(selector);
+            for (const element of elements) {
+              // Check if visible and interactable
+              if (element.offsetParent !== null && 
+                  element.getBoundingClientRect().width > 0) {
+                const text = element.textContent?.toLowerCase() || '';
+                const label = element.getAttribute('aria-label')?.toLowerCase() || '';
+                
+                if (label.includes('new') || text.includes('new chat')) {
+                  element.click();
+                  return true;
+                }
+              }
+            }
+          } catch (e) {
+            continue;
+          }
+        }
+        
+        // Final fallback: look for any clickable element with "new chat" text
+        const allClickable = document.querySelectorAll('a, button');
+        for (const el of allClickable) {
+          if (el.offsetParent !== null) {
+            const text = (el.textContent || '').toLowerCase();
+            const label = (el.getAttribute('aria-label') || '').toLowerCase();
+            if (label === 'new chat' || text.trim() === 'new chat') {
+              el.click();
+              return true;
+            }
+          }
+        }
+      })();
+    `);
+  } else if (
+    (view.id && view.id.match("bard")) ||
+    (view.id && view.id.match("gemini"))
+  ) {
+    view.webContents.executeJavaScript(`
+      (function() {
+        // Try to find button with aria-label="Nowy czat" or text="Nowy czat"
+        const allButtons = document.querySelectorAll('button');
+
+        let foundButtons = [];
+        for (const btn of allButtons) {
+          const label = (btn.getAttribute('aria-label') || '').toLowerCase();
+          const text = (btn.textContent || '').toLowerCase().trim();
+
+          // Check for "new chat" in various languages
+          if (label.includes('nowy czat') || text.includes('nowy czat') ||
+              label.includes('new chat') || text.includes('new chat')) {
+
+            foundButtons.push({
+              visible: btn.offsetParent !== null,
+              disabled: btn.disabled,
+              element: btn
+            });
+          }
+        }
+
+        // Try to click ANY button (visible or not, enabled or disabled)
+        if (foundButtons.length > 0) {
+          const info = foundButtons[0]; // Take the first one
+
+          // Force enable the button if it's disabled
+          if (info.element.disabled) {
+            info.element.disabled = false;
+            info.element.removeAttribute('disabled');
+            info.element.removeAttribute('aria-disabled');
+          }
+
+          // Click the button
+          info.element.click();
+
+          // If normal click doesn't work, try dispatching event
+          const clickEvent = new MouseEvent('click', {
+            bubbles: true,
+            cancelable: true,
+            view: window
+          });
+          info.element.dispatchEvent(clickEvent);
+
+          return true;
+        }
+
+        return false;
+      })();
+    `);
+  } else if (view.id && view.id.match("claude")) {
+    view.webContents.executeJavaScript(`
+      (function() {
+        const selectors = [
+          'a[aria-label="New chat"]',
+          'button[aria-label="New chat"]',
+          'a[href*="new"]',
+          'div[role="button"]:has-text("New")'
+        ];
+        
+        for (const selector of selectors) {
+          try {
+            const element = document.querySelector(selector);
+            if (element && element.offsetParent !== null && 
+                element.getBoundingClientRect().width > 0) {
+              element.click();
+              return true;
+            }
+          } catch (e) {
+            continue;
+          }
+        }
+        
+        // Fallback
+        const clickables = Array.from(document.querySelectorAll('a, button, div[role="button"]'));
+        const newChatBtn = clickables.find(el => {
+          if (el.offsetParent === null) return false;
+          const label = (el.getAttribute('aria-label') || '').toLowerCase();
+          const text = (el.textContent || '').toLowerCase();
+          return label.includes('new') || text.trim().includes('new chat');
+        });
+        if (newChatBtn) {
+          newChatBtn.click();
+        }
+      })();
+    `);
+  } else if (view.id && view.id.match("grok")) {
+    view.webContents.executeJavaScript(`
+      (function() {
+        // For Grok, clicking the "Home" link creates a new chat
+        const allLinks = document.querySelectorAll('a');
+
+        for (const link of allLinks) {
+          const label = (link.getAttribute('aria-label') || '').toLowerCase();
+          const href = link.href || '';
+
+          // Check for home page link (Polish: "Strona główna", English: "Home")
+          if ((label.includes('strona główna') || label.includes('home')) &&
+              href.includes('grok.com/') &&
+              !href.includes('sign-in') &&
+              !href.includes('sign-up')) {
+
+            if (link.offsetParent !== null) {
+              link.click();
+              return true;
+            }
+          }
+        }
+
+        // Fallback: just navigate to grok.com homepage
+        window.location.href = 'https://grok.com/';
+        return true;
+      })();
+    `);
+  } else if (view.id && view.id.match("deepseek")) {
+    view.webContents.executeJavaScript(`
+            (function() {
+                const newChatButton = document.getElementsByClassName('ds-icon-button')[1];
+                if (newChatButton) {
+                    newChatButton.click();
+                }
+            })();
+        `);
+  } else if (view.id && view.id.match("copilot")) {
+    view.webContents.executeJavaScript(`
+      (function() {
+        const selectors = [
+          'button[aria-label="Start new chat"]',
+          'button[aria-label*="new chat" i]',
+          'button[aria-label*="New" i]',
+          'button:has(svg)'
+        ];
+        
+        for (const selector of selectors) {
+          try {
+            const elements = document.querySelectorAll(selector);
+            for (const element of elements) {
+              if (element.offsetParent !== null && 
+                  element.getBoundingClientRect().width > 0 &&
+                  !element.disabled) {
+                const label = (element.getAttribute('aria-label') || '').toLowerCase();
+                if (label.includes('new') || label.includes('start')) {
+                  element.click();
+                  return true;
+                }
+              }
+            }
+          } catch (e) {
+            continue;
+          }
+        }
+        
+        // Fallback
+        const buttons = Array.from(document.querySelectorAll('button'));
+        const newChatBtn = buttons.find(btn => {
+          if (btn.disabled || btn.offsetParent === null) return false;
+          const label = (btn.getAttribute('aria-label') || '').toLowerCase();
+          return label.includes('new') || label.includes('start');
+        });
+        if (newChatBtn) {
+          newChatBtn.click();
+        }
+      })();
+    `);
+  }
 }
 
 export function injectPromptIntoView(

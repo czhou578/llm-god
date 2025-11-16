@@ -89,7 +89,9 @@
         position: relative;
         align-items: center;
         z-index: 10; /* Ensure prompt area is above the header */
-        transition: background-color 0.3s, color 0.3s;
+        transition:
+          background-color 0.3s,
+          color 0.3s;
       }
 
       #prompt-area.dark-mode {
@@ -110,7 +112,10 @@
         line-height: 1.5;
         width: 100%;
         height: 100%;
-        transition: background-color 0.3s, color 0.3s, border-color 0.3s;
+        transition:
+          background-color 0.3s,
+          color 0.3s,
+          border-color 0.3s;
       }
 
       #prompt-area.dark-mode #prompt-input {
@@ -133,13 +138,15 @@
         gap: 10px;
       }
 
-      .theme-toggle {
+      .theme-toggle,
+      .new-chat-toggle {
         width: 40px;
         height: 40px;
         font-size: 20px;
         padding: 5px;
         border-radius: 50%;
         align-self: center;
+        margin-top: 5px;
       }
 
       .dropdown,
@@ -154,7 +161,8 @@
       .prompt-select,
       .model-select,
       .diff-select,
-      .theme-toggle {
+      .theme-toggle,
+      .new-chat-toggle {
         width: 100%;
         height: 50px;
         font-size: 18px;
@@ -167,14 +175,18 @@
         display: block;
         text-align: center;
         font-weight: bold;
-        transition: background-color 0.3s, color 0.3s, border-color 0.3s;
+        transition:
+          background-color 0.3s,
+          color 0.3s,
+          border-color 0.3s;
       }
 
       #prompt-area.dark-mode #dropdown-button,
       #prompt-area.dark-mode .prompt-select,
       #prompt-area.dark-mode .model-select,
       #prompt-area.dark-mode .diff-select,
-      #prompt-area.dark-mode .theme-toggle {
+      #prompt-area.dark-mode .theme-toggle,
+      #prompt-area.dark-mode .new-chat-toggle {
         background-color: #2d2d2d;
         color: #e0e0e0;
         border-color: #444;
@@ -184,7 +196,8 @@
       #prompt-area:not(.dark-mode) .prompt-select,
       #prompt-area:not(.dark-mode) .model-select,
       #prompt-area:not(.dark-mode) .diff-select,
-      #prompt-area:not(.dark-mode) .theme-toggle {
+      #prompt-area:not(.dark-mode) .theme-toggle,
+      #prompt-area:not(.dark-mode) .new-chat-toggle {
         background-color: #f0f0f0 !important;
         color: #333 !important;
         border-color: #ccc !important;
@@ -277,19 +290,35 @@
     <h2 id="no-chats-header">No Chats Shown. Please add a Chat</h2>
 
     <div id="prompt-area">
-      <div style="position: relative; width: 100%; height: 100%;">
+      <div style="position: relative; width: 100%; height: 100%">
         <textarea
           id="prompt-input"
           rows="3"
           placeholder="Press Ctrl + Enter to send prompt"
         ></textarea>
-        <div id="char-counter" style="position: absolute; bottom: 5px; right: 10px; font-size: 12px; opacity: 0.6; pointer-events: none;">
+        <div
+          id="char-counter"
+          style="
+            position: absolute;
+            bottom: 5px;
+            right: 10px;
+            font-size: 12px;
+            opacity: 0.6;
+            pointer-events: none;
+          "
+        >
           0 chars / 0 words
         </div>
       </div>
-      <div class="tooltip-container">
-        <button class="theme-toggle" aria-label="Toggle light/dark theme">🌙</button>
-        <span class="tooltip" role="tooltip">Toggle light/dark theme</span>
+      <div style="display: flex; flex-direction: column; gap: 10px; align-items: center;">
+        <div class="tooltip-container">
+          <button class="new-chat-toggle">➕</button>
+          <span class="tooltip" role="tooltip">Open New Chat In Displayed Windows</span>
+        </div>
+        <div class="tooltip-container">
+          <button class="theme-toggle" aria-label="Toggle light/dark theme">🌙</button>
+          <span class="tooltip" role="tooltip">Toggle light/dark theme</span>
+        </div>
       </div>
       <div class="button-group">
         <div class="dropdown">

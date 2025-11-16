@@ -40,7 +40,7 @@
         align-items: center;
         height: 100vh;
         width: 100vw;
-        overflow: hidden;
+        overflow-x: hidden;
         transition: background-color 0.3s, color 0.3s;
       }
 
@@ -84,7 +84,9 @@
         flex-direction: column;
         align-items: center;
         justify-content: flex-start;
-        transition: background-color 0.3s, box-shadow 0.3s;
+        transition:
+          background-color 0.3s,
+          box-shadow 0.3s;
       }
 
       body.dark-mode .form-container {
@@ -153,7 +155,10 @@
         border: 2px solid #e0e0e0;
         border-radius: 6px;
         font-size: 16px;
-        transition: border-color 0.3s ease, background-color 0.3s, color 0.3s;
+        transition:
+          border-color 0.3s ease,
+          background-color 0.3s,
+          color 0.3s;
         resize: vertical;
         font-family: "Segoe UI", Arial, sans-serif;
         line-height: 1.5;
@@ -223,7 +228,9 @@
         border: 1px solid #ddd;
         padding: 8px;
         text-align: left;
-        transition: border-color 0.3s, background-color 0.3s;
+        transition:
+          border-color 0.3s,
+          background-color 0.3s;
       }
 
       body.dark-mode .prompt-table th,

@@ -14,6 +14,7 @@ import {
   injectPromptIntoView,
   sendPromptInView,
   stripEmojis, // Add this import
+  openNewChatInView,
 } from "./utilities.js"; // Adjusted path
 import { createRequire } from "node:module"; // Import createRequire
 import { fileURLToPath } from "node:url"; // Import fileURLToPath
@@ -46,7 +47,11 @@ const __dirname = path.dirname(__filename);
 if (process.env.NODE_ENV !== "production") {
   try {
     console.log("→ electron-reload is active");
-    require("electron-reload")(path.join(__dirname, "."));
+    // Watch the project root directory instead of dist
+    require("electron-reload")(path.join(__dirname, ".."), {
+      electron: path.join(__dirname, "..", "node_modules", ".bin", "electron"),
+      hardResetMethod: "exit",
+    });
   } catch (e) {
     // electron-reload not available in production, skip it
   }
@@ -114,7 +119,7 @@ function createWindow(): void {
     }) as CustomBrowserView; // Cast to CustomBrowserView
 
     // Set background color to prevent white flash while loading
-    view.setBackgroundColor('#000000');
+    view.setBackgroundColor("#000000");
 
     view.id = `${url}`;
     mainWindow.contentView.addChildView(view);
@@ -158,7 +163,7 @@ function createWindow(): void {
 async function createFormWindow() {
   // Get current theme from main window first
   const currentTheme = await mainWindow.webContents.executeJavaScript(
-    'localStorage.getItem("theme")'
+    'localStorage.getItem("theme")',
   );
 
   formWindow = new BrowserWindow({
@@ -167,7 +172,7 @@ async function createFormWindow() {
     parent: mainWindow,
     modal: true,
     show: false, // Don't show window until theme is applied
-    backgroundColor: currentTheme === 'dark' ? '#1e1e1e' : '#f0f0f0',
+    backgroundColor: currentTheme === "dark" ? "#1e1e1e" : "#f0f0f0",
     icon: path.join(__dirname, "..", "favicon.ico"),
     webPreferences: {
       preload: path.join(__dirname, "..", "dist", "preload.cjs"), // Correct path to compiled preload
@@ -177,15 +182,15 @@ async function createFormWindow() {
   });
 
   // Apply theme immediately when DOM is ready, before showing
-  formWindow.webContents.on('dom-ready', async () => {
-    const themeClass = currentTheme === 'dark' ? 'dark-mode' : 'light-mode';
+  formWindow.webContents.on("dom-ready", async () => {
+    const themeClass = currentTheme === "dark" ? "dark-mode" : "light-mode";
     await formWindow!.webContents.executeJavaScript(`
       document.body.classList.add('${themeClass}');
     `);
   });
 
   // Use ready-to-show event for smoother display
-  formWindow.once('ready-to-show', () => {
+  formWindow.once("ready-to-show", () => {
     formWindow!.show();
   });
 
@@ -195,7 +200,7 @@ async function createFormWindow() {
 async function createModelSelectionWindow() {
   // Get current theme from main window first
   const currentTheme = await mainWindow.webContents.executeJavaScript(
-    'localStorage.getItem("theme")'
+    'localStorage.getItem("theme")',
   );
 
   modelSelectionWindow = new BrowserWindow({
@@ -204,7 +209,7 @@ async function createModelSelectionWindow() {
     parent: mainWindow,
     modal: true,
     show: false, // Don't show window until theme is applied
-    backgroundColor: currentTheme === 'dark' ? '#1e1e1e' : '#f5f5f5',
+    backgroundColor: currentTheme === "dark" ? "#1e1e1e" : "#f5f5f5",
     icon: path.join(__dirname, "..", "favicon.ico"),
     webPreferences: {
       preload: path.join(__dirname, "..", "dist", "preload.cjs"),
@@ -214,15 +219,15 @@ async function createModelSelectionWindow() {
   });
 
   // Apply theme immediately when DOM is ready, before showing
-  modelSelectionWindow.webContents.on('dom-ready', async () => {
-    const themeClass = currentTheme === 'dark' ? 'dark-mode' : 'light-mode';
+  modelSelectionWindow.webContents.on("dom-ready", async () => {
+    const themeClass = currentTheme === "dark" ? "dark-mode" : "light-mode";
     await modelSelectionWindow!.webContents.executeJavaScript(`
       document.body.classList.add('${themeClass}');
     `);
   });
 
   // Use ready-to-show event for smoother display
-  modelSelectionWindow.once('ready-to-show', () => {
+  modelSelectionWindow.once("ready-to-show", () => {
     modelSelectionWindow!.show();
   });
 
@@ -510,13 +515,24 @@ ipcMain.on("close-gemini", (_, prompt: string) => {
   }
 });
 
+ipcMain.on("new-chat", () => {
+  console.log("New chat requested");
+  views.forEach((view) => {
+    try {
+      openNewChatInView(view); // Inject empty prompt to reset
+    } catch (error) {
+      console.error("Error resetting prompt in view:", error);
+    }
+  });
+});
+
 ipcMain.on("open-edit-view", async (_, prompt: string) => {
   console.log("Opening edit view for prompt:", prompt);
   prompt = prompt.normalize("NFKC");
 
   // Get current theme from main window first
   const currentTheme = await mainWindow.webContents.executeJavaScript(
-    'localStorage.getItem("theme")'
+    'localStorage.getItem("theme")',
   );
 
   const editWindow = new BrowserWindow({
@@ -525,7 +541,7 @@ ipcMain.on("open-edit-view", async (_, prompt: string) => {
     parent: formWindow || mainWindow, // Use mainWindow as a fallback if formWindow is null
     modal: true, // Make it a modal window
     show: false, // Don't show window until theme is applied
-    backgroundColor: currentTheme === 'dark' ? '#1e1e1e' : '#f0f0f0',
+    backgroundColor: currentTheme === "dark" ? "#1e1e1e" : "#f0f0f0",
     icon: path.join(__dirname, "..", "favicon.ico"),
     webPreferences: {
       preload: path.join(__dirname, "..", "dist", "preload.cjs"), // Correct path to compiled preload
@@ -535,9 +551,12 @@ ipcMain.on("open-edit-view", async (_, prompt: string) => {
   });
 
   // Apply theme and inject prompt when DOM is ready
-  const escapedPrompt = prompt.replace(/\\/g, '\\\\').replace(/`/g, '\\`').replace(/\$/g, '\\$');
-  const themeClass = currentTheme === 'dark' ? 'dark-mode' : 'light-mode';
-  editWindow.webContents.on('dom-ready', async () => {
+  const escapedPrompt = prompt
+    .replace(/\\/g, "\\\\")
+    .replace(/`/g, "\\`")
+    .replace(/\$/g, "\\$");
+  const themeClass = currentTheme === "dark" ? "dark-mode" : "light-mode";
+  editWindow.webContents.on("dom-ready", async () => {
     await editWindow.webContents.executeJavaScript(`
       document.body.classList.add('${themeClass}');
       const textarea = document.getElementById('template-content');
@@ -548,11 +567,13 @@ ipcMain.on("open-edit-view", async (_, prompt: string) => {
   });
 
   // Use ready-to-show event for smoother display
-  editWindow.once('ready-to-show', () => {
+  editWindow.once("ready-to-show", () => {
     editWindow.show();
   });
 
-  await editWindow.loadFile(path.join(__dirname, "..", "src", "edit_prompt.html"));
+  await editWindow.loadFile(
+    path.join(__dirname, "..", "src", "edit_prompt.html"),
+  );
 
   console.log("Edit window created.");
 });
@@ -637,7 +658,7 @@ ipcMain.handle("get-default-models", () => {
 
 ipcMain.handle("get-current-theme", () => {
   return mainWindow.webContents.executeJavaScript(
-    'localStorage.getItem("theme")'
+    'localStorage.getItem("theme")',
   );
 });
 
