@@ -8,7 +8,7 @@ export default {
     "/node_modules/",
     "/dist/"
   ],
-  moduleFileExtensions: ["js", "ts", "tsx"],
+  moduleFileExtensions: ["js", "ts", "tsx", "jsx"],
   transform: {
     '^.+\\.tsx?$': ['ts-jest', {
       tsconfig: {
