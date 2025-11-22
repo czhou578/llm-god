@@ -120,7 +120,7 @@ Finally, in the `src/main.ts` file, uncomment the following code to open the dev
 - 5/17: Migrated to using TypeScript across the app.
 - 6/15: Added support for LMArena and also for adding custom prompts that can be saved.
 - 10/10: Removed support for Perplexity and LMArena (due to incompatibility) and added more contextual searching for JavaScript injection logic. Added Copilot support.
-- 
+-
 
 ## Star History
 

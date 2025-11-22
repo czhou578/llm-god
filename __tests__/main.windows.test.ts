@@ -124,7 +124,7 @@ describe("Main Process - Window Management", () => {
     test("calls show after ready-to-show event", (done) => {
       const window = mainWindowInstance;
       const callback = window.once.mock.calls.find(
-        (call: any) => call[0] === "ready-to-show"
+        (call: any) => call[0] === "ready-to-show",
       )?.[1];
 
       if (callback) {
@@ -151,7 +151,7 @@ describe("Main Process - Window Management", () => {
 
       expect(window.on).toHaveBeenCalledWith(
         "enter-full-screen",
-        expect.any(Function)
+        expect.any(Function),
       );
     });
 
@@ -161,7 +161,7 @@ describe("Main Process - Window Management", () => {
 
       expect(window.on).toHaveBeenCalledWith(
         "leave-full-screen",
-        expect.any(Function)
+        expect.any(Function),
       );
     });
   });
@@ -208,7 +208,7 @@ describe("Main Process - Window Management", () => {
 
       expect(window.webContents.on).toHaveBeenCalledWith(
         "dom-ready",
-        expect.any(Function)
+        expect.any(Function),
       );
     });
 
@@ -220,7 +220,7 @@ describe("Main Process - Window Management", () => {
 
       expect(window.once).toHaveBeenCalledWith(
         "ready-to-show",
-        expect.any(Function)
+        expect.any(Function),
       );
     });
   });
@@ -261,7 +261,7 @@ describe("Main Process - Window Management", () => {
 
       expect(window.webContents.on).toHaveBeenCalledWith(
         "dom-ready",
-        expect.any(Function)
+        expect.any(Function),
       );
     });
   });
@@ -362,7 +362,7 @@ describe("Main Process - Window Management", () => {
       window.webContents.send("refresh-prompt-table");
 
       expect(window.webContents.send).toHaveBeenCalledWith(
-        "refresh-prompt-table"
+        "refresh-prompt-table",
       );
     });
   });
@@ -416,7 +416,7 @@ describe("Main Process - Window Management", () => {
       mainWindowInstance.contentView.addChildView(view);
 
       expect(mainWindowInstance.contentView.addChildView).toHaveBeenCalledWith(
-        view
+        view,
       );
     });
   });
@@ -501,7 +501,7 @@ describe("Main Process - Window Management", () => {
 
       expect(mainWindowInstance.on).toHaveBeenCalledWith(
         "enter-full-screen",
-        expect.any(Function)
+        expect.any(Function),
       );
     });
 
@@ -511,7 +511,7 @@ describe("Main Process - Window Management", () => {
 
       expect(mainWindowInstance.on).toHaveBeenCalledWith(
         "leave-full-screen",
-        expect.any(Function)
+        expect.any(Function),
       );
     });
   });
@@ -519,11 +519,11 @@ describe("Main Process - Window Management", () => {
   describe("Theme synchronization", () => {
     test("retrieves theme from localStorage", async () => {
       mainWindowInstance.webContents.executeJavaScript.mockResolvedValue(
-        "dark"
+        "dark",
       );
 
       const theme = await mainWindowInstance.webContents.executeJavaScript(
-        'localStorage.getItem("theme")'
+        'localStorage.getItem("theme")',
       );
 
       expect(theme).toBe("dark");
@@ -531,11 +531,11 @@ describe("Main Process - Window Management", () => {
 
     test("retrieves light theme from localStorage", async () => {
       mainWindowInstance.webContents.executeJavaScript.mockResolvedValue(
-        "light"
+        "light",
       );
 
       const theme = await mainWindowInstance.webContents.executeJavaScript(
-        'localStorage.getItem("theme")'
+        'localStorage.getItem("theme")',
       );
 
       expect(theme).toBe("light");
@@ -548,7 +548,7 @@ describe("Main Process - Window Management", () => {
       await formWindowInstance.webContents.executeJavaScript(script);
 
       expect(
-        formWindowInstance.webContents.executeJavaScript
+        formWindowInstance.webContents.executeJavaScript,
       ).toHaveBeenCalled();
     });
   });

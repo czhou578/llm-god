@@ -1,5 +1,5 @@
 // Mock window.electron before importing any modules
-Object.defineProperty(global, 'window', {
+Object.defineProperty(global, "window", {
   value: {
     electron: {
       ipcRenderer: {
@@ -31,26 +31,26 @@ const localStorageMock = (() => {
     },
   };
 })();
-Object.defineProperty(global, 'localStorage', {
+Object.defineProperty(global, "localStorage", {
   value: localStorageMock,
   writable: true,
 });
 
 // NOW import from source TypeScript files (after mocks are set up)
-import { 
-  openClaudeMessage, 
-  closeClaudeMessage, 
-  openChatGPTMessage, 
-  closeChatGPTMessage, 
-  openGeminiMessage, 
-  closeGeminiMessage, 
-  openGrokMessage, 
-  closeGrokMessage, 
-  openDeepSeekMessage, 
-  closeDeepSeekMessage, 
-  openCopilotMessage, 
-  closeCopilotMessage, 
-  logToWebPage 
+import {
+  openClaudeMessage,
+  closeClaudeMessage,
+  openChatGPTMessage,
+  closeChatGPTMessage,
+  openGeminiMessage,
+  closeGeminiMessage,
+  openGrokMessage,
+  closeGrokMessage,
+  openDeepSeekMessage,
+  closeDeepSeekMessage,
+  openCopilotMessage,
+  closeCopilotMessage,
+  logToWebPage,
 } from "../src/renderer";
 
 const mockIpcRenderer = (global as any).window.electron.ipcRenderer;
@@ -301,7 +301,7 @@ describe("Renderer Functions", () => {
 
     test("inject-prompt updates character counter", () => {
       const prompt = "Test prompt";
-      
+
       const callback = mockIpcRenderer.on.mock.calls.find(
         (call: any) => call[0] === "inject-prompt",
       )?.[1];

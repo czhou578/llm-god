@@ -84,7 +84,7 @@ describe("Save Edited Prompt Functions", () => {
     test("registers row-selected event listener", () => {
       expect(mockIpcRenderer.on).toHaveBeenCalledWith(
         "row-selected",
-        expect.any(Function)
+        expect.any(Function),
       );
     });
 
@@ -97,20 +97,22 @@ describe("Save Edited Prompt Functions", () => {
     });
 
     test("finds save prompt button", () => {
-      expect(document.querySelector).toHaveBeenCalledWith('button[type="submit"]');
+      expect(document.querySelector).toHaveBeenCalledWith(
+        'button[type="submit"]',
+      );
     });
   });
 
   describe("Row Selection Handling", () => {
     test("stores selected key when row-selected event is received", () => {
       const testKey = "test-key-123";
-      
+
       if (rowSelectedCallback) {
         rowSelectedCallback(testKey);
       }
 
       expect(console.log).toHaveBeenCalledWith(
-        `Selected key received in save_edited_prompt: ${testKey}`
+        `Selected key received in save_edited_prompt: ${testKey}`,
       );
     });
 
@@ -120,7 +122,7 @@ describe("Save Edited Prompt Functions", () => {
       }
 
       expect(console.error).toHaveBeenCalledWith(
-        "Received empty key in row-selected event."
+        "Received empty key in row-selected event.",
       );
     });
 
@@ -130,7 +132,7 @@ describe("Save Edited Prompt Functions", () => {
       }
 
       expect(console.log).not.toHaveBeenCalledWith(
-        expect.stringContaining("Selected key received")
+        expect.stringContaining("Selected key received"),
       );
     });
 
@@ -142,13 +144,13 @@ describe("Save Edited Prompt Functions", () => {
       }
 
       expect(console.log).toHaveBeenCalledWith(
-        "Selected key received in save_edited_prompt: first-key"
+        "Selected key received in save_edited_prompt: first-key",
       );
       expect(console.log).toHaveBeenCalledWith(
-        "Selected key received in save_edited_prompt: second-key"
+        "Selected key received in save_edited_prompt: second-key",
       );
       expect(console.log).toHaveBeenCalledWith(
-        "Selected key received in save_edited_prompt: third-key"
+        "Selected key received in save_edited_prompt: third-key",
       );
     });
   });
@@ -197,7 +199,7 @@ describe("Save Edited Prompt Functions", () => {
       savePromptButton.click();
 
       expect(console.log).toHaveBeenCalledWith(
-        'Sent update-prompt message with key "test-key" and value "Prompt content"'
+        'Sent update-prompt message with key "test-key" and value "Prompt content"',
       );
     });
 
@@ -219,7 +221,7 @@ describe("Save Edited Prompt Functions", () => {
 
       expect(mockIpcRenderer.send).not.toHaveBeenCalledWith(
         "update-prompt",
-        expect.any(Object)
+        expect.any(Object),
       );
     });
 
@@ -230,7 +232,7 @@ describe("Save Edited Prompt Functions", () => {
 
       expect(mockIpcRenderer.send).not.toHaveBeenCalledWith(
         "update-prompt",
-        expect.any(Object)
+        expect.any(Object),
       );
     });
 
@@ -240,7 +242,7 @@ describe("Save Edited Prompt Functions", () => {
       savePromptButton.click();
 
       expect(console.error).toHaveBeenCalledWith(
-        "No key selected or prompt is empty."
+        "No key selected or prompt is empty.",
       );
     });
 
@@ -249,7 +251,9 @@ describe("Save Edited Prompt Functions", () => {
 
       savePromptButton.click();
 
-      expect(mockIpcRenderer.send).not.toHaveBeenCalledWith("close-edit-window");
+      expect(mockIpcRenderer.send).not.toHaveBeenCalledWith(
+        "close-edit-window",
+      );
     });
   });
 
@@ -262,7 +266,7 @@ describe("Save Edited Prompt Functions", () => {
 
       expect(mockIpcRenderer.send).not.toHaveBeenCalledWith(
         "update-prompt",
-        expect.any(Object)
+        expect.any(Object),
       );
     });
 
@@ -272,7 +276,7 @@ describe("Save Edited Prompt Functions", () => {
       savePromptButton.click();
 
       expect(console.error).toHaveBeenCalledWith(
-        "No key selected or prompt is empty."
+        "No key selected or prompt is empty.",
       );
     });
 
@@ -281,7 +285,9 @@ describe("Save Edited Prompt Functions", () => {
 
       savePromptButton.click();
 
-      expect(mockIpcRenderer.send).not.toHaveBeenCalledWith("close-edit-window");
+      expect(mockIpcRenderer.send).not.toHaveBeenCalledWith(
+        "close-edit-window",
+      );
     });
   });
 
@@ -306,13 +312,13 @@ describe("Save Edited Prompt Functions", () => {
     });
 
     test("handles prompt with special characters", () => {
-      edit_templateContent.value = "Special: !@#$%^&*()_+-={}[]|\\:\";<>?,./";
+      edit_templateContent.value = 'Special: !@#$%^&*()_+-={}[]|\\:";<>?,./';
 
       savePromptButton.click();
 
       expect(mockIpcRenderer.send).toHaveBeenCalledWith("update-prompt", {
         key: "test-key",
-        value: "Special: !@#$%^&*()_+-={}[]|\\:\";<>?,./",
+        value: 'Special: !@#$%^&*()_+-={}[]|\\:";<>?,./',
       });
     });
 
@@ -383,10 +389,10 @@ describe("Save Edited Prompt Functions", () => {
 
       const sendCalls = mockIpcRenderer.send.mock.calls;
       const updateIndex = sendCalls.findIndex(
-        (call) => call[0] === "update-prompt"
+        (call) => call[0] === "update-prompt",
       );
       const closeIndex = sendCalls.findIndex(
-        (call) => call[0] === "close-edit-window"
+        (call) => call[0] === "close-edit-window",
       );
 
       expect(updateIndex).toBeLessThan(closeIndex);
@@ -404,7 +410,7 @@ describe("Save Edited Prompt Functions", () => {
       });
       expect(mockIpcRenderer.send).toHaveBeenNthCalledWith(
         2,
-        "close-edit-window"
+        "close-edit-window",
       );
     });
   });

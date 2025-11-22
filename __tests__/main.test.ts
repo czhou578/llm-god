@@ -72,7 +72,10 @@ describe("Main Process - App Lifecycle", () => {
     test("returns default models when no saved models", () => {
       mockStore.get.mockReturnValue(undefined);
 
-      const defaultModels = ["https://chatgpt.com", "https://gemini.google.com"];
+      const defaultModels = [
+        "https://chatgpt.com",
+        "https://gemini.google.com",
+      ];
       expect(defaultModels).toEqual([
         "https://chatgpt.com",
         "https://gemini.google.com",
@@ -82,7 +85,10 @@ describe("Main Process - App Lifecycle", () => {
     test("returns default models when saved models is empty array", () => {
       mockStore.get.mockReturnValue([]);
 
-      const defaultModels = ["https://chatgpt.com", "https://gemini.google.com"];
+      const defaultModels = [
+        "https://chatgpt.com",
+        "https://gemini.google.com",
+      ];
       expect(defaultModels).toEqual([
         "https://chatgpt.com",
         "https://gemini.google.com",

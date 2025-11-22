@@ -101,12 +101,17 @@ describe("Select Models Renderer Functions", () => {
     });
 
     document.querySelector = jest.fn((selector: string) => {
-      if (selector === 'input[value="https://chatgpt.com"]') return chatgptCheckbox;
-      if (selector === 'input[value="https://gemini.google.com"]') return geminiCheckbox;
-      if (selector === 'input[value="https://claude.ai"]') return claudeCheckbox;
+      if (selector === 'input[value="https://chatgpt.com"]')
+        return chatgptCheckbox;
+      if (selector === 'input[value="https://gemini.google.com"]')
+        return geminiCheckbox;
+      if (selector === 'input[value="https://claude.ai"]')
+        return claudeCheckbox;
       if (selector === 'input[value="https://x.ai/grok"]') return grokCheckbox;
-      if (selector === 'input[value="https://chat.deepseek.com"]') return deepseekCheckbox;
-      if (selector === 'input[value="https://copilot.microsoft.com"]') return copilotCheckbox;
+      if (selector === 'input[value="https://chat.deepseek.com"]')
+        return deepseekCheckbox;
+      if (selector === 'input[value="https://copilot.microsoft.com"]')
+        return copilotCheckbox;
       if (selector === ".model-item") {
         return document.body.querySelector(".model-item");
       }
@@ -127,7 +132,7 @@ describe("Select Models Renderer Functions", () => {
         return document.body.querySelectorAll(".model-item");
       }
       if (selector === 'input[type="checkbox"]:checked') {
-        return allCheckboxes.filter(cb => cb.checked);
+        return allCheckboxes.filter((cb) => cb.checked);
       }
       return [];
     });
@@ -164,11 +169,13 @@ describe("Select Models Renderer Functions", () => {
 
     beforeEach(() => {
       domLoadedCallback = undefined;
-      (window.addEventListener as jest.Mock).mockImplementation((event: string, callback: Function) => {
-        if (event === "DOMContentLoaded") {
-          domLoadedCallback = callback;
-        }
-      });
+      (window.addEventListener as jest.Mock).mockImplementation(
+        (event: string, callback: Function) => {
+          if (event === "DOMContentLoaded") {
+            domLoadedCallback = callback;
+          }
+        },
+      );
     });
 
     test("loads saved default models and checks corresponding checkboxes", async () => {
@@ -186,7 +193,7 @@ describe("Select Models Renderer Functions", () => {
         await domLoadedCallback();
       }
 
-      await new Promise(resolve => setTimeout(resolve, 100));
+      await new Promise((resolve) => setTimeout(resolve, 100));
 
       expect(mockIpcRenderer.invoke).toHaveBeenCalledWith("get-default-models");
       expect(chatgptCheckbox.checked).toBe(true);
@@ -205,7 +212,7 @@ describe("Select Models Renderer Functions", () => {
         await domLoadedCallback();
       }
 
-      await new Promise(resolve => setTimeout(resolve, 100));
+      await new Promise((resolve) => setTimeout(resolve, 100));
 
       expect(chatgptCheckbox.checked).toBe(true);
       expect(geminiCheckbox.checked).toBe(true);
@@ -222,7 +229,7 @@ describe("Select Models Renderer Functions", () => {
         await domLoadedCallback();
       }
 
-      await new Promise(resolve => setTimeout(resolve, 100));
+      await new Promise((resolve) => setTimeout(resolve, 100));
 
       expect(chatgptCheckbox.checked).toBe(true);
       expect(geminiCheckbox.checked).toBe(true);
@@ -246,7 +253,7 @@ describe("Select Models Renderer Functions", () => {
         await domLoadedCallback();
       }
 
-      await new Promise(resolve => setTimeout(resolve, 100));
+      await new Promise((resolve) => setTimeout(resolve, 100));
 
       expect(chatgptCheckbox.checked).toBe(true);
       expect(geminiCheckbox.checked).toBe(true);
@@ -270,7 +277,7 @@ describe("Select Models Renderer Functions", () => {
         await domLoadedCallback();
       }
 
-      await new Promise(resolve => setTimeout(resolve, 100));
+      await new Promise((resolve) => setTimeout(resolve, 100));
 
       expect(chatgptCheckbox.checked).toBe(true);
       // Invalid URL should not crash, just not check any box
@@ -286,7 +293,9 @@ describe("Select Models Renderer Functions", () => {
 
     test("toggles checkbox when clicking on model item", () => {
       const modelItem = document.querySelector(".model-item") as HTMLDivElement;
-      const checkbox = modelItem.querySelector("input[type='checkbox']") as HTMLInputElement;
+      const checkbox = modelItem.querySelector(
+        "input[type='checkbox']",
+      ) as HTMLInputElement;
 
       expect(checkbox.checked).toBe(false);
 
@@ -297,12 +306,17 @@ describe("Select Models Renderer Functions", () => {
 
     test("does not toggle checkbox when clicking directly on checkbox", () => {
       const modelItem = document.querySelector(".model-item") as HTMLDivElement;
-      const checkbox = modelItem.querySelector("input[type='checkbox']") as HTMLInputElement;
+      const checkbox = modelItem.querySelector(
+        "input[type='checkbox']",
+      ) as HTMLInputElement;
 
       checkbox.checked = false;
 
       const clickEvent = new MouseEvent("click", { bubbles: true });
-      Object.defineProperty(clickEvent, "target", { value: checkbox, writable: false });
+      Object.defineProperty(clickEvent, "target", {
+        value: checkbox,
+        writable: false,
+      });
 
       modelItem.dispatchEvent(clickEvent);
 
@@ -312,7 +326,9 @@ describe("Select Models Renderer Functions", () => {
 
     test("toggles checkbox off when clicking model item twice", () => {
       const modelItem = document.querySelector(".model-item") as HTMLDivElement;
-      const checkbox = modelItem.querySelector("input[type='checkbox']") as HTMLInputElement;
+      const checkbox = modelItem.querySelector(
+        "input[type='checkbox']",
+      ) as HTMLInputElement;
 
       modelItem.click();
       expect(checkbox.checked).toBe(true);
@@ -325,11 +341,13 @@ describe("Select Models Renderer Functions", () => {
       const modelItems = document.querySelectorAll(".model-item");
 
       modelItems.forEach((item) => {
-        const checkbox = item.querySelector("input[type='checkbox']") as HTMLInputElement;
+        const checkbox = item.querySelector(
+          "input[type='checkbox']",
+        ) as HTMLInputElement;
         expect(checkbox.checked).toBe(false);
-        
+
         (item as HTMLElement).click();
-        
+
         expect(checkbox.checked).toBe(true);
       });
     });
@@ -377,7 +395,7 @@ describe("Select Models Renderer Functions", () => {
       expect(alert).toHaveBeenCalledWith("Please select at least one model.");
       expect(mockIpcRenderer.send).not.toHaveBeenCalledWith(
         "save-default-models",
-        expect.any(Array)
+        expect.any(Array),
       );
     });
 
@@ -421,7 +439,9 @@ describe("Select Models Renderer Functions", () => {
     test("sends close-model-selection-window message", () => {
       cancelButton.click();
 
-      expect(mockIpcRenderer.send).toHaveBeenCalledWith("close-model-selection-window");
+      expect(mockIpcRenderer.send).toHaveBeenCalledWith(
+        "close-model-selection-window",
+      );
     });
 
     test("does not send save message when cancel is clicked", () => {
@@ -432,7 +452,7 @@ describe("Select Models Renderer Functions", () => {
 
       expect(mockIpcRenderer.send).not.toHaveBeenCalledWith(
         "save-default-models",
-        expect.any(Array)
+        expect.any(Array),
       );
     });
   });
@@ -442,11 +462,13 @@ describe("Select Models Renderer Functions", () => {
 
     beforeEach(() => {
       domLoadedCallback = undefined;
-      (window.addEventListener as jest.Mock).mockImplementation((event: string, callback: Function) => {
-        if (event === "DOMContentLoaded") {
-          domLoadedCallback = callback;
-        }
-      });
+      (window.addEventListener as jest.Mock).mockImplementation(
+        (event: string, callback: Function) => {
+          if (event === "DOMContentLoaded") {
+            domLoadedCallback = callback;
+          }
+        },
+      );
     });
 
     test("loads models, modifies selection, and saves", async () => {
@@ -462,7 +484,7 @@ describe("Select Models Renderer Functions", () => {
       if (domLoadedCallback) {
         await domLoadedCallback();
       }
-      await new Promise(resolve => setTimeout(resolve, 100));
+      await new Promise((resolve) => setTimeout(resolve, 100));
 
       // Initial state: ChatGPT and Gemini checked
       expect(chatgptCheckbox.checked).toBe(true);
@@ -490,7 +512,7 @@ describe("Select Models Renderer Functions", () => {
       if (domLoadedCallback) {
         await domLoadedCallback();
       }
-      await new Promise(resolve => setTimeout(resolve, 100));
+      await new Promise((resolve) => setTimeout(resolve, 100));
 
       // Should default to ChatGPT and Gemini
       expect(chatgptCheckbox.checked).toBe(true);
@@ -504,7 +526,8 @@ describe("Select Models Renderer Functions", () => {
 
       saveButton.click();
 
-      expect(mockIpcRenderer.send).toHaveBeenCalledWith("save-default-models", 
+      expect(mockIpcRenderer.send).toHaveBeenCalledWith(
+        "save-default-models",
         expect.arrayContaining([
           "https://chatgpt.com",
           "https://gemini.google.com",
@@ -512,14 +535,12 @@ describe("Select Models Renderer Functions", () => {
           "https://x.ai/grok",
           "https://chat.deepseek.com",
           "https://copilot.microsoft.com",
-        ])
+        ]),
       );
     });
 
     test("loads models, clicks cancel without saving", async () => {
-      mockIpcRenderer.invoke.mockResolvedValueOnce([
-        "https://chatgpt.com",
-      ]);
+      mockIpcRenderer.invoke.mockResolvedValueOnce(["https://chatgpt.com"]);
 
       jest.isolateModules(() => {
         require("../src/select_models_renderer");
@@ -528,7 +549,7 @@ describe("Select Models Renderer Functions", () => {
       if (domLoadedCallback) {
         await domLoadedCallback();
       }
-      await new Promise(resolve => setTimeout(resolve, 100));
+      await new Promise((resolve) => setTimeout(resolve, 100));
 
       // Modify selection
       chatgptCheckbox.checked = false;
@@ -540,9 +561,11 @@ describe("Select Models Renderer Functions", () => {
 
       expect(mockIpcRenderer.send).not.toHaveBeenCalledWith(
         "save-default-models",
-        expect.any(Array)
+        expect.any(Array),
       );
-      expect(mockIpcRenderer.send).toHaveBeenCalledWith("close-model-selection-window");
+      expect(mockIpcRenderer.send).toHaveBeenCalledWith(
+        "close-model-selection-window",
+      );
     });
   });
 
@@ -595,9 +618,13 @@ describe("Select Models Renderer Functions", () => {
       geminiCheckbox.checked = true;
 
       // Change state mid-process (simulating async behavior)
-      saveButton.addEventListener("click", () => {
-        claudeCheckbox.checked = true;
-      }, { capture: true });
+      saveButton.addEventListener(
+        "click",
+        () => {
+          claudeCheckbox.checked = true;
+        },
+        { capture: true },
+      );
 
       saveButton.click();
 

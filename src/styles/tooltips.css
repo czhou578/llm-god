@@ -24,7 +24,9 @@
   font-size: 14px;
   white-space: nowrap;
   z-index: 3000;
-  transition: opacity 0.3s ease, visibility 0.3s ease;
+  transition:
+    opacity 0.3s ease,
+    visibility 0.3s ease;
   pointer-events: none;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
 }

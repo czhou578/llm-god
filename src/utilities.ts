@@ -405,16 +405,9 @@ export function injectPromptIntoView(
   } else if (view.id && view.id.match("grok")) {
     view.webContents.executeJavaScript(`
             {
-                var inputElement = document.querySelector('textarea');
+                var inputElement = document.querySelector('div.ProseMirror > p');
                 if (inputElement) {
-                    const span = inputElement.previousElementSibling;
-                    if (span) {
-                        span.classList.add("hidden");
-                    }
-                    var nativeTextAreaValueSetter = Object.getOwnPropertyDescriptor(window.HTMLTextAreaElement.prototype, "value").set;
-                    nativeTextAreaValueSetter.call(inputElement, \`${escapedPrompt}\`);
-                    const inputEvent = new Event('input', { bubbles: true });
-                    inputElement.dispatchEvent(inputEvent);
+                    inputElement.innerHTML = \`${escapedPrompt}\`;
                 }
             }
         `);
