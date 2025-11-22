@@ -41,7 +41,9 @@
         height: 100vh;
         width: 100vw;
         overflow-x: hidden;
-        transition: background-color 0.3s, color 0.3s;
+        transition:
+          background-color 0.3s,
+          color 0.3s;
       }
 
       /* Dark mode styles - apply when dark-mode class IS present */
@@ -124,7 +126,9 @@
         background-color: #e3f2fd;
         border-left: 4px solid #2196f3;
         color: #1976d2;
-        transition: background-color 0.3s, color 0.3s;
+        transition:
+          background-color 0.3s,
+          color 0.3s;
         width: 90%;
         text-align: left;
       }
@@ -313,12 +317,19 @@
     <div class="form-container">
       <h2>Existing Prompts</h2>
       <div class="instructions">
-        Select an existing prompt from the table below or create a new prompt template.
+        Select an existing prompt from the table below or create a new prompt
+        template.
       </div>
       <div id="prompt-picker" class="prompt-picker">
         <table class="prompt-table"></table>
         <div class="tooltip-container">
-          <button class="choose-prompt-button" disabled aria-label="Select a prompt to use">Choose Prompt</button>
+          <button
+            class="choose-prompt-button"
+            disabled
+            aria-label="Select a prompt to use"
+          >
+            Choose Prompt
+          </button>
           <span class="tooltip" role="tooltip">Select a prompt to use</span>
         </div>
       </div>
@@ -331,7 +342,9 @@
           style="display: block; margin: 0 auto"
         ></textarea>
         <div class="tooltip-container">
-          <button type="submit" disabled aria-label="Save your prompt template">Save Template</button>
+          <button type="submit" disabled aria-label="Save your prompt template">
+            Save Template
+          </button>
           <span class="tooltip" role="tooltip">Save your prompt template</span>
         </div>
       </form>

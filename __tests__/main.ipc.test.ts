@@ -52,7 +52,7 @@ describe("Main Process - IPC Handlers", () => {
       expect(mockStore.set).toHaveBeenCalled();
       expect(mockStore.set).toHaveBeenCalledWith(
         expect.any(String),
-        promptValue
+        promptValue,
       );
     });
 
@@ -140,7 +140,7 @@ describe("Main Process - IPC Handlers", () => {
         const normalized = val.normalize("NFKC");
         const allEntries = mockStore.store;
         const matchingKey = Object.keys(allEntries).find(
-          (key) => allEntries[key] === normalized
+          (key) => allEntries[key] === normalized,
         );
 
         if (matchingKey) {
@@ -168,7 +168,7 @@ describe("Main Process - IPC Handlers", () => {
       const handler = jest.fn((event, val) => {
         const allEntries = mockStore.store;
         const matchingKey = Object.keys(allEntries).find(
-          (key) => allEntries[key] === val
+          (key) => allEntries[key] === val,
         );
 
         if (matchingKey) {
@@ -225,7 +225,7 @@ describe("Main Process - IPC Handlers", () => {
         const normalized = value.normalize("NFKC");
         const allEntries = mockStore.store;
         const matchingKey = Object.keys(allEntries).find(
-          (key) => allEntries[key] === normalized
+          (key) => allEntries[key] === normalized,
         );
 
         return matchingKey || null;
@@ -244,7 +244,7 @@ describe("Main Process - IPC Handlers", () => {
       const handler = jest.fn((event, value) => {
         const allEntries = mockStore.store;
         const matchingKey = Object.keys(allEntries).find(
-          (key) => allEntries[key] === value
+          (key) => allEntries[key] === value,
         );
 
         return matchingKey || null;
@@ -343,7 +343,7 @@ describe("Main Process - IPC Handlers", () => {
 
       expect(mockEvent.sender.send).toHaveBeenCalledWith(
         "row-selected",
-        pendingKey
+        pendingKey,
       );
     });
 

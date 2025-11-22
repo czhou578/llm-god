@@ -94,10 +94,7 @@ describe("Main Process - View Management", () => {
     });
 
     test("finds view using find()", () => {
-      mockViews = [
-        { id: "https://chatgpt.com" },
-        { id: "https://claude.ai" },
-      ];
+      mockViews = [{ id: "https://chatgpt.com" }, { id: "https://claude.ai" }];
 
       const claudeView = mockViews.find((view) => view.id.match("claude"));
 
@@ -201,7 +198,7 @@ describe("Main Process - View Management", () => {
       await Promise.all(
         mockViews.map(async (view) => {
           await view.inject(prompt);
-        })
+        }),
       );
 
       expect(mockInject).toHaveBeenCalledTimes(2);
@@ -215,15 +212,13 @@ describe("Main Process - View Management", () => {
       mockViews = [{ id: "view1", inject: mockInject }];
 
       await expect(mockViews[0].inject("test")).rejects.toThrow(
-        "Injection failed"
+        "Injection failed",
       );
     });
 
     test("continues processing views even if one fails", async () => {
       const successInject = jest.fn().mockResolvedValue(undefined);
-      const failInject = jest
-        .fn()
-        .mockRejectedValue(new Error("Failed"));
+      const failInject = jest.fn().mockRejectedValue(new Error("Failed"));
 
       mockViews = [{ inject: failInject }, { inject: successInject }];
 
@@ -292,10 +287,7 @@ describe("Main Process - View Management", () => {
 
   describe("View bounds updates", () => {
     test("updates all view bounds on window resize", () => {
-      mockViews = [
-        { setBounds: jest.fn() },
-        { setBounds: jest.fn() },
-      ];
+      mockViews = [{ setBounds: jest.fn() }, { setBounds: jest.fn() }];
 
       const bounds = { width: 2000, height: 1100 };
       const viewWidth = Math.floor(bounds.width / mockViews.length);
@@ -345,12 +337,32 @@ describe("Main Process - View Management", () => {
 
   describe("Platform-specific commands", () => {
     const platformCommands = [
-      { platform: "claude", open: "open claude now", close: "close claude now" },
+      {
+        platform: "claude",
+        open: "open claude now",
+        close: "close claude now",
+      },
       { platform: "grok", open: "open grok now", close: "close grok now" },
-      { platform: "deepseek", open: "open deepseek now", close: "close deepseek now" },
-      { platform: "copilot", open: "open copilot now", close: "close copilot now" },
-      { platform: "chatgpt", open: "open chatgpt now", close: "close chatgpt now" },
-      { platform: "gemini", open: "open gemini now", close: "close gemini now" },
+      {
+        platform: "deepseek",
+        open: "open deepseek now",
+        close: "close deepseek now",
+      },
+      {
+        platform: "copilot",
+        open: "open copilot now",
+        close: "close copilot now",
+      },
+      {
+        platform: "chatgpt",
+        open: "open chatgpt now",
+        close: "close chatgpt now",
+      },
+      {
+        platform: "gemini",
+        open: "open gemini now",
+        close: "close gemini now",
+      },
     ];
 
     platformCommands.forEach(({ platform, open, close }) => {
@@ -379,7 +391,7 @@ describe("Main Process - View Management", () => {
 
       expect(consoleSpy).toHaveBeenCalledWith(
         "Error injecting prompt:",
-        expect.any(Error)
+        expect.any(Error),
       );
 
       consoleSpy.mockRestore();
@@ -399,7 +411,7 @@ describe("Main Process - View Management", () => {
 
       expect(consoleSpy).toHaveBeenCalledWith(
         "Error sending prompt:",
-        expect.any(Error)
+        expect.any(Error),
       );
 
       consoleSpy.mockRestore();
@@ -421,7 +433,7 @@ describe("Main Process - View Management", () => {
 
       expect(consoleSpy).toHaveBeenCalledWith(
         "Error resetting prompt in view:",
-        expect.any(Error)
+        expect.any(Error),
       );
 
       consoleSpy.mockRestore();
@@ -509,7 +521,7 @@ describe("Main Process - View Management", () => {
 
       expect(consoleSpy).toHaveBeenCalledWith(
         "Prompt saved with key:",
-        timestamp
+        timestamp,
       );
 
       consoleSpy.mockRestore();

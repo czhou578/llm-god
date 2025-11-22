@@ -111,7 +111,7 @@ describe("Save Prompt Functions", () => {
 
       expect(mockIpcRenderer.on).toHaveBeenCalledWith(
         "refresh-prompt-table",
-        expect.any(Function)
+        expect.any(Function),
       );
     });
 
@@ -122,7 +122,7 @@ describe("Save Prompt Functions", () => {
 
       expect(mockIpcRenderer.on).toHaveBeenCalledWith(
         "prompt-deleted",
-        expect.any(Function)
+        expect.any(Function),
       );
     });
 
@@ -133,7 +133,7 @@ describe("Save Prompt Functions", () => {
 
       expect(mockIpcRenderer.on).toHaveBeenCalledWith(
         "prompt-not-found",
-        expect.any(Function)
+        expect.any(Function),
       );
     });
   });
@@ -185,9 +185,9 @@ describe("Save Prompt Functions", () => {
   describe("buildPromptTable Function", () => {
     beforeEach(() => {
       mockIpcRenderer.invoke.mockResolvedValue({
-        "key1": "Prompt 1",
-        "key2": "Prompt 2",
-        "key3": "Prompt 3",
+        key1: "Prompt 1",
+        key2: "Prompt 2",
+        key3: "Prompt 3",
       });
 
       jest.isolateModules(() => {
@@ -196,32 +196,32 @@ describe("Save Prompt Functions", () => {
     });
 
     test("builds table with prompts from IPC", async () => {
-      await new Promise(resolve => setTimeout(resolve, 100));
+      await new Promise((resolve) => setTimeout(resolve, 100));
 
       const rows = promptTable.querySelectorAll("tr");
       expect(rows.length).toBe(3);
     });
 
     test("creates cells with prompt values", async () => {
-      await new Promise(resolve => setTimeout(resolve, 100));
+      await new Promise((resolve) => setTimeout(resolve, 100));
 
       const cells = promptTable.querySelectorAll("td");
-      const cellTexts = Array.from(cells).map(cell => {
+      const cellTexts = Array.from(cells).map((cell) => {
         // Get only the text content, excluding button emojis
         const textNode = Array.from(cell.childNodes)
-          .filter(node => node.nodeType === Node.TEXT_NODE)
-          .map(node => node.textContent)
-          .join('');
+          .filter((node) => node.nodeType === Node.TEXT_NODE)
+          .map((node) => node.textContent)
+          .join("");
         return textNode.trim();
       });
-      
+
       expect(cellTexts).toContain("Prompt 1");
       expect(cellTexts).toContain("Prompt 2");
       expect(cellTexts).toContain("Prompt 3");
     });
 
     test("adds edit and delete buttons to each row", async () => {
-      await new Promise(resolve => setTimeout(resolve, 100));
+      await new Promise((resolve) => setTimeout(resolve, 100));
 
       const editButtons = promptTable.querySelectorAll(".edit-button");
       const deleteButtons = promptTable.querySelectorAll(".delete-button");
@@ -239,7 +239,10 @@ describe("Save Prompt Functions", () => {
     });
 
     test("prevents default form submission", () => {
-      const submitEvent = new Event("submit", { bubbles: true, cancelable: true });
+      const submitEvent = new Event("submit", {
+        bubbles: true,
+        cancelable: true,
+      });
       const preventDefaultSpy = jest.spyOn(submitEvent, "preventDefault");
 
       templateContent.value = "New prompt";
@@ -252,7 +255,10 @@ describe("Save Prompt Functions", () => {
       templateContent.value = "New prompt text";
       form.dispatchEvent(new Event("submit"));
 
-      expect(mockIpcRenderer.send).toHaveBeenCalledWith("save-prompt", "New prompt text");
+      expect(mockIpcRenderer.send).toHaveBeenCalledWith(
+        "save-prompt",
+        "New prompt text",
+      );
     });
 
     test("clears textarea after saving", () => {
@@ -264,7 +270,7 @@ describe("Save Prompt Functions", () => {
 
     test("adds new row to table after submission", () => {
       const initialRowCount = promptTable.querySelectorAll("tr").length;
-      
+
       templateContent.value = "New prompt";
       form.dispatchEvent(new Event("submit"));
 
@@ -278,7 +284,7 @@ describe("Save Prompt Functions", () => {
 
       expect(mockIpcRenderer.send).not.toHaveBeenCalledWith(
         "save-prompt",
-        expect.any(String)
+        expect.any(String),
       );
     });
 
@@ -286,29 +292,34 @@ describe("Save Prompt Functions", () => {
       templateContent.value = "  Trimmed prompt  ";
       form.dispatchEvent(new Event("submit"));
 
-      expect(mockIpcRenderer.send).toHaveBeenCalledWith("save-prompt", "Trimmed prompt");
+      expect(mockIpcRenderer.send).toHaveBeenCalledWith(
+        "save-prompt",
+        "Trimmed prompt",
+      );
     });
 
     test("logs when text area is empty", () => {
       templateContent.value = "";
       form.dispatchEvent(new Event("submit"));
 
-      expect(console.log).toHaveBeenCalledWith("Text area is empty. Nothing to save.");
+      expect(console.log).toHaveBeenCalledWith(
+        "Text area is empty. Nothing to save.",
+      );
     });
   });
 
   describe("Table Row Selection", () => {
     beforeEach(async () => {
       mockIpcRenderer.invoke.mockResolvedValue({
-        "key1": "Prompt 1",
-        "key2": "Prompt 2",
+        key1: "Prompt 1",
+        key2: "Prompt 2",
       });
 
       jest.isolateModules(() => {
         require("../src/save_prompt");
       });
 
-      await new Promise(resolve => setTimeout(resolve, 100));
+      await new Promise((resolve) => setTimeout(resolve, 100));
     });
 
     test("enables choose prompt button when row is selected", () => {
@@ -316,7 +327,10 @@ describe("Save Prompt Functions", () => {
       const cell = rows[0].querySelector("td") as HTMLTableCellElement;
 
       const clickEvent = new MouseEvent("click", { bubbles: true });
-      Object.defineProperty(clickEvent, "target", { value: cell, writable: false });
+      Object.defineProperty(clickEvent, "target", {
+        value: cell,
+        writable: false,
+      });
 
       promptTable.dispatchEvent(clickEvent);
 
@@ -328,7 +342,10 @@ describe("Save Prompt Functions", () => {
       const cell = rows[0].querySelector("td") as HTMLTableCellElement;
 
       const clickEvent = new MouseEvent("click", { bubbles: true });
-      Object.defineProperty(clickEvent, "target", { value: cell, writable: false });
+      Object.defineProperty(clickEvent, "target", {
+        value: cell,
+        writable: false,
+      });
 
       promptTable.dispatchEvent(clickEvent);
 
@@ -342,12 +359,18 @@ describe("Save Prompt Functions", () => {
 
       // Select first row
       let clickEvent = new MouseEvent("click", { bubbles: true });
-      Object.defineProperty(clickEvent, "target", { value: cell1, writable: false });
+      Object.defineProperty(clickEvent, "target", {
+        value: cell1,
+        writable: false,
+      });
       promptTable.dispatchEvent(clickEvent);
 
       // Select second row
       clickEvent = new MouseEvent("click", { bubbles: true });
-      Object.defineProperty(clickEvent, "target", { value: cell2, writable: false });
+      Object.defineProperty(clickEvent, "target", {
+        value: cell2,
+        writable: false,
+      });
       promptTable.dispatchEvent(clickEvent);
 
       expect(rows[0].classList.contains("selected")).toBe(false);
@@ -365,74 +388,97 @@ describe("Save Prompt Functions", () => {
         require("../src/save_prompt");
       });
 
-      await new Promise(resolve => setTimeout(resolve, 100));
+      await new Promise((resolve) => setTimeout(resolve, 100));
     });
 
     test("invokes get-key-by-value when edit button is clicked", async () => {
-      const editButton = promptTable.querySelector(".edit-button") as HTMLButtonElement;
-      
+      const editButton = promptTable.querySelector(
+        ".edit-button",
+      ) as HTMLButtonElement;
+
       mockIpcRenderer.invoke.mockResolvedValueOnce("test-key");
 
       const clickEvent = new MouseEvent("click", { bubbles: true });
-      Object.defineProperty(clickEvent, "target", { value: editButton, writable: false });
+      Object.defineProperty(clickEvent, "target", {
+        value: editButton,
+        writable: false,
+      });
 
       promptTable.dispatchEvent(clickEvent);
 
-      await new Promise(resolve => setTimeout(resolve, 100));
+      await new Promise((resolve) => setTimeout(resolve, 100));
 
       expect(mockIpcRenderer.invoke).toHaveBeenCalledWith(
         "get-key-by-value",
-        expect.any(String)
+        expect.any(String),
       );
     });
 
     test("sends row-selected message with key", async () => {
-      const editButton = promptTable.querySelector(".edit-button") as HTMLButtonElement;
-      
+      const editButton = promptTable.querySelector(
+        ".edit-button",
+      ) as HTMLButtonElement;
+
       mockIpcRenderer.invoke.mockResolvedValueOnce("test-key");
 
       const clickEvent = new MouseEvent("click", { bubbles: true });
-      Object.defineProperty(clickEvent, "target", { value: editButton, writable: false });
+      Object.defineProperty(clickEvent, "target", {
+        value: editButton,
+        writable: false,
+      });
 
       promptTable.dispatchEvent(clickEvent);
 
-      await new Promise(resolve => setTimeout(resolve, 100));
+      await new Promise((resolve) => setTimeout(resolve, 100));
 
-      expect(mockIpcRenderer.send).toHaveBeenCalledWith("row-selected", "test-key");
+      expect(mockIpcRenderer.send).toHaveBeenCalledWith(
+        "row-selected",
+        "test-key",
+      );
     });
 
     test("sends open-edit-view message with prompt text", async () => {
-      const editButton = promptTable.querySelector(".edit-button") as HTMLButtonElement;
-      
+      const editButton = promptTable.querySelector(
+        ".edit-button",
+      ) as HTMLButtonElement;
+
       mockIpcRenderer.invoke.mockResolvedValueOnce("test-key");
 
       const clickEvent = new MouseEvent("click", { bubbles: true });
-      Object.defineProperty(clickEvent, "target", { value: editButton, writable: false });
+      Object.defineProperty(clickEvent, "target", {
+        value: editButton,
+        writable: false,
+      });
 
       promptTable.dispatchEvent(clickEvent);
 
-      await new Promise(resolve => setTimeout(resolve, 100));
+      await new Promise((resolve) => setTimeout(resolve, 100));
 
       expect(mockIpcRenderer.send).toHaveBeenCalledWith(
         "open-edit-view",
-        expect.any(String)
+        expect.any(String),
       );
     });
 
     test("logs error when no key is found", async () => {
-      const editButton = promptTable.querySelector(".edit-button") as HTMLButtonElement;
-      
+      const editButton = promptTable.querySelector(
+        ".edit-button",
+      ) as HTMLButtonElement;
+
       mockIpcRenderer.invoke.mockResolvedValueOnce(null);
 
       const clickEvent = new MouseEvent("click", { bubbles: true });
-      Object.defineProperty(clickEvent, "target", { value: editButton, writable: false });
+      Object.defineProperty(clickEvent, "target", {
+        value: editButton,
+        writable: false,
+      });
 
       promptTable.dispatchEvent(clickEvent);
 
-      await new Promise(resolve => setTimeout(resolve, 100));
+      await new Promise((resolve) => setTimeout(resolve, 100));
 
       expect(console.error).toHaveBeenCalledWith(
-        expect.stringContaining("No key found for value:")
+        expect.stringContaining("No key found for value:"),
       );
     });
   });
@@ -440,36 +486,46 @@ describe("Save Prompt Functions", () => {
   describe("Delete Button Click", () => {
     beforeEach(async () => {
       mockIpcRenderer.invoke.mockResolvedValue({
-        "key1": "Prompt to delete",
+        key1: "Prompt to delete",
       });
 
       jest.isolateModules(() => {
         require("../src/save_prompt");
       });
 
-      await new Promise(resolve => setTimeout(resolve, 100));
+      await new Promise((resolve) => setTimeout(resolve, 100));
     });
 
     test("sends delete-prompt-by-value message", () => {
-      const deleteButton = promptTable.querySelector(".delete-button") as HTMLButtonElement;
+      const deleteButton = promptTable.querySelector(
+        ".delete-button",
+      ) as HTMLButtonElement;
 
       const clickEvent = new MouseEvent("click", { bubbles: true });
-      Object.defineProperty(clickEvent, "target", { value: deleteButton, writable: false });
+      Object.defineProperty(clickEvent, "target", {
+        value: deleteButton,
+        writable: false,
+      });
 
       promptTable.dispatchEvent(clickEvent);
 
       expect(mockIpcRenderer.send).toHaveBeenCalledWith(
         "delete-prompt-by-value",
-        expect.any(String)
+        expect.any(String),
       );
     });
 
     test("removes row from table after deletion", () => {
       const initialRowCount = promptTable.querySelectorAll("tr").length;
-      const deleteButton = promptTable.querySelector(".delete-button") as HTMLButtonElement;
+      const deleteButton = promptTable.querySelector(
+        ".delete-button",
+      ) as HTMLButtonElement;
 
       const clickEvent = new MouseEvent("click", { bubbles: true });
-      Object.defineProperty(clickEvent, "target", { value: deleteButton, writable: false });
+      Object.defineProperty(clickEvent, "target", {
+        value: deleteButton,
+        writable: false,
+      });
 
       promptTable.dispatchEvent(clickEvent);
 
@@ -478,16 +534,21 @@ describe("Save Prompt Functions", () => {
     });
 
     test("normalizes prompt text before deletion", () => {
-      const deleteButton = promptTable.querySelector(".delete-button") as HTMLButtonElement;
+      const deleteButton = promptTable.querySelector(
+        ".delete-button",
+      ) as HTMLButtonElement;
 
       const clickEvent = new MouseEvent("click", { bubbles: true });
-      Object.defineProperty(clickEvent, "target", { value: deleteButton, writable: false });
+      Object.defineProperty(clickEvent, "target", {
+        value: deleteButton,
+        writable: false,
+      });
 
       promptTable.dispatchEvent(clickEvent);
 
       expect(mockIpcRenderer.send).toHaveBeenCalledWith(
         "delete-prompt-by-value",
-        expect.stringMatching(/^[^\u{1F600}-\u{1F64F}]+$/u)
+        expect.stringMatching(/^[^\u{1F600}-\u{1F64F}]+$/u),
       );
     });
   });
@@ -495,25 +556,28 @@ describe("Save Prompt Functions", () => {
   describe("Choose Prompt Button", () => {
     beforeEach(async () => {
       mockIpcRenderer.invoke.mockResolvedValue({
-        "key1": "Selected Prompt",
+        key1: "Selected Prompt",
       });
 
       jest.isolateModules(() => {
         require("../src/save_prompt");
       });
 
-      await new Promise(resolve => setTimeout(resolve, 100));
+      await new Promise((resolve) => setTimeout(resolve, 100));
     });
 
     test("sends paste-prompt message when clicked with selection", () => {
       // Select a row first
       const row = promptTable.querySelector("tr") as HTMLTableRowElement;
       row.classList.add("selected");
-      
+
       // Manually track the selected row in the test
       const cell = row.querySelector("td") as HTMLTableCellElement;
       const clickEvent = new MouseEvent("click", { bubbles: true });
-      Object.defineProperty(clickEvent, "target", { value: cell, writable: false });
+      Object.defineProperty(clickEvent, "target", {
+        value: cell,
+        writable: false,
+      });
       promptTable.dispatchEvent(clickEvent);
 
       // Now click the choose button
@@ -521,17 +585,20 @@ describe("Save Prompt Functions", () => {
 
       expect(mockIpcRenderer.send).toHaveBeenCalledWith(
         "paste-prompt",
-        expect.any(String)
+        expect.any(String),
       );
     });
 
     test("sends close-form-window message after choosing prompt", () => {
       const row = promptTable.querySelector("tr") as HTMLTableRowElement;
       row.classList.add("selected");
-      
+
       const cell = row.querySelector("td") as HTMLTableCellElement;
       const clickEvent = new MouseEvent("click", { bubbles: true });
-      Object.defineProperty(clickEvent, "target", { value: cell, writable: false });
+      Object.defineProperty(clickEvent, "target", {
+        value: cell,
+        writable: false,
+      });
       promptTable.dispatchEvent(clickEvent);
 
       choosePromptButton.click();
@@ -541,11 +608,11 @@ describe("Save Prompt Functions", () => {
 
     test("does not send messages when no row is selected", () => {
       const sendCallsBefore = mockIpcRenderer.send.mock.calls.length;
-      
+
       choosePromptButton.click();
 
       const sendCallsAfter = mockIpcRenderer.send.mock.calls.length;
-      
+
       // Should not have sent paste-prompt or close-form-window
       expect(sendCallsAfter).toBe(sendCallsBefore);
     });
@@ -564,11 +631,13 @@ describe("Save Prompt Functions", () => {
     let notFoundCallback: Function;
 
     beforeEach(() => {
-      mockIpcRenderer.on.mockImplementation((event: string, callback: Function) => {
-        if (event === "refresh-prompt-table") refreshCallback = callback;
-        if (event === "prompt-deleted") deletedCallback = callback;
-        if (event === "prompt-not-found") notFoundCallback = callback;
-      });
+      mockIpcRenderer.on.mockImplementation(
+        (event: string, callback: Function) => {
+          if (event === "refresh-prompt-table") refreshCallback = callback;
+          if (event === "prompt-deleted") deletedCallback = callback;
+          if (event === "prompt-not-found") notFoundCallback = callback;
+        },
+      );
 
       jest.isolateModules(() => {
         require("../src/save_prompt");
@@ -593,7 +662,7 @@ describe("Save Prompt Functions", () => {
       }
 
       expect(console.log).toHaveBeenCalledWith(
-        'Prompt with key "test-key" and value "Test Prompt" was deleted from the store.'
+        'Prompt with key "test-key" and value "Test Prompt" was deleted from the store.',
       );
     });
 
@@ -603,7 +672,7 @@ describe("Save Prompt Functions", () => {
       }
 
       expect(console.error).toHaveBeenCalledWith(
-        'No matching entry found for value: "Missing Prompt"'
+        'No matching entry found for value: "Missing Prompt"',
       );
     });
   });
@@ -621,7 +690,7 @@ describe("Save Prompt Functions", () => {
 
       expect(mockIpcRenderer.send).toHaveBeenCalledWith(
         "save-prompt",
-        "Special: !@#$%^&*()"
+        "Special: !@#$%^&*()",
       );
     });
 
@@ -631,7 +700,7 @@ describe("Save Prompt Functions", () => {
 
       expect(mockIpcRenderer.send).toHaveBeenCalledWith(
         "save-prompt",
-        "Line 1\nLine 2\nLine 3"
+        "Line 1\nLine 2\nLine 3",
       );
     });
 
@@ -640,7 +709,10 @@ describe("Save Prompt Functions", () => {
       templateContent.value = longPrompt;
       form.dispatchEvent(new Event("submit"));
 
-      expect(mockIpcRenderer.send).toHaveBeenCalledWith("save-prompt", longPrompt);
+      expect(mockIpcRenderer.send).toHaveBeenCalledWith(
+        "save-prompt",
+        longPrompt,
+      );
     });
 
     test("handles empty prompt table gracefully", () => {

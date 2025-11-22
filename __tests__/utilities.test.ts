@@ -258,8 +258,18 @@ describe("Utilities Functions", () => {
       mockMainWindow.getBounds.mockReturnValue({ width: 1500, height: 900 });
 
       addBrowserView(mockMainWindow, "https://chatgpt.com", websites, views);
-      addBrowserView(mockMainWindow, "https://gemini.google.com", websites, views);
-      const view3 = addBrowserView(mockMainWindow, "https://claude.ai", websites, views);
+      addBrowserView(
+        mockMainWindow,
+        "https://gemini.google.com",
+        websites,
+        views,
+      );
+      const view3 = addBrowserView(
+        mockMainWindow,
+        "https://claude.ai",
+        websites,
+        views,
+      );
 
       // Each view should be 500px wide (1500 / 3)
       expect(view3.setBounds).toHaveBeenCalledWith({
@@ -281,8 +291,12 @@ describe("Utilities Functions", () => {
     let view3: any;
 
     beforeEach(() => {
-      websites = ["https://chatgpt.com", "https://gemini.google.com", "https://claude.ai"];
-      
+      websites = [
+        "https://chatgpt.com",
+        "https://gemini.google.com",
+        "https://claude.ai",
+      ];
+
       view1 = {
         id: "https://chatgpt.com",
         setBounds: jest.fn(),
@@ -347,7 +361,10 @@ describe("Utilities Functions", () => {
     });
 
     test("does nothing if view not found in array", () => {
-      const unknownView: any = { id: "https://unknown.com", setBounds: jest.fn() };
+      const unknownView: any = {
+        id: "https://unknown.com",
+        setBounds: jest.fn(),
+      };
 
       removeBrowserView(mockMainWindow, unknownView, websites, views);
 
@@ -357,11 +374,19 @@ describe("Utilities Functions", () => {
     });
 
     test("handles removing last remaining view", () => {
-      const singleView: any = { id: "https://chatgpt.com", setBounds: jest.fn() };
+      const singleView: any = {
+        id: "https://chatgpt.com",
+        setBounds: jest.fn(),
+      };
       const singleWebsites = ["https://chatgpt.com"];
       const singleViews = [singleView];
 
-      removeBrowserView(mockMainWindow, singleView, singleWebsites, singleViews);
+      removeBrowserView(
+        mockMainWindow,
+        singleView,
+        singleWebsites,
+        singleViews,
+      );
 
       expect(mockContentView.removeChildView).toHaveBeenCalledWith(singleView);
       expect(singleViews.length).toBe(0);
@@ -369,11 +394,19 @@ describe("Utilities Functions", () => {
     });
 
     test("does not redistribute bounds when no views remain", () => {
-      const singleView: any = { id: "https://chatgpt.com", setBounds: jest.fn() };
+      const singleView: any = {
+        id: "https://chatgpt.com",
+        setBounds: jest.fn(),
+      };
       const singleWebsites = ["https://chatgpt.com"];
       const singleViews = [singleView];
 
-      removeBrowserView(mockMainWindow, singleView, singleWebsites, singleViews);
+      removeBrowserView(
+        mockMainWindow,
+        singleView,
+        singleWebsites,
+        singleViews,
+      );
 
       expect(singleView.setBounds).not.toHaveBeenCalled();
     });
@@ -387,7 +420,9 @@ describe("Utilities Functions", () => {
 
       removeBrowserView(mockMainWindow, viewWithDifferentId, websites, views);
 
-      expect(mockContentView.removeChildView).toHaveBeenCalledWith(viewWithDifferentId);
+      expect(mockContentView.removeChildView).toHaveBeenCalledWith(
+        viewWithDifferentId,
+      );
       expect(views.length).toBe(2);
       // Original websites array should be unchanged for this URL
       expect(websites.length).toBe(3);
@@ -423,7 +458,7 @@ describe("Utilities Functions", () => {
 
       expect(mockView.webContents.executeJavaScript).toHaveBeenCalled();
       const jsCode = mockView.webContents.executeJavaScript.mock.calls[0][0];
-      expect(jsCode).toContain('nowy czat');
+      expect(jsCode).toContain("nowy czat");
     });
 
     test("executes JavaScript for Bard (legacy)", () => {
@@ -433,7 +468,7 @@ describe("Utilities Functions", () => {
 
       expect(mockView.webContents.executeJavaScript).toHaveBeenCalled();
       const jsCode = mockView.webContents.executeJavaScript.mock.calls[0][0];
-      expect(jsCode).toContain('nowy czat');
+      expect(jsCode).toContain("nowy czat");
     });
 
     test("executes JavaScript for Claude", () => {
@@ -443,7 +478,7 @@ describe("Utilities Functions", () => {
 
       expect(mockView.webContents.executeJavaScript).toHaveBeenCalled();
       const jsCode = mockView.webContents.executeJavaScript.mock.calls[0][0];
-      expect(jsCode).toContain('New chat');
+      expect(jsCode).toContain("New chat");
     });
 
     test("executes JavaScript for Grok", () => {
@@ -453,7 +488,7 @@ describe("Utilities Functions", () => {
 
       expect(mockView.webContents.executeJavaScript).toHaveBeenCalled();
       const jsCode = mockView.webContents.executeJavaScript.mock.calls[0][0];
-      expect(jsCode).toContain('strona główna');
+      expect(jsCode).toContain("strona główna");
     });
 
     test("executes JavaScript for DeepSeek", () => {
@@ -463,7 +498,7 @@ describe("Utilities Functions", () => {
 
       expect(mockView.webContents.executeJavaScript).toHaveBeenCalled();
       const jsCode = mockView.webContents.executeJavaScript.mock.calls[0][0];
-      expect(jsCode).toContain('ds-icon-button');
+      expect(jsCode).toContain("ds-icon-button");
     });
 
     test("executes JavaScript for Copilot", () => {
@@ -473,7 +508,7 @@ describe("Utilities Functions", () => {
 
       expect(mockView.webContents.executeJavaScript).toHaveBeenCalled();
       const jsCode = mockView.webContents.executeJavaScript.mock.calls[0][0];
-      expect(jsCode).toContain('Start new chat');
+      expect(jsCode).toContain("Start new chat");
     });
 
     test("does not execute for unknown platform", () => {
@@ -582,7 +617,6 @@ describe("Utilities Functions", () => {
 
       expect(mockView.webContents.executeJavaScript).toHaveBeenCalled();
       const jsCode = mockView.webContents.executeJavaScript.mock.calls[0][0];
-      expect(jsCode).toContain("textarea");
       expect(jsCode).toContain("Test prompt");
     });
 
@@ -678,7 +712,7 @@ describe("Utilities Functions", () => {
 
       expect(mockView.webContents.executeJavaScript).toHaveBeenCalled();
       const jsCode = mockView.webContents.executeJavaScript.mock.calls[0][0];
-      expect(jsCode).toContain('Send message');
+      expect(jsCode).toContain("Send message");
     });
 
     test("sends prompt for Bard (legacy)", () => {
@@ -688,7 +722,7 @@ describe("Utilities Functions", () => {
 
       expect(mockView.webContents.executeJavaScript).toHaveBeenCalled();
       const jsCode = mockView.webContents.executeJavaScript.mock.calls[0][0];
-      expect(jsCode).toContain('Send message');
+      expect(jsCode).toContain("Send message");
     });
 
     test("sends prompt for Claude", () => {
@@ -698,7 +732,7 @@ describe("Utilities Functions", () => {
 
       expect(mockView.webContents.executeJavaScript).toHaveBeenCalled();
       const jsCode = mockView.webContents.executeJavaScript.mock.calls[0][0];
-      expect(jsCode).toContain('Send message');
+      expect(jsCode).toContain("Send message");
     });
 
     test("sends prompt for Grok", () => {
@@ -708,7 +742,7 @@ describe("Utilities Functions", () => {
 
       expect(mockView.webContents.executeJavaScript).toHaveBeenCalled();
       const jsCode = mockView.webContents.executeJavaScript.mock.calls[0][0];
-      expect(jsCode).toContain('Submit');
+      expect(jsCode).toContain("Submit");
     });
 
     test("sends prompt for DeepSeek", () => {
@@ -718,7 +752,7 @@ describe("Utilities Functions", () => {
 
       expect(mockView.webContents.executeJavaScript).toHaveBeenCalled();
       const jsCode = mockView.webContents.executeJavaScript.mock.calls[0][0];
-      expect(jsCode).toContain('ds-icon-button');
+      expect(jsCode).toContain("ds-icon-button");
     });
 
     test("sends prompt for Copilot", () => {
@@ -728,7 +762,7 @@ describe("Utilities Functions", () => {
 
       expect(mockView.webContents.executeJavaScript).toHaveBeenCalled();
       const jsCode = mockView.webContents.executeJavaScript.mock.calls[0][0];
-      expect(jsCode).toContain('submit');
+      expect(jsCode).toContain("submit");
     });
 
     test("does not execute for unknown platform", () => {

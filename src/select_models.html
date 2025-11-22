@@ -48,7 +48,9 @@
       body {
         font-family: Arial, sans-serif;
         padding: 20px;
-        transition: background-color 0.3s, color 0.3s;
+        transition:
+          background-color 0.3s,
+          color 0.3s;
         overflow-x: hidden;
       }
 
@@ -250,12 +252,18 @@
 
     <div class="button-group">
       <div class="tooltip-container">
-        <button id="cancel-button" aria-label="Close without saving changes">Cancel</button>
+        <button id="cancel-button" aria-label="Close without saving changes">
+          Cancel
+        </button>
         <span class="tooltip" role="tooltip">Close without saving changes</span>
       </div>
       <div class="tooltip-container">
-        <button id="save-button" aria-label="Save settings and restart the app">Save & Restart</button>
-        <span class="tooltip" role="tooltip">Save settings and restart the app</span>
+        <button id="save-button" aria-label="Save settings and restart the app">
+          Save & Restart
+        </button>
+        <span class="tooltip" role="tooltip"
+          >Save settings and restart the app</span
+        >
       </div>
     </div>
 

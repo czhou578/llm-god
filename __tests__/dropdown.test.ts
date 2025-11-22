@@ -1,5 +1,5 @@
 // Mock window and document before importing
-Object.defineProperty(global, 'window', {
+Object.defineProperty(global, "window", {
   value: {
     addEventListener: jest.fn(),
     removeEventListener: jest.fn(),
@@ -38,7 +38,14 @@ describe("Dropdown Functions", () => {
     document.body.appendChild(dropdownContent);
 
     // Create dropdown items
-    const itemTexts = ["Hide ChatGPT", "Hide Gemini", "Show Claude", "Show Grok", "Show DeepSeek", "Show Copilot"];
+    const itemTexts = [
+      "Hide ChatGPT",
+      "Hide Gemini",
+      "Show Claude",
+      "Show Grok",
+      "Show DeepSeek",
+      "Show Copilot",
+    ];
     dropdownItems = itemTexts.map((text) => {
       const item = document.createElement("div");
       item.className = "dropdown-item";
@@ -65,19 +72,23 @@ describe("Dropdown Functions", () => {
 
     // Capture the DOMContentLoaded callback
     domContentLoadedCallback = undefined;
-    document.addEventListener = jest.fn((event: string, callback: (event: Event) => void) => {
-      if (event === "DOMContentLoaded") {
-        domContentLoadedCallback = callback;
-      }
-    });
+    document.addEventListener = jest.fn(
+      (event: string, callback: (event: Event) => void) => {
+        if (event === "DOMContentLoaded") {
+          domContentLoadedCallback = callback;
+        }
+      },
+    );
 
     // Capture the window click callback
     windowClickCallback = undefined;
-    (window.addEventListener as any) = jest.fn((event: string, callback: (event: MouseEvent) => void) => {
-      if (event === "click") {
-        windowClickCallback = callback;
-      }
-    });
+    (window.addEventListener as any) = jest.fn(
+      (event: string, callback: (event: MouseEvent) => void) => {
+        if (event === "click") {
+          windowClickCallback = callback;
+        }
+      },
+    );
 
     // Import and trigger the dropdown module
     jest.isolateModules(() => {
@@ -86,7 +97,9 @@ describe("Dropdown Functions", () => {
 
     // Trigger DOMContentLoaded to initialize the dropdown
     if (domContentLoadedCallback) {
-      (domContentLoadedCallback as (event: Event) => void)(new Event("DOMContentLoaded"));
+      (domContentLoadedCallback as (event: Event) => void)(
+        new Event("DOMContentLoaded"),
+      );
     }
   });
 
@@ -98,7 +111,7 @@ describe("Dropdown Functions", () => {
     test("sets up event listeners on DOMContentLoaded", () => {
       expect(document.addEventListener).toHaveBeenCalledWith(
         "DOMContentLoaded",
-        expect.any(Function)
+        expect.any(Function),
       );
     });
 
@@ -114,7 +127,7 @@ describe("Dropdown Functions", () => {
 
     test("initializes all dropdown items", () => {
       expect(dropdownItems.length).toBe(6);
-      dropdownItems.forEach(item => {
+      dropdownItems.forEach((item) => {
         expect(item.className).toContain("dropdown-item");
       });
     });
@@ -337,7 +350,10 @@ describe("Dropdown Functions", () => {
     test("prevents propagation to window click handler when button is clicked", () => {
       dropdownContent.classList.remove("show");
 
-      const clickEvent = new MouseEvent("click", { bubbles: true, cancelable: true });
+      const clickEvent = new MouseEvent("click", {
+        bubbles: true,
+        cancelable: true,
+      });
       const stopPropagationSpy = jest.spyOn(clickEvent, "stopPropagation");
 
       dropdownButton.dispatchEvent(clickEvent);
@@ -349,7 +365,10 @@ describe("Dropdown Functions", () => {
     test("prevents propagation to window click handler when item is clicked", () => {
       dropdownContent.classList.add("show");
 
-      const clickEvent = new MouseEvent("click", { bubbles: true, cancelable: true });
+      const clickEvent = new MouseEvent("click", {
+        bubbles: true,
+        cancelable: true,
+      });
       const stopPropagationSpy = jest.spyOn(clickEvent, "stopPropagation");
 
       dropdownItems[0].dispatchEvent(clickEvent);
