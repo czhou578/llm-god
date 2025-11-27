@@ -1,3 +1,4 @@
+import { IPC_CHANNELS } from "./constants";
 // Use require for compatibility with all Electron contexts
 const { contextBridge, ipcRenderer } = require("electron");
 
@@ -30,62 +31,62 @@ if (hasContextBridge && canAccessWindow) {
     ipcRenderer: {
       send: (channel: string, data: any) => {
         const validChannels = [
-          "save-prompt",
-          "open-form-window",
-          "enter-prompt",
-          "inject-prompt",
-          "send-prompt",
-          "delete-prompt-by-value",
-          "row-selected",
-          "paste-prompt",
-          "update-prompt",
-          "edit-prompt-ready",
-          "close-form-window",
-          "open-edit-view",
-          "close-edit-window",
-          "open-claude",
-          "close-claude",
-          "open-deepseek",
-          "close-deepseek",
-          "open-grok",
-          "close-grok",
-          "open-copilot",
-          "close-copilot",
-          "open-chatgpt",
-          "close-chatgpt",
-          "open-gemini",
-          "close-gemini",
-          "open-lm-arena",
-          "close-lm-arena",
-          "open-model-selection-window",
-          "close-model-selection-window",
-          "save-default-models",
-          "content-copied", // Add this for view contexts too
-          "new-chat",
+          IPC_CHANNELS.SAVE_PROMPT,
+          IPC_CHANNELS.OPEN_FORM_WINDOW,
+          IPC_CHANNELS.ENTER_PROMPT,
+          IPC_CHANNELS.INJECT_PROMPT,
+          IPC_CHANNELS.SEND_PROMPT,
+          IPC_CHANNELS.DELETE_PROMPT_BY_VALUE,
+          IPC_CHANNELS.ROW_SELECTED,
+          IPC_CHANNELS.PASTE_PROMPT,
+          IPC_CHANNELS.UPDATE_PROMPT,
+          IPC_CHANNELS.EDIT_PROMPT_READY,
+          IPC_CHANNELS.CLOSE_FORM_WINDOW,
+          IPC_CHANNELS.OPEN_EDIT_VIEW,
+          IPC_CHANNELS.CLOSE_EDIT_WINDOW,
+          IPC_CHANNELS.OPEN_CLAUDE,
+          IPC_CHANNELS.CLOSE_CLAUDE,
+          IPC_CHANNELS.OPEN_DEEPSEEK,
+          IPC_CHANNELS.CLOSE_DEEPSEEK,
+          IPC_CHANNELS.OPEN_GROK,
+          IPC_CHANNELS.CLOSE_GROK,
+          IPC_CHANNELS.OPEN_COPILOT,
+          IPC_CHANNELS.CLOSE_COPILOT,
+          IPC_CHANNELS.OPEN_CHATGPT,
+          IPC_CHANNELS.CLOSE_CHATGPT,
+          IPC_CHANNELS.OPEN_GEMINI,
+          IPC_CHANNELS.CLOSE_GEMINI,
+          IPC_CHANNELS.OPEN_LM_ARENA,
+          IPC_CHANNELS.CLOSE_LM_ARENA,
+          IPC_CHANNELS.OPEN_MODEL_SELECTION_WINDOW,
+          IPC_CHANNELS.CLOSE_MODEL_SELECTION_WINDOW,
+          IPC_CHANNELS.SAVE_DEFAULT_MODELS,
+          IPC_CHANNELS.CONTENT_COPIED, // Add this for view contexts too
+          IPC_CHANNELS.NEW_CHAT,
         ];
-        if (validChannels.includes(channel)) {
+        if (validChannels.includes(channel as any)) {
           ipcRenderer.send(channel, data);
         }
       },
       invoke: (channel: string, data?: any) => {
         const validChannels = [
-          "get-prompts",
-          "get-key-by-value",
-          "get-default-models",
-          "get-open-views",
+          IPC_CHANNELS.GET_PROMPTS,
+          IPC_CHANNELS.GET_KEY_BY_VALUE,
+          IPC_CHANNELS.GET_DEFAULT_MODELS,
+          IPC_CHANNELS.GET_OPEN_VIEWS,
         ];
-        if (validChannels.includes(channel)) {
+        if (validChannels.includes(channel as any)) {
           return ipcRenderer.invoke(channel, data);
         }
       },
       on: (channel: string, func: (...args: any[]) => void) => {
         const validChannels = [
-          "prompt-saved",
-          "on-selected",
-          "row-selected",
-          "refresh-prompt-table",
+          IPC_CHANNELS.PROMPT_SAVED,
+          IPC_CHANNELS.ON_SELECTED,
+          IPC_CHANNELS.ROW_SELECTED,
+          IPC_CHANNELS.REFRESH_PROMPT_TABLE,
         ];
-        if (validChannels.includes(channel)) {
+        if (validChannels.includes(channel as any)) {
           ipcRenderer.on(channel, (_: any, ...args: any) => func(...args));
         }
       },
@@ -93,8 +94,8 @@ if (hasContextBridge && canAccessWindow) {
     // Also expose view_ipcRenderer for external sites
     view_ipcRenderer: {
       send: (channel: string, data?: any) => {
-        const validChannels = ["content-copied"];
-        if (validChannels.includes(channel)) {
+        const validChannels = [IPC_CHANNELS.CONTENT_COPIED];
+        if (validChannels.includes(channel as any)) {
           ipcRenderer.send(channel, data);
         }
       },
