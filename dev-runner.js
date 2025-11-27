@@ -21,7 +21,7 @@ function runApp() {
   });
 
   buildProcess.on('close', (code) => {
-    if (code !== 0) {
+  if (code !== 0) {
       console.error('❌ Build failed!');
       process.exit(1);
     }
