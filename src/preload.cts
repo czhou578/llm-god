@@ -62,6 +62,7 @@ if (hasContextBridge && canAccessWindow) {
           "save-default-models",
           "content-copied", // Add this for view contexts too
           "paste-image",
+          "new-chat",
         ];
         if (validChannels.includes(channel)) {
           ipcRenderer.send(channel, data);

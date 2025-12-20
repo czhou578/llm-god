@@ -14,7 +14,7 @@ import {
   injectPromptIntoView,
   sendPromptInView,
   stripEmojis, // Add this import
-  injectImageIntoView,
+  openNewChatInView,
 } from "./utilities.js"; // Adjusted path
 import { createRequire } from "node:module"; // Import createRequire
 import { fileURLToPath } from "node:url"; // Import fileURLToPath
@@ -47,7 +47,11 @@ const __dirname = path.dirname(__filename);
 if (process.env.NODE_ENV !== "production") {
   try {
     console.log("→ electron-reload is active");
-    require("electron-reload")(path.join(__dirname, "."));
+    // Watch the project root directory instead of dist
+    require("electron-reload")(path.join(__dirname, ".."), {
+      electron: path.join(__dirname, "..", "node_modules", ".bin", "electron"),
+      hardResetMethod: "exit",
+    });
   } catch (e) {
     // electron-reload not available in production, skip it
   }
@@ -265,6 +269,27 @@ app.whenReady().then(() => {
 
 app.on("window-all-closed", () => {
   if (process.platform !== "darwin") app.quit();
+});
+
+// Cleanup handler before app quits
+app.on("before-quit", () => {
+  console.log("Cleaning up resources before quit...");
+
+  // Destroy all browser views
+  views.forEach((view) => {
+    try {
+      if (mainWindow && !mainWindow.isDestroyed()) {
+        mainWindow.contentView.removeChildView(view);
+      }
+      // @ts-ignore - close() method exists but may not be in type definitions
+      if (view.webContents && !view.webContents.isDestroyed()) {
+        view.webContents.close();
+      }
+    } catch (error) {
+      console.error("Error cleaning up view on quit:", error);
+    }
+  });
+  views.length = 0;
 });
 
 ipcMain.on("open-form-window", () => {
@@ -511,6 +536,17 @@ ipcMain.on("close-gemini", (_, prompt: string) => {
   }
 });
 
+ipcMain.on("new-chat", () => {
+  console.log("New chat requested");
+  views.forEach((view) => {
+    try {
+      openNewChatInView(view); // Inject empty prompt to reset
+    } catch (error) {
+      console.error("Error resetting prompt in view:", error);
+    }
+  });
+});
+
 ipcMain.on("open-edit-view", async (_, prompt: string) => {
   console.log("Opening edit view for prompt:", prompt);
   prompt = prompt.normalize("NFKC");
@@ -655,15 +691,79 @@ ipcMain.on("save-default-models", (_, models: string[]) => {
   store.set("defaultModels", models);
   console.log("Saved default models:", models);
 
-  // Show a message and restart the app
+  // Close model selection window
   if (modelSelectionWindow) {
     modelSelectionWindow.close();
     modelSelectionWindow = null;
   }
 
+  // Cleanup: destroy all browser views before reload
+  console.log("Cleaning up browser views before reload...");
+  views.forEach((view) => {
+    try {
+      mainWindow.contentView.removeChildView(view);
+      // @ts-ignore - close() method exists but may not be in type definitions
+      if (view.webContents && !view.webContents.isDestroyed()) {
+        view.webContents.close();
+      }
+    } catch (error) {
+      console.error("Error cleaning up view:", error);
+    }
+  });
+  views.length = 0; // Clear the views array
+
+  // Close all other windows
+  if (formWindow && !formWindow.isDestroyed()) {
+    formWindow.close();
+    formWindow = null;
+  }
+
+  console.log("Recreating browser views with new models...");
+
+  // Reload the websites array with new models
+  const newWebsites = store.get("defaultModels") as string[];
+
+  // Recreate the browser views with new models
+  const bounds = mainWindow.getBounds();
+  const viewWidth = Math.floor(bounds.width / newWebsites.length);
+  const viewHeight = getViewHeight(bounds.height);
+
+  newWebsites.forEach((url: string, index: number) => {
+    const view = new WebContentsView({
+      webPreferences: {
+        nodeIntegration: false,
+        contextIsolation: true,
+        preload: path.join(__dirname, "..", "dist", "preload.cjs"),
+      },
+    }) as CustomBrowserView;
+
+    view.setBackgroundColor('#000000');
+    view.id = `${url}`;
+    mainWindow.contentView.addChildView(view);
+    view.setBounds({
+      x: index * viewWidth,
+      y: 0,
+      width: viewWidth,
+      height: viewHeight,
+    });
+
+    view.webContents.setZoomFactor(1);
+    view.webContents.loadURL(url);
+    views.push(view);
+  });
+
+  console.log("Browser views recreated successfully");
   // Restart the application
-  app.relaunch();
-  app.exit(0);
+  if (process.env.NODE_ENV === "production") {
+    // In production, use relaunch
+    app.relaunch();
+    app.exit(0);
+  } else {
+    // In development with npm run dev, use special exit code
+    // The dev-runner.js will detect this and restart
+    console.log("🔄 Development mode: Closing app for auto-restart...");
+    app.exit(42); // Special exit code 42 = intentional restart
+  }
 });
 
 ipcMain.on("paste-image", (_, imageData: string) => {

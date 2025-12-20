@@ -4,7 +4,9 @@
 
 ![alt text](image-1.png)
 
-This is a desktop app for Windows machines only (currently) that allows users to simultaneously prompt multiple LLM's at once in one environment. I use this app every day, for coding or non coding purposes. It has saved me countless hours of copypasting and is just so much more efficient.
+This is a desktop app for Windows machines only\* that allows users to simultaneously prompt multiple LLM's at once in one environment. I use this app every day, for coding or non coding purposes. It has saved me countless hours of copypasting and is just so much more efficient.
+
+\*Linux version is currently being tested. The app is packaged for Mac but I do not have a Mac to test it on. If any Mac developers want to help test, please do! File any issues you find in the Issues tab.
 
 Currently, the following LLM web interfaces are supported:
 
@@ -33,6 +35,10 @@ Use the dropdown at the bottom right corner to add and remove LLM web consoles. 
 To launch the prompt to all the LLM's, press `Ctrl + Enter` on your keyboard
 
 If you want to close the app, press `Ctrl + W` on your keyboard.
+
+**Important Note:** If you experience issues with the "New Chat" button, make sure your AI chat interface is set to English language. The button may not work properly in other languages.
+
+**Important Note:** You must be logged into the respective LLM web interfaces in the browserviews for the app to work properly. In the future, functionality to support usage without logging in may be added, although it is not currently a high priority.
 
 ## Disclaimer
 
@@ -90,8 +96,8 @@ When submitting pull requests, please make sure to list the changes made using b
 While developing, I liked to have the devtools of the app be visible and also have the option to have hot reloading on every save.
 For hot reloading, we are using the `electron-reload` package. On windows, you will need to have the `cross-env` package installed as a dev dependency to set the NODE_ENV variable properly.
 
-```npm install --save-dev cross-env
-
+```
+npm install --save-dev cross-env
 ```
 
 Then, in the `package.json` file, set the start script to the following:
@@ -116,3 +122,8 @@ Finally, in the `src/main.ts` file, uncomment the following code to open the dev
 - 5/17: Migrated to using TypeScript across the app.
 - 6/15: Added support for LMArena and also for adding custom prompts that can be saved.
 - 10/10: Removed support for Perplexity and LMArena (due to incompatibility) and added more contextual searching for JavaScript injection logic. Added Copilot support.
+- 11/22: Fixed bug with Grok injection, added unit testing for all files, new chat button support, multi-platform build workflows, and dark mode have been added.
+
+## Star History
+
+[![Star History Chart](https://api.star-history.com/svg?repos=czhou578/llm-god&type=date&legend=top-left)](https://www.star-history.com/#czhou578/llm-god&type=date&legend=top-left)

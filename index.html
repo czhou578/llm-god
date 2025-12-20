@@ -7,6 +7,7 @@
       content="default-src 'self'; style-src 'self' 'unsafe-inline';"
     />
     <title>Multi-LLM Interface</title>
+    <link rel="stylesheet" href="src/styles/tooltips.css" />
     <style>
       /* Critical CSS - Prevent white flash by defaulting to dark theme */
       html {
@@ -137,13 +138,15 @@
         gap: 10px;
       }
 
-      .theme-toggle {
+      .theme-toggle,
+      .new-chat-toggle {
         width: 40px;
         height: 40px;
         font-size: 20px;
         padding: 5px;
         border-radius: 50%;
         align-self: center;
+        margin-top: 5px;
       }
 
       .dropdown,
@@ -158,7 +161,8 @@
       .prompt-select,
       .model-select,
       .diff-select,
-      .theme-toggle {
+      .theme-toggle,
+      .new-chat-toggle {
         width: 100%;
         height: 50px;
         font-size: 18px;
@@ -181,7 +185,8 @@
       #prompt-area.dark-mode .prompt-select,
       #prompt-area.dark-mode .model-select,
       #prompt-area.dark-mode .diff-select,
-      #prompt-area.dark-mode .theme-toggle {
+      #prompt-area.dark-mode .theme-toggle,
+      #prompt-area.dark-mode .new-chat-toggle {
         background-color: #2d2d2d;
         color: #e0e0e0;
         border-color: #444;
@@ -191,7 +196,8 @@
       #prompt-area:not(.dark-mode) .prompt-select,
       #prompt-area:not(.dark-mode) .model-select,
       #prompt-area:not(.dark-mode) .diff-select,
-      #prompt-area:not(.dark-mode) .theme-toggle {
+      #prompt-area:not(.dark-mode) .theme-toggle,
+      #prompt-area:not(.dark-mode) .new-chat-toggle {
         background-color: #f0f0f0 !important;
         color: #333 !important;
         border-color: #ccc !important;
@@ -304,10 +310,40 @@
           0 chars / 0 words
         </div>
       </div>
-      <button class="theme-toggle">🌙</button>
+      <div
+        style="
+          display: flex;
+          flex-direction: column;
+          gap: 10px;
+          align-items: center;
+        "
+      >
+        <div class="tooltip-container">
+          <button class="new-chat-toggle">➕</button>
+          <span class="tooltip" role="tooltip"
+            >Open New Chat In Displayed Windows</span
+          >
+        </div>
+        <div class="tooltip-container">
+          <button class="theme-toggle" aria-label="Toggle light/dark theme">
+            🌙
+          </button>
+          <span class="tooltip" role="tooltip">Toggle light/dark theme</span>
+        </div>
+      </div>
       <div class="button-group">
         <div class="dropdown">
-          <button id="dropdown-button">Show Models ▼</button>
+          <div class="tooltip-container">
+            <button
+              id="dropdown-button"
+              aria-label="Show or hide AI model chats"
+            >
+              Show Models ▼
+            </button>
+            <span class="tooltip" role="tooltip"
+              >Show or hide AI model chats</span
+            >
+          </div>
           <div class="dropdown-content">
             <div class="dropdown-item" id="showChatGPT">Hide ChatGPT</div>
             <div class="dropdown-item" id="showGemini">Hide Gemini</div>
@@ -318,10 +354,30 @@
           </div>
         </div>
         <div class="prompt-picker">
-          <button class="prompt-select">Select Prompts</button>
+          <div class="tooltip-container">
+            <button
+              class="prompt-select"
+              aria-label="Choose from saved prompts"
+            >
+              Select Prompts
+            </button>
+            <span class="tooltip" role="tooltip"
+              >Choose from saved prompts</span
+            >
+          </div>
         </div>
         <div class="model-picker">
-          <button class="model-select">Default Models</button>
+          <div class="tooltip-container">
+            <button
+              class="model-select"
+              aria-label="Configure default AI models"
+            >
+              Default Models
+            </button>
+            <span class="tooltip" role="tooltip"
+              >Configure default AI models</span
+            >
+          </div>
         </div>
       </div>
     </div>
