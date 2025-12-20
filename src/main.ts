@@ -15,6 +15,7 @@ import {
   sendPromptInView,
   stripEmojis, // Add this import
   openNewChatInView,
+  injectImageIntoView
 } from "./utilities.js"; // Adjusted path
 import { createRequire } from "node:module"; // Import createRequire
 import { fileURLToPath } from "node:url"; // Import fileURLToPath
