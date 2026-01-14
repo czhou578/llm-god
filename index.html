@@ -1,386 +1,467 @@
 <!doctype html>
 <html>
-  <head>
-    <meta charset="utf-8" />
-    <meta
-      http-equiv="Content-Security-Policy"
-      content="default-src 'self'; style-src 'self' 'unsafe-inline';"
-    />
-    <title>Multi-LLM Interface</title>
-    <link rel="stylesheet" href="src/styles/tooltips.css" />
-    <style>
-      /* Critical CSS - Prevent white flash by defaulting to dark theme */
-      html {
-        background-color: #000000;
-      }
-      body {
-        background-color: #000000;
-        color: #e0e0e0;
-        margin: 0;
-        padding: 0;
-      }
-      #prompt-area {
-        background-color: #1e1e1e !important;
-        color: #e0e0e0 !important;
-      }
-      #prompt-input {
-        background-color: #2d2d2d !important;
-        color: #e0e0e0 !important;
-        border: 1px solid #444 !important;
-      }
-      #dropdown-button,
-      .prompt-select,
-      .model-select,
-      .diff-select,
-      .theme-toggle {
-        background-color: #2d2d2d !important;
-        color: #e0e0e0 !important;
-        border-color: #444 !important;
-      }
-      .dropdown-content {
-        background-color: #2d2d2d !important;
-        border-color: #0078d7 !important;
-      }
-      .dropdown-item {
-        background-color: #3a3a3a !important;
-        color: #e0e0e0 !important;
-      }
-      #no-chats-header {
-        color: #999 !important;
-      }
-    </style>
-    <style>
-      * {
-        margin: 0;
-        padding: 0;
-        box-sizing: border-box;
-      }
 
-      body {
-        display: flex;
-        flex-direction: column;
-        justify-content: flex-end;
-        height: 100vh;
-        margin: 0;
-        position: relative; /* Add this to create positioning context */
-      }
+<head>
+  <meta charset="utf-8" />
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; style-src 'self' 'unsafe-inline';" />
+  <title>Multi-LLM Interface</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="src/styles/tooltips.css" />
+  <style>
+    html {
+      background-color: #1a1a2e;
+      font-family: 'Outfit', sans-serif;
+    }
 
-      /* Add styling for the centered header */
-      #no-chats-header {
-        position: absolute;
-        top: 50%;
-        left: 50%;
-        transform: translate(-50%, -50%);
-        font-size: 24px;
-        color: #666;
-        text-align: center;
-        pointer-events: none; /* Makes it non-interactive */
-        z-index: 1; /* Ensures it's below the prompt area */
-      }
+    body {
+      background-color: #1a1a2e;
+      color: #e0e0e0;
+      margin: 0;
+      padding: 0;
+      font-family: 'Outfit', sans-serif;
+    }
 
-      #prompt-area {
-        display: grid;
-        grid-template-columns: 1fr auto auto;
-        gap: 15px;
-        height: auto;
-        padding: 10px;
-        min-height: 180px;
-        max-height: 50%;
-        position: relative;
-        align-items: center;
-        z-index: 10; /* Ensure prompt area is above the header */
-        transition:
-          background-color 0.3s,
-          color 0.3s;
-      }
+    #prompt-area {
+      background-color: #1a1a2e !important;
+      color: #e0e0e0 !important;
+    }
 
-      #prompt-area.dark-mode {
-        background-color: #1e1e1e;
-        color: #e0e0e0;
-      }
+    #prompt-input {
+      background-color: #16213e !important;
+      color: #e0e0e0 !important;
+      border: 2px solid #0f3460 !important;
+    }
 
-      /* Light mode overrides - restore light theme when dark-mode is removed */
-      #prompt-area:not(.dark-mode) {
-        background-color: #f0f0f0 !important;
-        color: #333 !important;
-      }
+    #dropdown-button,
+    .prompt-select,
+    .model-select,
+    .diff-select,
+    .theme-toggle,
+    .new-chat-toggle,
+    .send-button {
+      background-color: #16213e !important;
+      color: #e0e0e0 !important;
+      border-color: #1f3a5f !important;
+    }
 
-      #prompt-input {
-        padding: 10px;
-        font-size: 30px;
-        font-family: "Times New Roman", Times, serif;
-        line-height: 1.5;
-        width: 100%;
-        height: 100%;
-        transition:
-          background-color 0.3s,
-          color 0.3s,
-          border-color 0.3s;
-      }
+    .dropdown-content {
+      background-color: #16213e !important;
+      border-color: #1f3a5f !important;
+    }
 
-      #prompt-area.dark-mode #prompt-input {
-        background-color: #2d2d2d;
-        color: #e0e0e0;
-        border: 1px solid #444;
-      }
+    .dropdown-item {
+      background-color: transparent !important;
+      color: #e0e0e0 !important;
+    }
 
-      #prompt-area:not(.dark-mode) #prompt-input {
-        background-color: white !important;
-        color: #333 !important;
-        border: 1px solid #ccc !important;
-      }
+    #no-chats-header {
+      color: #94a3b8 !important;
+    }
+  </style>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
 
-      .button-group {
-        display: flex;
-        flex-direction: column;
-        align-items: flex-start;
-        width: 180px;
-        gap: 10px;
-      }
+    body {
+      margin: 0;
+      padding-bottom: 260px;
+      position: relative;
+      overflow: auto;
+    }
 
-      .theme-toggle,
-      .new-chat-toggle {
-        width: 40px;
-        height: 40px;
-        font-size: 20px;
-        padding: 5px;
-        border-radius: 50%;
-        align-self: center;
-        margin-top: 5px;
-      }
+    #no-chats-header {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      font-size: 20px;
+      font-weight: 500;
+      color: #999;
+      text-align: center;
+      pointer-events: none;
+      z-index: 1;
+      letter-spacing: 0.5px;
+    }
 
-      .dropdown,
-      .prompt-picker,
-      .model-picker,
-      .diff {
-        width: 100%;
-        position: relative;
-      }
+    #prompt-area {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      display: grid;
+      grid-template-columns: 1fr auto auto;
+      gap: 20px;
+      height: auto;
+      padding: 24px;
+      min-height: 120px;
+      /* Reduced from 200px */
+      z-index: 9999;
+    }
 
-      #dropdown-button,
-      .prompt-select,
-      .model-select,
-      .diff-select,
-      .theme-toggle,
-      .new-chat-toggle {
-        width: 100%;
-        height: 50px;
-        font-size: 18px;
-        padding: 10px;
-        border: 2px solid #ccc;
-        border-radius: 4px;
-        background-color: #f0f0f0;
-        cursor: pointer;
-        box-sizing: border-box;
-        display: block;
-        text-align: center;
-        font-weight: bold;
-        transition:
-          background-color 0.3s,
-          color 0.3s,
-          border-color 0.3s;
-      }
+    #prompt-area.dark-mode {
+      background-color: #1a1a2e;
+      color: #e0e0e0;
+      box-shadow: 0 -4px 24px rgba(0, 0, 0, 0.3);
+    }
 
-      #prompt-area.dark-mode #dropdown-button,
-      #prompt-area.dark-mode .prompt-select,
-      #prompt-area.dark-mode .model-select,
-      #prompt-area.dark-mode .diff-select,
-      #prompt-area.dark-mode .theme-toggle,
-      #prompt-area.dark-mode .new-chat-toggle {
-        background-color: #2d2d2d;
-        color: #e0e0e0;
-        border-color: #444;
-      }
+    #prompt-area:not(.dark-mode) {
+      background-color: #ffffff !important;
+      color: #1a1a2e !important;
+      box-shadow: 0 -4px 24px rgba(0, 0, 0, 0.08);
+    }
 
-      #prompt-area:not(.dark-mode) #dropdown-button,
-      #prompt-area:not(.dark-mode) .prompt-select,
-      #prompt-area:not(.dark-mode) .model-select,
-      #prompt-area:not(.dark-mode) .diff-select,
-      #prompt-area:not(.dark-mode) .theme-toggle,
-      #prompt-area:not(.dark-mode) .new-chat-toggle {
-        background-color: #f0f0f0 !important;
-        color: #333 !important;
-        border-color: #ccc !important;
-      }
+    #prompt-input {
+      padding: 20px;
+      font-size: 16px;
+      font-family: 'Outfit', sans-serif;
+      line-height: 1.6;
+      width: 100%;
+      height: 100%;
+      border-radius: 12px;
+      resize: none;
+    }
 
-      .dropdown-content {
-        display: none;
-        position: absolute;
-        top: 100%;
-        left: 5%;
-        width: 90%;
-        background-color: #f9f9f9;
-        box-shadow: 0px 8px 16px 0px rgba(0, 0, 0, 0.2);
-        border: 2px solid #0078d7;
-        border-radius: 8px;
-        padding: 4px;
-        max-height: 110px;
-        overflow-y: auto;
-        z-index: 1000;
-      }
+    #prompt-area.dark-mode #prompt-input {
+      background-color: #16213e;
+      color: #e0e0e0;
+      border: 2px solid #0f3460;
+    }
 
-      .dropdown-item {
-        width: 100%;
-        padding: 8px;
-        text-decoration: none;
-        display: block;
-        cursor: pointer;
-        font-weight: bold;
-        background-color: #e6e6e6;
-        border: none;
-        text-align: left;
-        box-sizing: border-box;
-        margin: 0;
-        margin-bottom: 5px;
-        font-size: 16px;
-        transition: background-color 0.3s;
-      }
+    #prompt-input:focus {
+      outline: none;
+      border-color: #4a90e2 !important;
+      box-shadow: 0 0 0 3px rgba(74, 144, 226, 0.1);
+    }
 
-      .dropdown-item:hover {
-        background-color: #ddd;
-      }
+    #prompt-area:not(.dark-mode) #prompt-input {
+      background-color: #f8fafc !important;
+      color: #1a1a2e !important;
+      border: 2px solid #e2e8f0 !important;
+    }
 
-      #prompt-area.dark-mode .dropdown-content {
-        background-color: #2d2d2d;
-        border-color: #0078d7;
-      }
+    .button-group {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+      width: 200px;
+      gap: 12px;
+      justify-content: center;
+      /* Center buttons vertically */
+    }
 
-      #prompt-area.dark-mode .dropdown-item {
-        background-color: #3a3a3a;
-        color: #e0e0e0;
-      }
+    .theme-toggle,
+    .new-chat-toggle,
+    .send-button {
+      width: 44px;
+      height: 44px;
+      font-size: 20px;
+      padding: 0;
+      border-radius: 12px;
+      align-self: center;
+      /* removed auto margin-top */
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
 
-      #prompt-area.dark-mode .dropdown-item:hover {
-        background-color: #4a4a4a;
-      }
+    .dropdown,
+    .prompt-picker,
+    .model-picker,
+    .diff {
+      width: 100%;
+      position: relative;
+    }
 
-      #prompt-area:not(.dark-mode) .dropdown-content {
-        background-color: #f9f9f9 !important;
-        border-color: #0078d7 !important;
-      }
+    #dropdown-button,
+    .prompt-select,
+    .model-select,
+    .diff-select,
+    .theme-toggle,
+    .new-chat-toggle,
+    .send-button {
+      width: 100%;
+      height: 48px;
+      font-size: 14px;
+      font-weight: 600;
+      padding: 0 16px;
+      border: 2px solid;
+      border-radius: 10px;
+      background-color: #f8fafc;
+      color: #475569;
+      cursor: pointer;
+      box-sizing: border-box;
+      display: block;
+      text-align: center;
+    }
 
-      #prompt-area:not(.dark-mode) .dropdown-item {
-        background-color: #e6e6e6 !important;
-        color: #333 !important;
-      }
+    #dropdown-button,
+    .prompt-select,
+    .model-select,
+    .diff-select {
+      text-align: left;
+      justify-content: flex-start;
+    }
 
-      #prompt-area:not(.dark-mode) .dropdown-item:hover {
-        background-color: #ddd !important;
-      }
+    #prompt-area.dark-mode #dropdown-button,
+    #prompt-area.dark-mode .prompt-select,
+    #prompt-area.dark-mode .model-select,
+    #prompt-area.dark-mode .diff-select,
+    #prompt-area.dark-mode .theme-toggle,
+    #prompt-area.dark-mode .new-chat-toggle,
+    #prompt-area.dark-mode .send-button {
+      background-color: #16213e;
+      color: #e0e0e0;
+      border-color: #1f3a5f;
+    }
 
-      body:not(.dark-mode) #no-chats-header {
-        color: #666 !important;
-      }
+    #prompt-area.dark-mode #dropdown-button:hover,
+    #prompt-area.dark-mode .prompt-select:hover,
+    #prompt-area.dark-mode .model-select:hover,
+    #prompt-area.dark-mode .diff-select:hover,
+    #prompt-area.dark-mode .theme-toggle:hover,
+    #prompt-area.dark-mode .new-chat-toggle:hover,
+    #prompt-area.dark-mode .send-button:hover {
+      background-color: #1e3a5f;
+      border-color: #4a90e2;
+    }
 
-      .prompt-picker,
-      .model-picker {
-        margin: 0;
-      }
+    #prompt-area:not(.dark-mode) #dropdown-button,
+    #prompt-area:not(.dark-mode) .prompt-select,
+    #prompt-area:not(.dark-mode) .model-select,
+    #prompt-area:not(.dark-mode) .diff-select,
+    #prompt-area:not(.dark-mode) .theme-toggle,
+    #prompt-area:not(.dark-mode) .new-chat-toggle,
+    #prompt-area:not(.dark-mode) .send-button {
+      background-color: #f8fafc !important;
+      color: #475569 !important;
+      border-color: #cbd5e1 !important;
+    }
 
-      .show {
-        display: block;
-        position: absolute;
-      }
-    </style>
-    <script type="module" src="./dist/renderer.js"></script>
-  </head>
+    #prompt-area:not(.dark-mode) #dropdown-button:hover,
+    #prompt-area:not(.dark-mode) .prompt-select:hover,
+    #prompt-area:not(.dark-mode) .model-select:hover,
+    #prompt-area:not(.dark-mode) .diff-select:hover,
+    #prompt-area:not(.dark-mode) .theme-toggle:hover,
+    #prompt-area:not(.dark-mode) .new-chat-toggle:hover,
+    #prompt-area:not(.dark-mode) .send-button:hover {
+      background-color: #e2e8f0 !important;
+      border-color: #94a3b8 !important;
+    }
 
-  <body>
-    <!-- Move the header outside prompt-area and give it an ID -->
-    <h2 id="no-chats-header">No Chats Shown. Please add a Chat</h2>
+    .dropdown-content {
+      display: none;
+      position: absolute;
+      top: 100%;
+      /* Open downwards */
+      left: 0;
+      width: 100%;
+      background-color: #ffffff;
+      box-shadow: 0 10px 40px rgba(0, 0, 0, 0.15);
+      border: 1px solid #e2e8f0;
+      border-radius: 12px;
+      padding: 8px;
+      max-height: 150px;
+      /* Limit height to fit better */
+      overflow-y: auto;
+      z-index: 1000;
+      margin-top: 8px;
+      /* Spacing from button */
+    }
 
-    <div id="prompt-area">
-      <div style="position: relative; width: 100%; height: 100%">
-        <textarea
-          id="prompt-input"
-          rows="3"
-          placeholder="Press Ctrl + Enter to send prompt"
-        ></textarea>
-        <div
-          id="char-counter"
-          style="
+    .dropdown-item {
+      width: 100%;
+      padding: 12px 16px;
+      text-decoration: none;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      cursor: pointer;
+      font-weight: 500;
+      font-size: 14px;
+      border-radius: 8px;
+      margin: 0;
+      margin-bottom: 4px;
+      color: #475569;
+    }
+
+    .status-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      flex-shrink: 0;
+    }
+
+    .status-dot.active {
+      background-color: #10b981;
+      box-shadow: 0 0 8px rgba(16, 185, 129, 0.4);
+    }
+
+    .status-dot.inactive {
+      background-color: #ef4444;
+      opacity: 0.6;
+    }
+
+    .dropdown-item:hover {
+      background-color: #f1f5f9;
+      color: #1a1a2e;
+    }
+
+    #prompt-area.dark-mode .dropdown-content {
+      background-color: #16213e;
+      border-color: #1f3a5f;
+    }
+
+    #prompt-area.dark-mode .dropdown-item {
+      background-color: transparent;
+      color: #e0e0e0;
+    }
+
+    #prompt-area.dark-mode .dropdown-item:hover {
+      background-color: #1e3a5f;
+      color: #ffffff;
+    }
+
+    #prompt-area:not(.dark-mode) .dropdown-content {
+      background-color: #ffffff !important;
+      border-color: #e2e8f0 !important;
+    }
+
+    #prompt-area:not(.dark-mode) .dropdown-item {
+      background-color: transparent !important;
+      color: #475569 !important;
+    }
+
+    #prompt-area:not(.dark-mode) .dropdown-item:hover {
+      background-color: #f1f5f9 !important;
+      color: #1a1a2e !important;
+    }
+
+    body:not(.dark-mode) #no-chats-header {
+      color: #94a3b8 !important;
+    }
+
+    #char-counter {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Inter",
+        Roboto, sans-serif;
+      font-size: 13px;
+      font-weight: 500;
+      color: #94a3b8;
+    }
+
+    .prompt-picker,
+    .model-picker {
+      margin: 0;
+    }
+
+    .show {
+      display: block;
+      /* position: absolute; should not override relative positioning of container if used differently */
+    }
+  </style>
+  <script type="module" src="./dist/renderer.js"></script>
+</head>
+
+<body>
+  <!-- Move the header outside prompt-area and give it an ID -->
+  <h2 id="no-chats-header">No Chats Shown. Please add a Chat</h2>
+
+  <div id="prompt-area">
+    <div style="position: relative; width: 100%; height: 100%">
+      <textarea id="prompt-input" rows="3" placeholder="Press Ctrl + Enter to send prompt"></textarea>
+      <div id="char-counter" style="
             position: absolute;
             bottom: 5px;
             right: 10px;
             font-size: 12px;
             opacity: 0.6;
             pointer-events: none;
-          "
-        >
-          0 chars / 0 words
-        </div>
+          ">
+        0 chars / 0 words
       </div>
-      <div
-        style="
+    </div>
+    <div style="
           display: flex;
           flex-direction: column;
           gap: 10px;
           align-items: center;
-        "
-      >
+          justify-content: center; /* Center small buttons */
+        ">
+      <div class="tooltip-container">
+        <button class="new-chat-toggle">➕</button>
+        <span class="tooltip" role="tooltip">Open New Chat In Displayed Windows</span>
+      </div>
+      <div class="tooltip-container">
+        <button class="theme-toggle" aria-label="Toggle light/dark theme">
+          🌙
+        </button>
+        <span class="tooltip" role="tooltip">Toggle light/dark theme</span>
+      </div>
+      <div class="tooltip-container">
+        <button class="send-button" aria-label="Send prompt to all windows">
+          🚀
+        </button>
+        <span class="tooltip" role="tooltip">Send prompt to all windows</span>
+      </div>
+    </div>
+    <div class="button-group">
+      <div class="dropdown">
         <div class="tooltip-container">
-          <button class="new-chat-toggle">➕</button>
-          <span class="tooltip" role="tooltip"
-            >Open New Chat In Displayed Windows</span
-          >
-        </div>
-        <div class="tooltip-container">
-          <button class="theme-toggle" aria-label="Toggle light/dark theme">
-            🌙
+          <button id="dropdown-button" aria-label="Show or hide AI model chats">
+            Show Models ▼
           </button>
-          <span class="tooltip" role="tooltip">Toggle light/dark theme</span>
+          <span class="tooltip" role="tooltip">Show or hide AI model chats</span>
+        </div>
+        <div class="dropdown-content">
+          <div class="dropdown-item" id="showChatGPT" data-active="false">
+            <span class="status-dot inactive"></span>
+            <span class="label">ChatGPT</span>
+          </div>
+          <div class="dropdown-item" id="showGemini" data-active="false">
+            <span class="status-dot inactive"></span>
+            <span class="label">Gemini</span>
+          </div>
+          <div class="dropdown-item" id="showClaude" data-active="false">
+            <span class="status-dot inactive"></span>
+            <span class="label">Claude</span>
+          </div>
+          <div class="dropdown-item" id="showGrok" data-active="false">
+            <span class="status-dot inactive"></span>
+            <span class="label">Grok</span>
+          </div>
+          <div class="dropdown-item" id="showDeepSeek" data-active="false">
+            <span class="status-dot inactive"></span>
+            <span class="label">DeepSeek</span>
+          </div>
+          <div class="dropdown-item" id="showCopilot" data-active="false">
+            <span class="status-dot inactive"></span>
+            <span class="label">Copilot</span>
+          </div>
         </div>
       </div>
-      <div class="button-group">
-        <div class="dropdown">
-          <div class="tooltip-container">
-            <button
-              id="dropdown-button"
-              aria-label="Show or hide AI model chats"
-            >
-              Show Models ▼
-            </button>
-            <span class="tooltip" role="tooltip"
-              >Show or hide AI model chats</span
-            >
-          </div>
-          <div class="dropdown-content">
-            <div class="dropdown-item" id="showChatGPT">Hide ChatGPT</div>
-            <div class="dropdown-item" id="showGemini">Hide Gemini</div>
-            <div class="dropdown-item" id="showClaude">Show Claude</div>
-            <div class="dropdown-item" id="showGrok">Show Grok</div>
-            <div class="dropdown-item" id="showDeepSeek">Show DeepSeek</div>
-            <div class="dropdown-item" id="showCopilot">Show Copilot</div>
-          </div>
+      <div class="prompt-picker">
+        <div class="tooltip-container">
+          <button class="prompt-select" aria-label="Choose from saved prompts">
+            Select Prompts
+          </button>
+          <span class="tooltip" role="tooltip">Choose from saved prompts</span>
         </div>
-        <div class="prompt-picker">
-          <div class="tooltip-container">
-            <button
-              class="prompt-select"
-              aria-label="Choose from saved prompts"
-            >
-              Select Prompts
-            </button>
-            <span class="tooltip" role="tooltip"
-              >Choose from saved prompts</span
-            >
-          </div>
-        </div>
-        <div class="model-picker">
-          <div class="tooltip-container">
-            <button
-              class="model-select"
-              aria-label="Configure default AI models"
-            >
-              Default Models
-            </button>
-            <span class="tooltip" role="tooltip"
-              >Configure default AI models</span
-            >
-          </div>
+      </div>
+      <div class="model-picker">
+        <div class="tooltip-container">
+          <button class="model-select" aria-label="Configure default AI models">
+            Default Models
+          </button>
+          <span class="tooltip" role="tooltip">Configure default AI models</span>
         </div>
       </div>
     </div>
-  </body>
-  <script type="module" src="./dist/dropdown.js"></script>
+  </div>
+</body>
+<script type="module" src="./dist/dropdown.js"></script>
+
 </html>

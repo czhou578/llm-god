@@ -45,7 +45,7 @@ export function addBrowserView(
       x: index * viewWidth,
       y: 0,
       width: viewWidth,
-      height: height - 235,
+      height: height - 280,
     });
   });
 
@@ -53,7 +53,7 @@ export function addBrowserView(
     x: (websites.length - 1) * viewWidth,
     y: 0,
     width: viewWidth,
-    height: height - 235,
+    height: height - 280,
   });
 
   view.webContents.setZoomFactor(1.5);
@@ -94,7 +94,7 @@ export function removeBrowserView(
       x: index * viewWidth,
       y: 0,
       width: viewWidth,
-      height: height - 235,
+      height: height - 280,
     });
   });
 }
@@ -404,13 +404,26 @@ export function injectPromptIntoView(
         `);
   } else if (view.id && view.id.match("grok")) {
     view.webContents.executeJavaScript(`
-            {
-                var inputElement = document.querySelector('div.ProseMirror > p');
-                if (inputElement) {
-                    inputElement.innerHTML = \`${escapedPrompt}\`;
+        {
+            var inputElement = document.querySelector('textarea');
+            if (!inputElement) {
+                // Try finding contenteditable div (Lexical editor)
+                inputElement = document.querySelector('div[contenteditable="true"]');
+            }
+            if (inputElement) {
+                if (inputElement.tagName === 'TEXTAREA') {
+                    // TextArea approach
+                    var nativeTextAreaValueSetter = Object.getOwnPropertyDescriptor(window.HTMLTextAreaElement.prototype, "value").set;
+                    nativeTextAreaValueSetter.call(inputElement, \`${escapedPrompt}\`);
+                    inputElement.dispatchEvent(new Event('input', { bubbles: true }));
+                } else {
+                    // ContentEditable approach
+                    inputElement.innerHTML = \`<p>${escapedPrompt}</p>\`;
+                    inputElement.dispatchEvent(new Event('input', { bubbles: true }));
                 }
             }
-        `);
+        }
+    `);
   } else if (view.id && view.id.match("deepseek")) {
     view.webContents.executeJavaScript(`
             {
@@ -493,75 +506,96 @@ export function sendPromptInView(view: CustomBrowserView) {
     `);
   } else if (view.id && view.id.match("claude")) {
     view.webContents.executeJavaScript(`
-      (function() {
-        var btn = document.querySelector("button[aria-label*='Send message']");
-        if (!btn) btn = document.querySelector("button[aria-label*='Send Message']");
-        if (!btn) btn = document.querySelector('button:has(div svg)');
-        if (!btn) btn = document.querySelector('button:has(svg)');
-        if (!btn) {
-          const inputArea = document.querySelector('[contenteditable="true"]');
-          if (inputArea) {
-            const container = inputArea.closest('div[class*="composer"]') || inputArea.closest('form') || inputArea.parentElement;
-            if (container) {
-              const buttons = container.querySelectorAll('button');
-              btn = Array.from(buttons).find(b => {
-                const svg = b.querySelector('svg');
-                return svg && !b.disabled;
-              });
-            }
+      (function () {
+          // 1. Try standard button selectors
+          var btn = document.querySelector('button[aria-label="Send message"]');
+          // Fallback to the specific class patterns seen in the DOM
+          if (!btn) btn = document.querySelector('button[class*="Button_claude"]');
+          
+          if (!btn) {
+             // Fallback to broader search
+             const buttons = Array.from(document.querySelectorAll('button'));
+             btn = buttons.find(b => {
+                 const label = b.getAttribute('aria-label');
+                 return label === 'Send message';
+             });
           }
-        }
 
-        if (btn) {
-          btn.disabled = false;
-          btn.click();
-        }
+          if (btn) {
+             console.log("Claude: Found button, clicking...");
+             btn.disabled = false;
+             
+             // Dispatch full sequence of events for React
+             const mouseClick = new MouseEvent('click', {
+                 bubbles: true,
+                 cancelable: true,
+                 view: window
+             });
+             btn.dispatchEvent(mouseClick);
+             
+          } else {
+              console.log("Claude: Button not found, using Enter key fallback...");
+              const editor = document.querySelector('div[contenteditable="true"]');
+              if (editor) {
+                  editor.focus();
+                  
+                  const enterEvent = new KeyboardEvent('keydown', {
+                      key: 'Enter',
+                      code: 'Enter',
+                      keyCode: 13,
+                      bubbles: true,
+                      cancelable: true,
+                      shiftKey: false,
+                      ctrlKey: false
+                  });
+                  editor.dispatchEvent(enterEvent);
+              }
+          }
       })();
     `);
   } else if (view.id && view.id.match("grok")) {
     view.webContents.executeJavaScript(`
-      (function() {
-        const textarea = document.querySelector('textarea');
-        var btn = document.querySelector('button[aria-label*="Submit"]');
-        if (!btn) btn = document.querySelector('button[aria-label*="Send"]');
-        if (!btn) btn = document.querySelector('button[data-testid="send-button"]');
-        if (!btn && textarea) {
-          const form = textarea.closest('form');
-          if (form) {
-            const buttons = form.querySelectorAll('button');
-            btn = Array.from(buttons).find(b => {
-              const svg = b.querySelector('svg');
-              return svg && !b.disabled;
-            });
-          }
-        }
+      (function () {
+         const textarea = document.querySelector('textarea');
+         const contentEditable = document.querySelector('div[contenteditable="true"]');
+         
+         // 1. Try button click
+         const allButtons = Array.from(document.querySelectorAll('button'));
+         // Look for primary submit buttons or ones with specific aria labels
+         const btn = allButtons.find(b => {
+             const label = (b.getAttribute('aria-label') || '').toLowerCase();
+             return !b.disabled && (label === 'send' || label === 'submit' || label === 'grok');
+         });
 
-        if (btn) {
-          btn.disabled = false;
-          btn.click();
+         if (btn) {
+             console.log("Grok: Found button, clicking...");
+             btn.click();
+             return;
+         }
 
-          setTimeout(() => {
-            const clickEvent = new MouseEvent('click', {
-              bubbles: true,
-              cancelable: true,
-              view: window
-            });
-            btn.dispatchEvent(clickEvent);
-          }, 50);
-
-          if (textarea) {
-            setTimeout(() => {
-              const enterEvent = new KeyboardEvent('keydown', {
+         // 2. Fallback: Enter key on TextArea
+         if (textarea) {
+             console.log("Grok: Dispatching Enter on TextArea...");
+             textarea.focus();
+             textarea.dispatchEvent(new KeyboardEvent('keydown', {
                 key: 'Enter',
                 code: 'Enter',
                 keyCode: 13,
-                bubbles: true,
-                cancelable: true
-              });
-              textarea.dispatchEvent(enterEvent);
-            }, 100);
-          }
-        }
+                bubbles: true
+             }));
+         }
+         
+         // 3. Fallback: Enter key on ContentEditable
+         if (contentEditable) {
+            console.log("Grok: Dispatching Enter on ContentEditable...");
+            contentEditable.focus();
+            contentEditable.dispatchEvent(new KeyboardEvent('keydown', {
+                key: 'Enter',
+                code: 'Enter',
+                keyCode: 13,
+                bubbles: true
+             }));
+         }
       })();
     `);
   } else if (view.id && view.id.match("deepseek")) {
@@ -688,7 +722,7 @@ export function injectImageIntoView(
   if (view.id && view.id.match("chatgpt")) {
     view.webContents.executeJavaScript(
       base64toBlobFnString +
-        `
+      `
         const blob = base64toBlob('${base64Data}');
         const file = new File([blob], uniqueFilename, { type: 'image/png' });
         
@@ -770,7 +804,7 @@ export function injectImageIntoView(
   ) {
     view.webContents.executeJavaScript(
       base64toBlobFnString +
-        `
+      `
         const blob = base64toBlob('${base64Data}');
         const file = new File([blob], uniqueFilename, { type: 'image/png' });
         
@@ -864,7 +898,7 @@ export function injectImageIntoView(
   } else if (view.id && view.id.match("claude")) {
     view.webContents.executeJavaScript(
       base64toBlobFnString +
-        `
+      `
         const blob = base64toBlob('${base64Data}');
         const file = new File([blob], uniqueFilename, { type: 'image/png' });
         
@@ -930,7 +964,7 @@ export function injectImageIntoView(
   } else if (view.id && view.id.match("grok")) {
     view.webContents.executeJavaScript(
       base64toBlobFnString +
-        `
+      `
         const blob = base64toBlob('${base64Data}');
         const file = new File([blob], uniqueFilename, { type: 'image/png' });
         
@@ -981,7 +1015,7 @@ export function injectImageIntoView(
   } else if (view.id && view.id.match("deepseek")) {
     view.webContents.executeJavaScript(
       base64toBlobFnString +
-        `
+      `
         const blob = base64toBlob('${base64Data}');
         const file = new File([blob], uniqueFilename, { type: 'image/png' });
         
@@ -1018,7 +1052,7 @@ export function injectImageIntoView(
   } else if (view.id && view.id.match("copilot")) {
     view.webContents.executeJavaScript(
       base64toBlobFnString +
-        `
+      `
         const blob = base64toBlob('${base64Data}');
         const file = new File([blob], uniqueFilename, { type: 'image/png' });
         
