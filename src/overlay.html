@@ -1,56 +1,63 @@
 <!doctype html>
-<html>
+<html style="background: transparent !important">
   <head>
     <style>
+      html,
       body {
         margin: 0;
-        background: transparent; /* Ensure transparency */
-      }
-      #overlay {
-        position: absolute;
-        top: 0;
-        left: 0;
-        width: 100%;
+        padding: 0;
         height: 100%;
-        z-index: 1000; /* High z-index */
-        background: rgba(
-          0,
-          0,
-          0,
-          0.5
-        ); /* Optional semi-transparent background */
-        display: flex;
-        justify-content: center;
-        align-items: center;
+        background: transparent !important;
+        overflow: hidden;
       }
-      #overlay-content {
+      .interactive {
+        pointer-events: auto; /* ensure it can receive events */
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        padding: 16px 32px;
+        background: rgba(30, 30, 50, 0.85);
         color: white;
-        padding: 20px;
-        background: #333;
-        border-radius: 5px;
+        border-radius: 12px;
+        font-size: 18px;
+        cursor: pointer;
+        user-select: none;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+      }
+      .interactive:hover {
+        background: rgba(50, 50, 80, 0.95);
       }
     </style>
   </head>
   <body>
-    <div id="overlay">
-      <div id="overlay-content">
-        <h1>Overlay Content</h1>
-        <p>This is an overlay over the BrowserView!</p>
-        <button
-          onclick="document.getElementById('overlay').style.display = 'none';"
-        >
-          Close
-        </button>
-      </div>
-    </div>
+    <button class="interactive" id="myButton">Click Me (Interactive)</button>
+
     <script>
-      // Optional: Sync position with main window
-      require("electron").ipcRenderer.on(
-        "update-position",
-        (event, position) => {
-          window.moveTo(position[0], position[1]);
-        },
-      );
+      const button = document.getElementById("myButton");
+
+      // When mouse enters the button → enable interaction
+      button.addEventListener("mouseenter", () => {
+        window.overlayAPI.setIgnoreMouse(false);
+        console.log("Overlay: mouse entered interactive area → clicks enabled");
+      });
+
+      // When mouse leaves → disable again (pass-through)
+      button.addEventListener("mouseleave", () => {
+        window.overlayAPI.setIgnoreMouse(true);
+        console.log("Overlay: mouse left → pass-through restored");
+      });
+
+      // Optional: keep enabled while actually clicking/dragging
+      button.addEventListener("mousedown", () => {
+        // You can keep enabled during click if needed
+      });
+
+      // Handle the click itself
+      button.addEventListener("click", () => {
+        alert("Button clicked! (Overlay is interactive here)");
+        // Or send IPC to main: ipcRenderer.send('button-action', ...);
+      });
     </script>
   </body>
 </html>

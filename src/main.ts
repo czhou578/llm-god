@@ -15,7 +15,7 @@ import {
   sendPromptInView,
   stripEmojis, // Add this import
   openNewChatInView,
-  injectImageIntoView
+  injectImageIntoView,
 } from "./utilities.js"; // Adjusted path
 import { createRequire } from "node:module"; // Import createRequire
 import { fileURLToPath } from "node:url"; // Import fileURLToPath
@@ -33,7 +33,7 @@ interface CustomBrowserView extends WebContentsView {
 remote.initialize();
 
 let mainWindow: BrowserWindow;
-let overlayWindow: BrowserWindow;
+let overlayWindow: WebContentsView;
 let formWindow: BrowserWindow | null; // Allow formWindow to be null
 let modelSelectionWindow: BrowserWindow | null = null;
 let pendingRowSelectedKey: string | null = null; // Store the key of the selected row for later use
@@ -74,9 +74,13 @@ const websites: string[] = getDefaultWebsites();
 function getViewHeight(windowHeight: number): number {
   // Calculate the height for browser views
   // This leaves space for the textarea and controls at the bottom
-  const controlsHeight = 235; // Height reserved for textarea and buttons (min 180px + padding 20px + buttons ~35px)
+  const controlsHeight = 280; // Height reserved for textarea and buttons (increased to prevent truncation)
   return windowHeight - controlsHeight;
 }
+
+// function updateOverlayBounds() {
+
+// }
 
 function createWindow(): void {
   mainWindow = new BrowserWindow({
@@ -95,15 +99,34 @@ function createWindow(): void {
   });
   remote.enable(mainWindow.webContents);
 
-  // Use 'ready-to-show' to display windows gracefully.
-  mainWindow.once("ready-to-show", () => {
-    mainWindow.show();
-    setTimeout(() => {
-      isInitialSetupComplete = true;
-    }, 500);
+  let overlayWindow = new BrowserWindow({
+    width: 2000, // match main window size
+    height: 1100,
+    x: mainWindow.getBounds().x,
+    y: mainWindow.getBounds().y,
+    frame: false,
+    transparent: true,
+    alwaysOnTop: true, // or parent: mainWin to keep it attached
+    resizable: false,
+    skipTaskbar: true,
+    hasShadow: false,
+    focusable: false,
+    show: false,
+    webPreferences: {
+      nodeIntegration: false,
+      contextIsolation: true,
+      preload: path.join(__dirname, "..", "dist", "preload.cjs"),
+    },
   });
 
+  overlayWindow.setBackgroundColor("#00000000");
+
   mainWindow.loadFile(path.join(__dirname, "..", "index.html"));
+  overlayWindow.webContents.loadFile(
+    path.join(__dirname, "..", "src", "overlay.html"),
+  );
+  // mainWindow.webContents.openDevTools({ mode: "detach" });
+  // overlayWindow.webContents.openDevTools({ mode: "detach" });
 
   const bounds = mainWindow.getBounds();
   const viewWidth = Math.floor(bounds.width / websites.length);
@@ -140,6 +163,17 @@ function createWindow(): void {
     views.push(view);
   });
 
+  // overlayWindow.setIgnoreMouseEvents(true, { forward: true }); // forward=true helps on Windows/macOS
+  // overlayWindow.show();
+  // Use 'ready-to-show' to display windows gracefully.
+  mainWindow.once("ready-to-show", () => {
+    mainWindow.maximize();
+    mainWindow.show();
+    setTimeout(() => {
+      isInitialSetupComplete = true;
+    }, 500);
+  });
+
   mainWindow.on("enter-full-screen", () => {
     updateZoomFactor();
     updateViewBounds(); // Update bounds when entering fullscreen
@@ -151,14 +185,53 @@ function createWindow(): void {
 
   let resizeTimeout: NodeJS.Timeout;
 
+  overlayWindow.on('show', () => console.log('Overlay shown'));
+
+  mainWindow.once("ready-to-show", () => {
+    mainWindow.maximize();
+    mainWindow.show();
+
+    // Now safe to show overlay: main has valid bounds & is visible
+    const bounds = mainWindow.getBounds();
+    overlayWindow.setBounds(bounds);
+    overlayWindow.setIgnoreMouseEvents(true, { forward: true });
+
+    // Show overlay only if main is focused (which it should be after show())
+    if (mainWindow.isFocused()) {
+      console.log("we are showing in ready to show")
+      overlayWindow.show();
+    }
+
+    setTimeout(() => {
+      isInitialSetupComplete = true;
+    }, 500);
+  });
+
   mainWindow.on("resize", () => {
+    const bounds = mainWindow.getBounds();
+    overlayWindow.setBounds(bounds);
+
     clearTimeout(resizeTimeout);
     resizeTimeout = setTimeout(() => {
       updateViewBounds(); // Use helper function
     }, 200); // Debounce to avoid too many updates
   });
 
-  // This logic has been moved up and placed inside the 'ready-to-show' event.
+  mainWindow.on("blur", () => {
+    if (overlayWindow && !overlayWindow.isDestroyed()) {
+      console.log("we are hiding overlay in blur")
+      overlayWindow.hide();
+    }
+  });
+
+  mainWindow.on("focus", () => {
+      if (overlayWindow && !overlayWindow.isDestroyed() && mainWindow.isVisible()) {
+        const bounds = mainWindow.getBounds();
+        overlayWindow.setBounds(bounds);
+        console.log("overlay show in focus")
+        overlayWindow.show();
+      }
+    });
 }
 
 async function createFormWindow() {
@@ -738,7 +811,7 @@ ipcMain.on("save-default-models", (_, models: string[]) => {
       },
     }) as CustomBrowserView;
 
-    view.setBackgroundColor('#000000');
+    view.setBackgroundColor("#000000");
     view.id = `${url}`;
     mainWindow.contentView.addChildView(view);
     view.setBounds({
