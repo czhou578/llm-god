@@ -78,22 +78,22 @@ const textArea = document.getElementById(
 ) as HTMLTextAreaElement | null;
 const openClaudeButton = document.getElementById(
   "showClaude",
-) as HTMLButtonElement | null;
+) as HTMLElement | null;
 const openGrokButton = document.getElementById(
   "showGrok",
-) as HTMLButtonElement | null;
+) as HTMLElement | null;
 const openDeepSeekButton = document.getElementById(
   "showDeepSeek",
-) as HTMLButtonElement | null;
+) as HTMLElement | null;
 const openCopilotButton = document.getElementById(
   "showCopilot",
-) as HTMLButtonElement | null;
+) as HTMLElement | null;
 const openChatGPTButton = document.getElementById(
   "showChatGPT",
-) as HTMLButtonElement | null;
+) as HTMLElement | null;
 const openGeminiButton = document.getElementById(
   "showGemini",
-) as HTMLButtonElement | null;
+) as HTMLElement | null;
 
 const promptDropdownButton = document.querySelector(
   ".prompt-select",
@@ -109,6 +109,30 @@ const newChatToggleButton = document.querySelector(
   ".new-chat-toggle",
 ) as HTMLButtonElement | null;
 
+const sendButton = document.querySelector(
+  ".send-button",
+) as HTMLButtonElement | null;
+
+// Helper to update dropdown item status
+function updateDropdownItemState(element: HTMLElement | null, isActive: boolean, modelName: string) {
+  if (!element) return;
+
+  // Update data attribute
+  element.dataset.active = isActive.toString();
+
+  // Update dot
+  const dot = element.querySelector('.status-dot');
+  if (dot) {
+    dot.className = `status-dot ${isActive ? 'active' : 'inactive'}`;
+  }
+
+  // Update label
+  const label = element.querySelector('.label');
+  if (label) {
+    label.textContent = modelName;
+  }
+}
+
 // Check if views are currently open and set initial button text
 window.addEventListener("DOMContentLoaded", async () => {
   const ipc = window.electron.ipcRenderer;
@@ -117,43 +141,37 @@ window.addEventListener("DOMContentLoaded", async () => {
   if (openChatGPTButton) {
     const isChatGPTOpen =
       openViews && openViews.some((url: string) => url.includes("chatgpt"));
-    openChatGPTButton.textContent = isChatGPTOpen
-      ? "Hide ChatGPT"
-      : "Show ChatGPT";
+    updateDropdownItemState(openChatGPTButton, isChatGPTOpen, "ChatGPT");
   }
 
   if (openGeminiButton) {
     const isGeminiOpen =
       openViews && openViews.some((url: string) => url.includes("gemini"));
-    openGeminiButton.textContent = isGeminiOpen ? "Hide Gemini" : "Show Gemini";
+    updateDropdownItemState(openGeminiButton, isGeminiOpen, "Gemini");
   }
 
   if (openClaudeButton) {
     const isClaudeOpen =
       openViews && openViews.some((url: string) => url.includes("claude"));
-    openClaudeButton.textContent = isClaudeOpen ? "Hide Claude" : "Show Claude";
+    updateDropdownItemState(openClaudeButton, isClaudeOpen, "Claude");
   }
 
   if (openGrokButton) {
     const isGrokOpen =
       openViews && openViews.some((url: string) => url.includes("grok"));
-    openGrokButton.textContent = isGrokOpen ? "Hide Grok" : "Show Grok";
+    updateDropdownItemState(openGrokButton, isGrokOpen, "Grok");
   }
 
   if (openDeepSeekButton) {
     const isDeepSeekOpen =
       openViews && openViews.some((url: string) => url.includes("deepseek"));
-    openDeepSeekButton.textContent = isDeepSeekOpen
-      ? "Hide DeepSeek"
-      : "Show DeepSeek";
+    updateDropdownItemState(openDeepSeekButton, isDeepSeekOpen, "DeepSeek");
   }
 
   if (openCopilotButton) {
     const isCopilotOpen =
       openViews && openViews.some((url: string) => url.includes("copilot"));
-    openCopilotButton.textContent = isCopilotOpen
-      ? "Hide Copilot"
-      : "Show Copilot";
+    updateDropdownItemState(openCopilotButton, isCopilotOpen, "Copilot");
   }
 
   // Load saved theme preference
@@ -169,72 +187,78 @@ window.addEventListener("DOMContentLoaded", async () => {
 
 if (openChatGPTButton) {
   openChatGPTButton.addEventListener("click", (event: MouseEvent) => {
-    if (openChatGPTButton.textContent === "Show ChatGPT") {
+    const isActive = openChatGPTButton.dataset.active === "true";
+    if (!isActive) {
       openChatGPTMessage("open chatgpt now");
-      openChatGPTButton.textContent = "Hide ChatGPT";
+      updateDropdownItemState(openChatGPTButton, true, "ChatGPT");
     } else {
       closeChatGPTMessage("close chatgpt now");
-      openChatGPTButton.textContent = "Show ChatGPT";
+      updateDropdownItemState(openChatGPTButton, false, "ChatGPT");
     }
   });
 }
 
 if (openGeminiButton) {
   openGeminiButton.addEventListener("click", (event: MouseEvent) => {
-    if (openGeminiButton.textContent === "Show Gemini") {
+    const isActive = openGeminiButton.dataset.active === "true";
+    if (!isActive) {
       openGeminiMessage("open gemini now");
-      openGeminiButton.textContent = "Hide Gemini";
+      updateDropdownItemState(openGeminiButton, true, "Gemini");
     } else {
       closeGeminiMessage("close gemini now");
-      openGeminiButton.textContent = "Show Gemini";
+      updateDropdownItemState(openGeminiButton, false, "Gemini");
     }
   });
 }
 
 if (openClaudeButton) {
   openClaudeButton.addEventListener("click", (event: MouseEvent) => {
-    if (openClaudeButton.textContent === "Show Claude") {
+    const isActive = openClaudeButton.dataset.active === "true";
+    if (!isActive) {
       openClaudeMessage("open claude now");
-      openClaudeButton.textContent = "Hide Claude";
+      updateDropdownItemState(openClaudeButton, true, "Claude");
     } else {
       closeClaudeMessage("close claude now");
-      openClaudeButton.textContent = "Show Claude";
+      updateDropdownItemState(openClaudeButton, false, "Claude");
     }
   });
 }
 
 if (openGrokButton) {
   openGrokButton.addEventListener("click", (event: MouseEvent) => {
-    if (openGrokButton.textContent === "Show Grok") {
+    const isActive = openGrokButton.dataset.active === "true";
+    if (!isActive) {
       openGrokMessage("open grok now");
-      openGrokButton.textContent = "Hide Grok";
+      updateDropdownItemState(openGrokButton, true, "Grok");
     } else {
       closeGrokMessage("close grok now");
-      openGrokButton.textContent = "Show Grok";
+      updateDropdownItemState(openGrokButton, false, "Grok");
     }
   });
 }
 
 if (openDeepSeekButton) {
   openDeepSeekButton.addEventListener("click", (event: MouseEvent) => {
-    if (openDeepSeekButton.textContent === "Show DeepSeek") {
+    const isActive = openDeepSeekButton.dataset.active === "true";
+    if (!isActive) {
       openDeepSeekMessage("open deepseek now");
-      openDeepSeekButton.textContent = "Hide DeepSeek";
+      updateDropdownItemState(openDeepSeekButton, true, "DeepSeek");
     } else {
       closeDeepSeekMessage("close deepseek now");
-      openDeepSeekButton.textContent = "Show DeepSeek";
+      updateDropdownItemState(openDeepSeekButton, false, "DeepSeek");
     }
   });
 }
 
 if (openCopilotButton) {
   openCopilotButton.addEventListener("click", (event: MouseEvent) => {
-    if (openCopilotButton.textContent === "Show Copilot") {
+    const isActive = openCopilotButton.dataset.active === "true";
+    if (!isActive) {
       openCopilotMessage("open copilot now");
-      openCopilotButton.textContent = "Hide Copilot";
+      updateDropdownItemState(openCopilotButton, true, "Copilot");
     } else {
       closeCopilotMessage("close copilot now");
-      openCopilotButton.textContent = "Show Copilot";
+      updateDropdownItemState(openCopilotButton, false, "Copilot");
     }
   });
 }
@@ -298,6 +322,22 @@ if (newChatToggleButton) {
     console.log("New chat toggle button clicked");
     event.stopPropagation();
     ipcRenderer.send("new-chat");
+  });
+}
+
+if (sendButton) {
+  sendButton.addEventListener("click", (event: MouseEvent) => {
+    console.log("Send button clicked");
+    event.stopPropagation();
+    if (textArea) {
+      const promptText = textArea.value;
+      if (promptText.trim()) {
+        console.log("Button clicked, sending prompt:", promptText);
+        ipcRenderer.send("send-prompt", promptText);
+        textArea.value = "";
+        updateCharCounter("");
+      }
+    }
   });
 }
 

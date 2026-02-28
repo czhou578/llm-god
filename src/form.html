@@ -5,19 +5,17 @@
     <title>Prompt Templates</title>
     <link rel="stylesheet" href="styles/tooltips.css" />
     <style>
-      /* Critical CSS - Prevent white flash by defaulting to dark theme */
       html {
-        background-color: #1e1e1e;
+        background-color: #1a1a2e;
       }
       body {
-        background-color: #1e1e1e;
+        background-color: #1a1a2e;
         color: #e0e0e0;
         margin: 0;
         padding: 0;
       }
-      /* Critical: Set dark background for container immediately */
       .form-container {
-        background-color: #2d2d2d !important;
+        background-color: #1a1a2e !important;
         color: #e0e0e0 !important;
       }
       .form-container h1,
@@ -25,14 +23,15 @@
         color: #e0e0e0 !important;
       }
       .form-container textarea {
-        background-color: #3a3a3a !important;
+        background-color: #16213e !important;
         color: #e0e0e0 !important;
-        border-color: #555 !important;
+        border-color: #1f3a5f !important;
       }
     </style>
     <style>
       body {
-        font-family: "Segoe UI", Arial, sans-serif;
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Inter",
+          Roboto, sans-serif;
         margin: 0;
         padding: 0;
         display: flex;
@@ -41,44 +40,39 @@
         height: 100vh;
         width: 100vw;
         overflow-x: hidden;
-        transition:
-          background-color 0.3s,
-          color 0.3s;
       }
 
-      /* Dark mode styles - apply when dark-mode class IS present */
       body.dark-mode {
-        background-color: #1e1e1e;
+        background-color: #1a1a2e;
         color: #e0e0e0;
       }
 
-      /* Light mode styles - only apply when light-mode class is present */
       body.light-mode {
-        background-color: #f0f0f0;
-        color: #333;
+        background-color: #f1f5f9;
+        color: #1a1a2e;
       }
 
       body.light-mode .form-container {
         background-color: white !important;
-        color: #333 !important;
+        color: #1a1a2e !important;
       }
 
       body.light-mode .form-container h1,
       body.light-mode .form-container h2 {
-        color: #333 !important;
+        color: #1a1a2e !important;
       }
 
       body.light-mode .form-container textarea {
-        background-color: white !important;
-        color: #333 !important;
-        border-color: #e0e0e0 !important;
+        background-color: #f8fafc !important;
+        color: #1a1a2e !important;
+        border-color: #e2e8f0 !important;
       }
 
       .form-container {
         background-color: white;
-        padding: 25px;
-        border-radius: 8px;
-        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        padding: 32px;
+        border-radius: 16px;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
         width: 100%;
         height: 100%;
         max-width: none;
@@ -86,22 +80,19 @@
         flex-direction: column;
         align-items: center;
         justify-content: flex-start;
-        transition:
-          background-color 0.3s,
-          box-shadow 0.3s;
       }
 
       body.dark-mode .form-container {
-        background-color: #2d2d2d;
-        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.5);
+        background-color: #1a1a2e;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
       }
 
       h1 {
-        color: #333;
-        margin-bottom: 20px;
-        font-size: 24px;
+        color: #1a1a2e;
+        margin-bottom: 24px;
+        font-size: 28px;
+        font-weight: 700;
         text-align: center;
-        transition: color 0.3s;
       }
 
       body.dark-mode h1 {
@@ -109,11 +100,11 @@
       }
 
       h2 {
-        color: #333;
-        margin-bottom: 15px;
-        font-size: 20px;
+        color: #1a1a2e;
+        margin-bottom: 20px;
+        font-size: 22px;
+        font-weight: 600;
         text-align: center;
-        transition: color 0.3s;
       }
 
       body.dark-mode h2 {
@@ -121,26 +112,26 @@
       }
 
       .instructions {
-        margin-bottom: 20px;
-        padding: 10px;
-        background-color: #e3f2fd;
-        border-left: 4px solid #2196f3;
-        color: #1976d2;
-        transition:
-          background-color 0.3s,
-          color 0.3s;
+        margin-bottom: 24px;
+        padding: 16px;
+        background-color: #f0f9ff;
+        border-left: 4px solid #4a90e2;
+        color: #1a5490;
         width: 90%;
         text-align: left;
+        border-radius: 0 8px 8px 0;
+        font-size: 14px;
+        font-weight: 500;
       }
 
       body.dark-mode .instructions {
-        background-color: #1a3a52;
-        color: #64b5f6;
+        background-color: #0f2744;
+        color: #7eb8ff;
       }
 
       body.light-mode .instructions {
-        background-color: #e3f2fd;
-        color: #1976d2;
+        background-color: #f0f9ff;
+        color: #1a5490;
       }
 
       form,
@@ -148,98 +139,91 @@
         display: flex;
         flex-direction: column;
         align-items: center;
-        gap: 15px;
+        gap: 20px;
         width: 90%;
       }
 
       textarea {
         width: 100%;
         min-height: 200px;
-        padding: 12px;
-        border: 2px solid #e0e0e0;
-        border-radius: 6px;
-        font-size: 16px;
-        transition:
-          border-color 0.3s ease,
-          background-color 0.3s,
-          color 0.3s;
+        padding: 16px;
+        border: 2px solid #e2e8f0;
+        border-radius: 12px;
+        font-size: 15px;
         resize: vertical;
-        font-family: "Segoe UI", Arial, sans-serif;
-        line-height: 1.5;
-        margin: 15px 0;
-        background-color: white;
-        color: #333;
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Inter",
+          Roboto, sans-serif;
+        line-height: 1.6;
+        margin: 0;
+        background-color: #f8fafc;
+        color: #1a1a2e;
       }
 
       body.dark-mode textarea {
-        background-color: #3a3a3a;
+        background-color: #16213e;
         color: #e0e0e0;
-        border-color: #555;
+        border-color: #1f3a5f;
       }
 
       textarea:focus {
         outline: none;
-        border-color: #0078d7;
-        box-shadow: 0 0 0 1px #0078d7;
+        border-color: #4a90e2;
+        box-shadow: 0 0 0 3px rgba(74, 144, 226, 0.1);
       }
 
       button {
-        background-color: #0078d7; /* Default background color */
-        color: white; /* Text color */
-        padding: 12px;
+        background-color: #4a90e2;
+        color: white;
+        padding: 14px 28px;
         border: none;
-        border-radius: 6px;
-        font-size: 16px;
+        border-radius: 10px;
+        font-size: 15px;
         font-weight: 600;
         cursor: pointer;
-        transition: background-color 0.3s ease;
-        width: 50%; /* Make button width proportional */
-        min-width: 150px; /* Ensure minimum width to fit text on one line */
-        white-space: nowrap; /* Prevent text from wrapping to new line */
+        width: 50%;
+        min-width: 160px;
       }
 
       button:hover {
-        background-color: #006cbd; /* Darker blue on hover */
+        background-color: #3a7bc8;
       }
 
       button:active {
-        transform: scale(0.98); /* Slightly shrink on click */
+        transform: scale(0.98);
       }
 
       button:disabled {
-        background-color: #add8e6; /* Light blue when disabled */
-        color: #ffffff; /* Ensure text is readable */
-        cursor: not-allowed; /* Change cursor to indicate disabled state */
+        background-color: #cbd5e1;
+        color: #64748b;
+        cursor: not-allowed;
       }
 
       .prompt-table {
-        max-height: 300px; /* Set maximum height */
-        overflow-y: auto; /* Add vertical scroll bar if content exceeds max height */
+        max-height: 350px;
+        overflow-y: auto;
         display: block;
-        width: 100%; /* Maintain full width */
+        width: 100%;
         border-collapse: collapse;
         overflow-x: hidden;
+        border-radius: 8px;
       }
 
       .prompt-table tr {
-        display: table; /* Ensure rows behave like table rows */
-        width: 100%; /* Ensure rows take full width */
-        table-layout: fixed; /* Fix the layout to prevent shrinking */
+        display: table;
+        width: 100%;
+        table-layout: fixed;
       }
 
       .prompt-table th,
       .prompt-table td {
-        border: 1px solid #ddd;
-        padding: 8px;
+        border: 1px solid #e2e8f0;
+        padding: 14px;
         text-align: left;
-        transition:
-          border-color 0.3s,
-          background-color 0.3s;
       }
 
       body.dark-mode .prompt-table th,
       body.dark-mode .prompt-table td {
-        border-color: #555;
+        border-color: #1f3a5f;
       }
 
       .prompt-table td {
@@ -247,25 +231,26 @@
         width: 100%;
         word-wrap: break-word;
         text-align: left;
-        padding: 8px;
-        border: 1px solid #ddd;
+        padding: 14px;
+        border: 1px solid #e2e8f0;
+        font-size: 14px;
       }
 
       body.dark-mode .prompt-table td {
-        border-color: #555;
+        border-color: #1f3a5f;
       }
 
       .row-actions {
         position: absolute;
         top: 50%;
-        right: 8px;
+        right: 12px;
         transform: translateY(-50%);
-        display: none; /* Hidden by default */
-        gap: 5px; /* Add spacing between buttons */
+        display: none;
+        gap: 6px;
       }
 
       .prompt-table tr:hover .row-actions {
-        display: flex; /* Show the buttons when the row is hovered */
+        display: flex;
       }
 
       .edit-button,
@@ -274,38 +259,37 @@
         border: none;
         cursor: pointer;
         font-size: 16px;
-        padding: 4px;
-        border-radius: 4px;
-        transition: background-color 0.3s ease;
+        padding: 6px;
+        border-radius: 6px;
       }
 
       .edit-button:hover {
-        background-color: #e0f7fa; /* Light blue background on hover */
+        background-color: #dbeafe;
       }
 
       .delete-button:hover {
-        background-color: #ffebee; /* Light red background on hover */
+        background-color: #fee2e2;
       }
 
       .prompt-table tr.selected {
-        background-color: #d1e7fd;
+        background-color: #dbeafe;
       }
 
       body.dark-mode .prompt-table tr.selected {
-        background-color: #1a4a6e;
+        background-color: #1e3a5f;
       }
 
       .prompt-table tr:hover {
-        background-color: #f1f1f1;
+        background-color: #f8fafc;
         cursor: pointer;
       }
 
       body.dark-mode .prompt-table tr:hover {
-        background-color: #3a3a3a;
+        background-color: #16213e;
       }
 
       .choose-prompt-button:hover {
-        background-color: #218838;
+        background-color: #3a7bc8;
       }
 
       .choose-prompt-button:active {

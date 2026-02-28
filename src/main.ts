@@ -74,7 +74,7 @@ const websites: string[] = getDefaultWebsites();
 function getViewHeight(windowHeight: number): number {
   // Calculate the height for browser views
   // This leaves space for the textarea and controls at the bottom
-  const controlsHeight = 235; // Height reserved for textarea and buttons (min 180px + padding 20px + buttons ~35px)
+  const controlsHeight = 280; // Height reserved for textarea and buttons (increased to prevent truncation)
   return windowHeight - controlsHeight;
 }
 
@@ -97,6 +97,7 @@ function createWindow(): void {
 
   // Use 'ready-to-show' to display windows gracefully.
   mainWindow.once("ready-to-show", () => {
+    mainWindow.maximize();
     mainWindow.show();
     setTimeout(() => {
       isInitialSetupComplete = true;
