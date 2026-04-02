@@ -11,42 +11,43 @@
     <style>
       /* Critical CSS - Prevent white flash by defaulting to dark theme */
       html {
-        background-color: #000000;
+        background-color: #0d1117;
       }
       body {
-        background-color: #000000;
-        color: #e0e0e0;
+        background-color: #0d1117;
+        color: #e6edf3;
         margin: 0;
         padding: 0;
       }
       #prompt-area {
-        background-color: #1e1e1e !important;
-        color: #e0e0e0 !important;
+        background-color: #161b22 !important;
+        color: #e6edf3 !important;
+        border-top: 1px solid #30363d !important;
       }
       #prompt-input {
-        background-color: #2d2d2d !important;
-        color: #e0e0e0 !important;
-        border: 1px solid #444 !important;
+        background-color: #0d1117 !important;
+        color: #e6edf3 !important;
+        border: 1px solid #30363d !important;
       }
       #dropdown-button,
       .prompt-select,
       .model-select,
       .diff-select,
       .theme-toggle {
-        background-color: #2d2d2d !important;
-        color: #e0e0e0 !important;
-        border-color: #444 !important;
+        background-color: #21262d !important;
+        color: #e6edf3 !important;
+        border-color: #30363d !important;
       }
       .dropdown-content {
-        background-color: #2d2d2d !important;
-        border-color: #0078d7 !important;
+        background-color: #161b22 !important;
+        border-color: #388bfd !important;
       }
       .dropdown-item {
-        background-color: #3a3a3a !important;
-        color: #e0e0e0 !important;
+        background-color: #21262d !important;
+        color: #e6edf3 !important;
       }
       #no-chats-header {
-        color: #999 !important;
+        color: #8b949e !important;
       }
     </style>
     <style>
@@ -62,7 +63,18 @@
         justify-content: flex-end;
         height: 100vh;
         margin: 0;
-        position: relative; /* Add this to create positioning context */
+        position: relative;
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+          "Helvetica Neue", Arial, sans-serif;
+        --bg-primary: #0d1117;
+        --bg-secondary: #161b22;
+        --bg-tertiary: #21262d;
+        --border-color: #30363d;
+        --text-primary: #e6edf3;
+        --text-secondary: #8b949e;
+        --accent-blue: #388bfd;
+        --accent-green: #3fb950;
+        --accent-orange: #d29922;
       }
 
       /* Add styling for the centered header */
@@ -71,82 +83,118 @@
         top: 50%;
         left: 50%;
         transform: translate(-50%, -50%);
-        font-size: 24px;
-        color: #666;
+        font-size: 20px;
+        color: #484f58;
         text-align: center;
-        pointer-events: none; /* Makes it non-interactive */
-        z-index: 1; /* Ensures it's below the prompt area */
+        pointer-events: none;
+        z-index: 1;
+        font-weight: 500;
+        letter-spacing: 0.5px;
       }
 
       #prompt-area {
         display: grid;
         grid-template-columns: 1fr auto auto;
-        gap: 15px;
+        gap: 16px;
         height: auto;
-        padding: 10px;
+        padding: 16px 20px;
         min-height: 180px;
         max-height: 50%;
         position: relative;
         align-items: center;
-        z-index: 10; /* Ensure prompt area is above the header */
+        z-index: 10;
         transition:
           background-color 0.3s,
           color 0.3s;
+        border-radius: 12px 12px 0 0;
       }
 
       #prompt-area.dark-mode {
-        background-color: #1e1e1e;
-        color: #e0e0e0;
+        background-color: #161b22;
+        color: #e6edf3;
       }
 
-      /* Light mode overrides - restore light theme when dark-mode is removed */
+      /* Light mode overrides */
       #prompt-area:not(.dark-mode) {
-        background-color: #f0f0f0 !important;
-        color: #333 !important;
+        background-color: #ffffff !important;
+        color: #24292f !important;
+        border-top: 1px solid #d0d7de !important;
       }
 
       #prompt-input {
-        padding: 10px;
-        font-size: 30px;
-        font-family: "Times New Roman", Times, serif;
+        padding: 14px 16px;
+        font-size: 15px;
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+          sans-serif;
         line-height: 1.5;
         width: 100%;
         height: 100%;
+        border-radius: 8px;
+        resize: none;
         transition:
           background-color 0.3s,
           color 0.3s,
-          border-color 0.3s;
+          border-color 0.3s,
+          box-shadow 0.2s;
       }
 
       #prompt-area.dark-mode #prompt-input {
-        background-color: #2d2d2d;
-        color: #e0e0e0;
-        border: 1px solid #444;
+        background-color: #0d1117;
+        color: #e6edf3;
+        border-color: #30363d;
+      }
+
+      #prompt-area.dark-mode #prompt-input:focus {
+        border-color: #388bfd;
+        box-shadow: 0 0 0 3px rgba(56, 139, 253, 0.3);
+        outline: none;
       }
 
       #prompt-area:not(.dark-mode) #prompt-input {
-        background-color: white !important;
-        color: #333 !important;
-        border: 1px solid #ccc !important;
+        background-color: #ffffff !important;
+        color: #24292f !important;
+        border-color: #d0d7de !important;
+      }
+
+      #prompt-area:not(.dark-mode) #prompt-input:focus {
+        border-color: #0969da;
+        box-shadow: 0 0 0 3px rgba(9, 105, 218, 0.15);
+        outline: none;
       }
 
       .button-group {
         display: flex;
         flex-direction: column;
         align-items: flex-start;
-        width: 180px;
-        gap: 10px;
+        width: 160px;
+        gap: 8px;
       }
 
       .theme-toggle,
       .new-chat-toggle {
-        width: 40px;
-        height: 40px;
-        font-size: 20px;
-        padding: 5px;
-        border-radius: 50%;
+        width: 36px;
+        height: 36px;
+        font-size: 18px;
+        padding: 6px;
+        border-radius: 8px;
         align-self: center;
-        margin-top: 5px;
+        margin-top: 4px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition:
+          background-color 0.2s,
+          transform 0.15s;
+      }
+
+      .theme-toggle:hover,
+      .new-chat-toggle:hover {
+        transform: scale(1.05);
+      }
+
+      .theme-toggle:active,
+      .new-chat-toggle:active {
+        transform: scale(0.95);
       }
 
       .dropdown,
@@ -164,32 +212,32 @@
       .theme-toggle,
       .new-chat-toggle {
         width: 100%;
-        height: 50px;
-        font-size: 18px;
-        padding: 10px;
-        border: 2px solid #ccc;
-        border-radius: 4px;
-        background-color: #f0f0f0;
+        height: 44px;
+        font-size: 14px;
+        padding: 8px 12px;
+        border: 1px solid #30363d;
+        border-radius: 6px;
+        background-color: #21262d;
+        color: #e6edf3;
         cursor: pointer;
         box-sizing: border-box;
-        display: block;
+        display: flex;
+        align-items: center;
+        justify-content: center;
         text-align: center;
-        font-weight: bold;
+        font-weight: 500;
         transition:
-          background-color 0.3s,
-          color 0.3s,
-          border-color 0.3s;
+          background-color 0.2s,
+          border-color 0.2s,
+          color 0.2s;
       }
 
-      #prompt-area.dark-mode #dropdown-button,
-      #prompt-area.dark-mode .prompt-select,
-      #prompt-area.dark-mode .model-select,
-      #prompt-area.dark-mode .diff-select,
-      #prompt-area.dark-mode .theme-toggle,
-      #prompt-area.dark-mode .new-chat-toggle {
-        background-color: #2d2d2d;
-        color: #e0e0e0;
-        border-color: #444;
+      #prompt-area.dark-mode #dropdown-button:hover,
+      #prompt-area.dark-mode .prompt-select:hover,
+      #prompt-area.dark-mode .model-select:hover,
+      #prompt-area.dark-mode .diff-select:hover {
+        background-color: #30363d;
+        border-color: #8b949e;
       }
 
       #prompt-area:not(.dark-mode) #dropdown-button,
@@ -198,9 +246,15 @@
       #prompt-area:not(.dark-mode) .diff-select,
       #prompt-area:not(.dark-mode) .theme-toggle,
       #prompt-area:not(.dark-mode) .new-chat-toggle {
-        background-color: #f0f0f0 !important;
-        color: #333 !important;
-        border-color: #ccc !important;
+        background-color: #f6f8fa !important;
+        color: #24292f !important;
+        border-color: #d0d7de !important;
+      }
+
+      #prompt-area:not(.dark-mode) #dropdown-button:hover,
+      #prompt-area:not(.dark-mode) .prompt-select:hover,
+      #prompt-area:not(.dark-mode) .model-select:hover {
+        background-color: #eaeef2 !important;
       }
 
       .dropdown-content {
@@ -209,67 +263,70 @@
         top: 100%;
         left: 5%;
         width: 90%;
-        background-color: #f9f9f9;
-        box-shadow: 0px 8px 16px 0px rgba(0, 0, 0, 0.2);
-        border: 2px solid #0078d7;
+        background-color: #161b22;
+        border: 1px solid #30363d;
         border-radius: 8px;
         padding: 4px;
-        max-height: 110px;
+        max-height: 200px;
         overflow-y: auto;
         z-index: 1000;
+        box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
       }
 
       .dropdown-item {
         width: 100%;
-        padding: 8px;
+        padding: 10px 12px;
         text-decoration: none;
         display: block;
         cursor: pointer;
-        font-weight: bold;
-        background-color: #e6e6e6;
+        font-weight: 500;
+        background-color: transparent;
         border: none;
         text-align: left;
         box-sizing: border-box;
         margin: 0;
-        margin-bottom: 5px;
-        font-size: 16px;
-        transition: background-color 0.3s;
+        border-radius: 4px;
+        font-size: 14px;
+        color: #e6edf3;
+        transition: background-color 0.15s;
       }
 
       .dropdown-item:hover {
-        background-color: #ddd;
+        background-color: #388bfd;
+        color: #ffffff;
       }
 
       #prompt-area.dark-mode .dropdown-content {
-        background-color: #2d2d2d;
-        border-color: #0078d7;
+        background-color: #161b22;
+        border-color: #30363d;
       }
 
       #prompt-area.dark-mode .dropdown-item {
-        background-color: #3a3a3a;
-        color: #e0e0e0;
+        color: #e6edf3;
       }
 
       #prompt-area.dark-mode .dropdown-item:hover {
-        background-color: #4a4a4a;
+        background-color: #388bfd;
+        color: #ffffff;
       }
 
       #prompt-area:not(.dark-mode) .dropdown-content {
-        background-color: #f9f9f9 !important;
-        border-color: #0078d7 !important;
+        background-color: #ffffff !important;
+        border-color: #d0d7de !important;
+        box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
       }
 
       #prompt-area:not(.dark-mode) .dropdown-item {
-        background-color: #e6e6e6 !important;
-        color: #333 !important;
+        color: #24292f !important;
       }
 
       #prompt-area:not(.dark-mode) .dropdown-item:hover {
-        background-color: #ddd !important;
+        background-color: #0969da !important;
+        color: #ffffff !important;
       }
 
       body:not(.dark-mode) #no-chats-header {
-        color: #666 !important;
+        color: #57606a !important;
       }
 
       .prompt-picker,
@@ -281,30 +338,103 @@
         display: block;
         position: absolute;
       }
+
+      /* Character counter styling */
+      #char-counter {
+        font-size: 12px;
+        color: #8b949e;
+        background-color: rgba(13, 17, 23, 0.8);
+        padding: 4px 8px;
+        border-radius: 4px;
+      }
+
+      #prompt-area:not(.dark-mode) #char-counter {
+        color: #57606a;
+        background-color: rgba(255, 255, 255, 0.9);
+      }
+
+      /* Icon buttons container */
+      .icon-buttons {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+        align-items: center;
+      }
+
+      /* Tooltip improvements */
+      .tooltip-container {
+        position: relative;
+        width: 100%;
+      }
+
+      .tooltip-container .tooltip {
+        visibility: hidden;
+        background-color: #6e7681;
+        color: #ffffff;
+        text-align: center;
+        padding: 6px 10px;
+        border-radius: 6px;
+        position: absolute;
+        z-index: 1001;
+        bottom: 125%;
+        left: 50%;
+        transform: translateX(-50%);
+        font-size: 12px;
+        white-space: nowrap;
+        opacity: 0;
+        transition:
+          opacity 0.2s,
+          visibility 0.2s;
+        font-weight: 400;
+      }
+
+      .tooltip-container:hover .tooltip {
+        visibility: visible;
+        opacity: 1;
+      }
+
+      /* Custom scrollbar */
+      ::-webkit-scrollbar {
+        width: 8px;
+        height: 8px;
+      }
+
+      ::-webkit-scrollbar-track {
+        background: #0d1117;
+      }
+
+      ::-webkit-scrollbar-thumb {
+        background: #30363d;
+        border-radius: 4px;
+      }
+
+      ::-webkit-scrollbar-thumb:hover {
+        background: #484f58;
+      }
     </style>
     <script type="module" src="./dist/renderer.js"></script>
   </head>
 
   <body>
-    <!-- Move the header outside prompt-area and give it an ID -->
-    <h2 id="no-chats-header">No Chats Shown. Please add a Chat</h2>
+    <h2 id="no-chats-header">No chats shown. Please add a chat</h2>
 
     <div id="prompt-area">
       <div style="position: relative; width: 100%; height: 100%">
         <textarea
           id="prompt-input"
           rows="3"
-          placeholder="Press Ctrl + Enter to send prompt"
+          placeholder="Type your prompt here... (Ctrl + Enter to send)"
         ></textarea>
         <div
           id="char-counter"
           style="
             position: absolute;
-            bottom: 5px;
-            right: 10px;
+            bottom: 8px;
+            right: 12px;
             font-size: 12px;
-            opacity: 0.6;
+            opacity: 0.7;
             pointer-events: none;
+            font-weight: 500;
           "
         >
           0 chars / 0 words
@@ -314,19 +444,24 @@
         style="
           display: flex;
           flex-direction: column;
-          gap: 10px;
+          gap: 8px;
           align-items: center;
+          min-width: 50px;
         "
       >
         <div class="tooltip-container">
-          <button class="new-chat-toggle">➕</button>
+          <button class="new-chat-toggle" title="New Chat">&#x21BB;</button>
           <span class="tooltip" role="tooltip"
             >Open New Chat In Displayed Windows</span
           >
         </div>
         <div class="tooltip-container">
-          <button class="theme-toggle" aria-label="Toggle light/dark theme">
-            🌙
+          <button
+            class="theme-toggle"
+            aria-label="Toggle light/dark theme"
+            title="Toggle Theme"
+          >
+            &#x263D;
           </button>
           <span class="tooltip" role="tooltip">Toggle light/dark theme</span>
         </div>
@@ -338,19 +473,22 @@
               id="dropdown-button"
               aria-label="Show or hide AI model chats"
             >
-              Show Models ▼
+              Models
+              <span style="font-size: 11px; margin-left: 4px; opacity: 0.8"
+                >&#x25BC;</span
+              >
             </button>
             <span class="tooltip" role="tooltip"
               >Show or hide AI model chats</span
             >
           </div>
           <div class="dropdown-content">
-            <div class="dropdown-item" id="showChatGPT">Hide ChatGPT</div>
-            <div class="dropdown-item" id="showGemini">Hide Gemini</div>
-            <div class="dropdown-item" id="showClaude">Show Claude</div>
-            <div class="dropdown-item" id="showGrok">Show Grok</div>
-            <div class="dropdown-item" id="showDeepSeek">Show DeepSeek</div>
-            <div class="dropdown-item" id="showCopilot">Show Copilot</div>
+            <div class="dropdown-item" id="showChatGPT">&#x2714; ChatGPT</div>
+            <div class="dropdown-item" id="showGemini">&#x2714; Gemini</div>
+            <div class="dropdown-item" id="showClaude">&#x2718; Claude</div>
+            <div class="dropdown-item" id="showGrok">&#x2718; Grok</div>
+            <div class="dropdown-item" id="showDeepSeek">&#x2718; DeepSeek</div>
+            <div class="dropdown-item" id="showCopilot">&#x2718; Copilot</div>
           </div>
         </div>
         <div class="prompt-picker">
@@ -359,7 +497,7 @@
               class="prompt-select"
               aria-label="Choose from saved prompts"
             >
-              Select Prompts
+              Prompts
             </button>
             <span class="tooltip" role="tooltip"
               >Choose from saved prompts</span
@@ -372,7 +510,7 @@
               class="model-select"
               aria-label="Configure default AI models"
             >
-              Default Models
+              Settings
             </button>
             <span class="tooltip" role="tooltip"
               >Configure default AI models</span
