@@ -7,32 +7,31 @@
     <style>
       /* Critical CSS - Prevent white flash by defaulting to dark theme */
       html {
-        background-color: #1e1e1e;
+        background-color: #0d1117;
       }
       body {
-        background-color: #1e1e1e;
-        color: #e0e0e0;
+        background-color: #0d1117;
+        color: #e6edf3;
         margin: 0;
         padding: 0;
       }
-      /* Critical: Set dark background for container immediately */
       .form-container {
-        background-color: #2d2d2d !important;
-        color: #e0e0e0 !important;
+        background-color: #161b22 !important;
       }
       .form-container h1,
       .form-container h2 {
-        color: #e0e0e0 !important;
+        color: #e6edf3 !important;
       }
       .form-container textarea {
-        background-color: #3a3a3a !important;
-        color: #e0e0e0 !important;
-        border-color: #555 !important;
+        background-color: #0d1117 !important;
+        color: #e6edf3 !important;
+        border-color: #30363d !important;
       }
     </style>
     <style>
       body {
-        font-family: "Segoe UI", Arial, sans-serif;
+        font-family:
+          -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
         margin: 0;
         padding: 0;
         display: flex;
@@ -41,44 +40,33 @@
         height: 100vh;
         width: 100vw;
         overflow-x: hidden;
-        transition:
-          background-color 0.3s,
-          color 0.3s;
+        background-color: #0d1117;
       }
-
-      /* Dark mode styles - apply when dark-mode class IS present */
       body.dark-mode {
-        background-color: #1e1e1e;
-        color: #e0e0e0;
+        background-color: #0d1117;
+        color: #e6edf3;
       }
-
-      /* Light mode styles - only apply when light-mode class is present */
       body.light-mode {
-        background-color: #f0f0f0;
-        color: #333;
+        background-color: #ffffff;
+        color: #24292f;
       }
-
       body.light-mode .form-container {
-        background-color: white !important;
-        color: #333 !important;
+        background-color: #ffffff !important;
       }
-
       body.light-mode .form-container h1,
       body.light-mode .form-container h2 {
-        color: #333 !important;
+        color: #24292f !important;
       }
-
       body.light-mode .form-container textarea {
-        background-color: white !important;
-        color: #333 !important;
-        border-color: #e0e0e0 !important;
+        background-color: #ffffff !important;
+        color: #24292f !important;
+        border-color: #d0d7de !important;
       }
-
       .form-container {
-        background-color: white;
-        padding: 25px;
-        border-radius: 8px;
-        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        background-color: #161b22;
+        padding: 24px;
+        border-radius: 12px;
+        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
         width: 100%;
         height: 100%;
         max-width: none;
@@ -86,230 +74,253 @@
         flex-direction: column;
         align-items: center;
         justify-content: flex-start;
-        transition:
-          background-color 0.3s,
-          box-shadow 0.3s;
+        border: 1px solid #30363d;
       }
-
       body.dark-mode .form-container {
-        background-color: #2d2d2d;
-        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.5);
+        background-color: #161b22;
+        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
       }
-
-      h1 {
-        color: #333;
-        margin-bottom: 20px;
-        font-size: 24px;
-        text-align: center;
-        transition: color 0.3s;
-      }
-
-      body.dark-mode h1 {
-        color: #e0e0e0;
-      }
-
+      h1,
       h2 {
-        color: #333;
-        margin-bottom: 15px;
+        color: #e6edf3;
+        margin-bottom: 16px;
         font-size: 20px;
+        font-weight: 600;
         text-align: center;
-        transition: color 0.3s;
       }
-
+      body.dark-mode h1,
       body.dark-mode h2 {
-        color: #e0e0e0;
+        color: #e6edf3;
       }
-
       .instructions {
         margin-bottom: 20px;
-        padding: 10px;
-        background-color: #e3f2fd;
-        border-left: 4px solid #2196f3;
-        color: #1976d2;
-        transition:
-          background-color 0.3s,
-          color 0.3s;
+        padding: 12px 16px;
+        background-color: #1f3a5f;
+        border-left: 3px solid #388bfd;
+        color: #8cb4ff;
+        border-radius: 6px;
         width: 90%;
         text-align: left;
+        font-size: 14px;
       }
-
       body.dark-mode .instructions {
-        background-color: #1a3a52;
-        color: #64b5f6;
+        background-color: #1f3a5f;
+        color: #8cb4ff;
+        border-color: #388bfd;
       }
-
       body.light-mode .instructions {
-        background-color: #e3f2fd;
-        color: #1976d2;
+        background-color: #ddf4ff;
+        color: #0969da;
+        border-color: #0969da;
       }
-
       form,
       #prompt-picker {
         display: flex;
         flex-direction: column;
         align-items: center;
-        gap: 15px;
+        gap: 16px;
         width: 90%;
       }
-
       textarea {
         width: 100%;
-        min-height: 200px;
-        padding: 12px;
-        border: 2px solid #e0e0e0;
-        border-radius: 6px;
-        font-size: 16px;
-        transition:
-          border-color 0.3s ease,
-          background-color 0.3s,
-          color 0.3s;
+        min-height: 180px;
+        padding: 14px;
+        border: 1px solid #30363d;
+        border-radius: 8px;
+        font-size: 14px;
         resize: vertical;
-        font-family: "Segoe UI", Arial, sans-serif;
-        line-height: 1.5;
-        margin: 15px 0;
-        background-color: white;
-        color: #333;
+        font-family: inherit;
+        line-height: 1.6;
+        margin: 12px 0;
+        background-color: #0d1117;
+        color: #e6edf3;
+        transition:
+          border-color 0.2s,
+          box-shadow 0.2s;
       }
-
       body.dark-mode textarea {
-        background-color: #3a3a3a;
-        color: #e0e0e0;
-        border-color: #555;
+        background-color: #0d1117;
+        color: #e6edf3;
+        border-color: #30363d;
       }
-
       textarea:focus {
         outline: none;
-        border-color: #0078d7;
-        box-shadow: 0 0 0 1px #0078d7;
+        border-color: #388bfd;
+        box-shadow: 0 0 0 3px rgba(56, 139, 253, 0.3);
       }
-
+      body.light-mode textarea:focus {
+        border-color: #0969da;
+        box-shadow: 0 0 0 3px rgba(9, 105, 218, 0.15);
+      }
       button {
-        background-color: #0078d7; /* Default background color */
-        color: white; /* Text color */
-        padding: 12px;
+        background-color: #238636;
+        color: #ffffff;
+        padding: 10px 20px;
         border: none;
         border-radius: 6px;
-        font-size: 16px;
-        font-weight: 600;
+        font-size: 14px;
+        font-weight: 500;
         cursor: pointer;
-        transition: background-color 0.3s ease;
-        width: 50%; /* Make button width proportional */
-        min-width: 150px; /* Ensure minimum width to fit text on one line */
-        white-space: nowrap; /* Prevent text from wrapping to new line */
+        transition: background-color 0.2s;
+        width: 50%;
+        min-width: 140px;
       }
-
       button:hover {
-        background-color: #006cbd; /* Darker blue on hover */
+        background-color: #2da44e;
       }
-
       button:active {
-        transform: scale(0.98); /* Slightly shrink on click */
+        transform: scale(0.98);
       }
-
       button:disabled {
-        background-color: #add8e6; /* Light blue when disabled */
-        color: #ffffff; /* Ensure text is readable */
-        cursor: not-allowed; /* Change cursor to indicate disabled state */
+        background-color: #21262d;
+        color: #484f58;
+        cursor: not-allowed;
       }
-
+      body.light-mode button:disabled {
+        background-color: #d0d7de;
+        color: #8b949e;
+      }
       .prompt-table {
-        max-height: 300px; /* Set maximum height */
-        overflow-y: auto; /* Add vertical scroll bar if content exceeds max height */
+        max-height: 280px;
+        overflow-y: auto;
         display: block;
-        width: 100%; /* Maintain full width */
-        border-collapse: collapse;
-        overflow-x: hidden;
+        width: 100%;
+        border-collapse: separate;
+        border-spacing: 0;
+        border-radius: 8px;
+        border: 1px solid #30363d;
+        overflow: hidden;
       }
-
+      body.light-mode .prompt-table {
+        border-color: #d0d7de;
+      }
       .prompt-table tr {
-        display: table; /* Ensure rows behave like table rows */
-        width: 100%; /* Ensure rows take full width */
-        table-layout: fixed; /* Fix the layout to prevent shrinking */
+        display: table;
+        width: 100%;
+        table-layout: fixed;
       }
-
       .prompt-table th,
       .prompt-table td {
-        border: 1px solid #ddd;
-        padding: 8px;
+        border-bottom: 1px solid #30363d;
+        padding: 12px;
         text-align: left;
-        transition:
-          border-color 0.3s,
-          background-color 0.3s;
+        background-color: #161b22;
       }
-
-      body.dark-mode .prompt-table th,
-      body.dark-mode .prompt-table td {
-        border-color: #555;
+      body.light-mode .prompt-table th,
+      body.light-mode .prompt-table td {
+        border-color: #d0d7de;
+        background-color: #ffffff;
       }
-
+      .prompt-table th {
+        background-color: #21262d;
+        font-weight: 600;
+        font-size: 13px;
+        color: #8b949e;
+      }
+      body.light-mode .prompt-table th {
+        background-color: #f6f8fa;
+        color: #57606a;
+      }
       .prompt-table td {
         position: relative;
         width: 100%;
         word-wrap: break-word;
-        text-align: left;
-        padding: 8px;
-        border: 1px solid #ddd;
+        font-size: 14px;
       }
-
-      body.dark-mode .prompt-table td {
-        border-color: #555;
-      }
-
       .row-actions {
         position: absolute;
         top: 50%;
         right: 8px;
         transform: translateY(-50%);
-        display: none; /* Hidden by default */
-        gap: 5px; /* Add spacing between buttons */
+        display: none;
+        gap: 6px;
       }
-
       .prompt-table tr:hover .row-actions {
-        display: flex; /* Show the buttons when the row is hovered */
+        display: flex;
       }
-
       .edit-button,
       .delete-button {
         background: none;
         border: none;
         cursor: pointer;
-        font-size: 16px;
-        padding: 4px;
+        font-size: 14px;
+        padding: 6px 8px;
         border-radius: 4px;
-        transition: background-color 0.3s ease;
+        transition: background-color 0.2s;
       }
-
       .edit-button:hover {
-        background-color: #e0f7fa; /* Light blue background on hover */
+        background-color: #1f3a5f;
       }
-
       .delete-button:hover {
-        background-color: #ffebee; /* Light red background on hover */
+        background-color: #5a1d1d;
       }
-
       .prompt-table tr.selected {
-        background-color: #d1e7fd;
+        background-color: #1a3a5f;
       }
-
       body.dark-mode .prompt-table tr.selected {
-        background-color: #1a4a6e;
+        background-color: #1a3a5f;
       }
-
+      body.light-mode .prompt-table tr.selected {
+        background-color: #ddf4ff;
+      }
       .prompt-table tr:hover {
-        background-color: #f1f1f1;
+        background-color: #21262d;
         cursor: pointer;
       }
-
       body.dark-mode .prompt-table tr:hover {
-        background-color: #3a3a3a;
+        background-color: #21262d;
       }
-
+      body.light-mode .prompt-table tr:hover {
+        background-color: #f6f8fa;
+      }
+      body.light-mode .edit-button:hover {
+        background-color: #ddf4ff;
+      }
+      body.light-mode .delete-button:hover {
+        background-color: #ffebe9;
+      }
+      .choose-prompt-button {
+        background-color: #388bfd;
+      }
       .choose-prompt-button:hover {
-        background-color: #218838;
+        background-color: #4493f0;
       }
-
-      .choose-prompt-button:active {
-        transform: scale(0.98);
+      .tooltip-container {
+        position: relative;
+      }
+      .tooltip-container .tooltip {
+        visibility: hidden;
+        background-color: #6e7681;
+        color: #ffffff;
+        text-align: center;
+        padding: 6px 10px;
+        border-radius: 6px;
+        position: absolute;
+        z-index: 1001;
+        bottom: 125%;
+        left: 50%;
+        transform: translateX(-50%);
+        font-size: 12px;
+        white-space: nowrap;
+        opacity: 0;
+        transition: opacity 0.2s;
+      }
+      .tooltip-container:hover .tooltip {
+        visibility: visible;
+        opacity: 1;
+      }
+      ::-webkit-scrollbar {
+        width: 6px;
+      }
+      ::-webkit-scrollbar-track {
+        background: #161b22;
+      }
+      ::-webkit-scrollbar-thumb {
+        background: #30363d;
+        border-radius: 3px;
+      }
+      ::-webkit-scrollbar-thumb:hover {
+        background: #484f58;
       }
     </style>
   </head>
