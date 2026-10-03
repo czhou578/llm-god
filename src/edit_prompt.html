@@ -7,168 +7,169 @@
     <style>
       /* Critical CSS - Prevent white flash by defaulting to dark theme */
       html {
-        background-color: #1e1e1e;
+        background-color: #0d1117;
       }
       body {
-        background-color: #1e1e1e;
-        color: #e0e0e0;
+        background-color: #0d1117;
+        color: #e6edf3;
         margin: 0;
         padding: 0;
       }
-      /* Critical: Set dark background for container immediately */
       .form-container {
-        background-color: #2d2d2d !important;
-        color: #e0e0e0 !important;
+        background-color: #161b22 !important;
+        border: 1px solid #30363d !important;
       }
       .form-container h2 {
-        color: #e0e0e0 !important;
+        color: #e6edf3 !important;
       }
       .form-container textarea {
-        background-color: #3a3a3a !important;
-        color: #e0e0e0 !important;
-        border-color: #555 !important;
+        background-color: #0d1117 !important;
+        color: #e6edf3 !important;
+        border-color: #30363d !important;
       }
     </style>
     <style>
       body {
-        font-family: "Segoe UI", Arial, sans-serif;
+        font-family:
+          -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
         margin: 0;
         padding: 0;
         display: flex;
         justify-content: center;
         align-items: center;
         height: 100vh;
-        transition:
-          background-color 0.3s,
-          color 0.3s;
+        background-color: #0d1117;
       }
-
       body.dark-mode {
-        background-color: #1e1e1e;
-        color: #e0e0e0;
+        background-color: #0d1117;
+        color: #e6edf3;
       }
-
       body.light-mode {
-        background-color: #f0f0f0;
-        color: #333;
+        background-color: #ffffff;
+        color: #24292f;
       }
-
       body.light-mode .form-container {
-        background-color: white !important;
-        color: #333 !important;
+        background-color: #ffffff !important;
+        border-color: #d0d7de !important;
       }
-
       body.light-mode .form-container h2 {
-        color: #333 !important;
+        color: #24292f !important;
       }
-
       body.light-mode .form-container textarea {
-        background-color: white !important;
-        color: #333 !important;
-        border-color: #e0e0e0 !important;
+        background-color: #ffffff !important;
+        color: #24292f !important;
+        border-color: #d0d7de !important;
       }
-
       .form-container {
-        background-color: white;
-        padding: 25px;
-        border-radius: 8px;
-        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-        width: 100%;
-        height: 100%;
-        max-width: 400px;
-        margin: 0 auto;
+        background-color: #161b22;
+        padding: 28px;
+        border-radius: 12px;
+        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+        width: 90%;
+        max-width: 420px;
         display: flex;
         flex-direction: column;
         align-items: center;
         justify-content: flex-start;
-        transition:
-          background-color 0.3s,
-          box-shadow 0.3s;
+        border: 1px solid #30363d;
       }
-
       body.dark-mode .form-container {
-        background-color: #2d2d2d;
-        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.5);
+        background-color: #161b22;
+        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
       }
-
       h2 {
-        color: #333;
-        margin-bottom: 15px;
+        color: #e6edf3;
+        margin-bottom: 20px;
         font-size: 20px;
+        font-weight: 600;
         text-align: center;
-        transition: color 0.3s;
       }
-
       body.dark-mode h2 {
-        color: #e0e0e0;
+        color: #e6edf3;
       }
-
       form {
         display: flex;
         flex-direction: column;
         align-items: center;
-        gap: 15px;
+        gap: 16px;
         width: 100%;
       }
-
       textarea {
         width: 100%;
-        max-width: 350px;
-        min-height: 200px;
-        padding: 12px;
-        border: 2px solid #e0e0e0;
-        border-radius: 6px;
-        font-size: 16px;
-        transition:
-          border-color 0.3s ease,
-          background-color 0.3s,
-          color 0.3s;
+        min-height: 180px;
+        padding: 14px;
+        border: 1px solid #30363d;
+        border-radius: 8px;
+        font-size: 14px;
         resize: vertical;
-        font-family: "Segoe UI", Arial, sans-serif;
-        line-height: 1.5;
-        margin: 15px 0;
-        background-color: white;
-        color: #333;
+        font-family: inherit;
+        line-height: 1.6;
+        margin: 12px 0;
+        background-color: #0d1117;
+        color: #e6edf3;
+        transition:
+          border-color 0.2s,
+          box-shadow 0.2s;
       }
-
       body.dark-mode textarea {
-        background-color: #3a3a3a;
-        color: #e0e0e0;
-        border-color: #555;
+        background-color: #0d1117;
+        color: #e6edf3;
+        border-color: #30363d;
       }
-
       textarea:focus {
         outline: none;
-        border-color: #0078d7;
-        box-shadow: 0 0 0 1px #0078d7;
+        border-color: #388bfd;
+        box-shadow: 0 0 0 3px rgba(56, 139, 253, 0.3);
       }
-
+      body.light-mode textarea:focus {
+        border-color: #0969da;
+        box-shadow: 0 0 0 3px rgba(9, 105, 218, 0.15);
+      }
       button {
-        background-color: #0078d7; /* Default background color */
-        color: white; /* Text color */
-        padding: 12px;
+        background-color: #388bfd;
+        color: #ffffff;
+        padding: 12px 24px;
         border: none;
         border-radius: 6px;
-        font-size: 16px;
-        font-weight: 600;
+        font-size: 14px;
+        font-weight: 500;
         cursor: pointer;
-        transition: background-color 0.3s ease;
-        width: 50%; /* Make button width proportional */
-        min-width: 150px; /* Ensure minimum width */
+        transition: all 0.2s;
+        width: 50%;
+        min-width: 140px;
       }
-
       button:hover {
-        background-color: #006cbd; /* Darker blue on hover */
+        background-color: #4493f0;
       }
-
       button:active {
-        transform: scale(0.98); /* Slightly shrink on click */
+        transform: scale(0.98);
       }
-
-      button:disabled {
-        background-color: #add8e6; /* Light blue when disabled */
-        color: #ffffff; /* Ensure text is readable */
-        cursor: not-allowed; /* Change cursor to indicate disabled state */
+      .tooltip-container {
+        position: relative;
+        width: 100%;
+        display: flex;
+        justify-content: center;
+      }
+      .tooltip-container .tooltip {
+        visibility: hidden;
+        background-color: #6e7681;
+        color: #ffffff;
+        text-align: center;
+        padding: 6px 10px;
+        border-radius: 6px;
+        position: absolute;
+        z-index: 1001;
+        bottom: 125%;
+        left: 50%;
+        transform: translateX(-50%);
+        font-size: 12px;
+        white-space: nowrap;
+        opacity: 0;
+        transition: opacity 0.2s;
+      }
+      .tooltip-container:hover .tooltip {
+        visibility: visible;
+        opacity: 1;
       }
     </style>
   </head>

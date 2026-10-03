@@ -11,31 +11,31 @@
     <style>
       /* Critical CSS - Prevent white flash by defaulting to dark theme */
       html {
-        background-color: #1e1e1e;
+        background-color: #0d1117;
       }
       body {
-        background-color: #1e1e1e;
-        color: #e0e0e0;
+        background-color: #0d1117;
+        color: #e6edf3;
         margin: 0;
         padding: 20px;
       }
-      /* Critical: Set dark backgrounds for all elements immediately */
       h2 {
-        color: #e0e0e0 !important;
+        color: #e6edf3 !important;
       }
       .instructions {
-        background-color: #1a3a52 !important;
-        color: #64b5f6 !important;
+        background-color: #1f3a5f !important;
+        color: #8cb4ff !important;
       }
       .model-list {
-        background-color: #2d2d2d !important;
+        background-color: #161b22 !important;
+        border: 1px solid #30363d !important;
       }
       .model-item {
-        background-color: #2d2d2d !important;
-        border-color: #444 !important;
+        background-color: #21262d !important;
+        border-color: #30363d !important;
       }
       .model-item label {
-        color: #e0e0e0 !important;
+        color: #e6edf3 !important;
       }
     </style>
     <style>
@@ -44,167 +44,180 @@
         padding: 0;
         box-sizing: border-box;
       }
-
       body {
-        font-family: Arial, sans-serif;
-        padding: 20px;
-        transition:
-          background-color 0.3s,
-          color 0.3s;
+        font-family:
+          -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+        padding: 24px;
+        background-color: #0d1117;
         overflow-x: hidden;
       }
-
       body.dark-mode {
-        background-color: #1e1e1e;
-        color: #e0e0e0;
+        background-color: #0d1117;
+        color: #e6edf3;
       }
-
       body.light-mode {
-        background-color: #f5f5f5;
-        color: #333;
+        background-color: #ffffff;
+        color: #24292f;
       }
-
       body.light-mode h2 {
-        color: #333 !important;
+        color: #24292f !important;
       }
-
       body.light-mode .instructions {
-        background-color: #e3f2fd !important;
-        color: #1976d2 !important;
+        background-color: #ddf4ff !important;
+        color: #0969da !important;
       }
-
       body.light-mode .model-list {
-        background-color: white !important;
+        background-color: #ffffff !important;
+        border-color: #d0d7de !important;
       }
-
       body.light-mode .model-item {
-        background-color: transparent !important;
-        border-color: #e0e0e0 !important;
+        background-color: #f6f8fa !important;
+        border-color: #d0d7de !important;
       }
-
       body.light-mode .model-item label {
-        color: #333 !important;
+        color: #24292f !important;
       }
-
       h2 {
         margin-bottom: 20px;
-        color: #333;
-        transition: color 0.3s;
+        color: #e6edf3;
+        font-size: 22px;
+        font-weight: 600;
       }
-
       body.dark-mode h2 {
-        color: #e0e0e0;
+        color: #e6edf3;
       }
-
       .instructions {
         margin-bottom: 20px;
-        padding: 10px;
-        background-color: #e3f2fd;
-        border-left: 4px solid #2196f3;
-        color: #1976d2;
-        transition:
-          background-color 0.3s,
-          color 0.3s;
-      }
-
-      body.dark-mode .instructions {
-        background-color: #1a3a52;
-        color: #64b5f6;
-      }
-
-      .model-list {
-        background-color: white;
-        padding: 20px;
+        padding: 14px 16px;
+        background-color: #1f3a5f;
+        border-left: 3px solid #388bfd;
+        color: #8cb4ff;
         border-radius: 8px;
-        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-        margin-bottom: 20px;
-        transition:
-          background-color 0.3s,
-          box-shadow 0.3s;
+        font-size: 14px;
+        line-height: 1.5;
       }
-
+      body.dark-mode .instructions {
+        background-color: #1f3a5f;
+        color: #8cb4ff;
+        border-color: #388bfd;
+      }
+      .model-list {
+        background-color: #161b22;
+        padding: 20px;
+        border-radius: 12px;
+        box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
+        margin-bottom: 24px;
+        border: 1px solid #30363d;
+      }
       body.dark-mode .model-list {
-        background-color: #2d2d2d;
-        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+        background-color: #161b22;
+        box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
       }
-
       .model-item {
         display: flex;
         align-items: center;
-        padding: 12px;
-        margin-bottom: 8px;
-        border: 2px solid #e0e0e0;
-        border-radius: 4px;
+        padding: 14px 16px;
+        margin-bottom: 10px;
+        border: 1px solid #30363d;
+        border-radius: 8px;
         cursor: pointer;
         transition: all 0.2s;
+        background-color: #21262d;
       }
-
       body.dark-mode .model-item {
-        border-color: #444;
-        background-color: #2d2d2d;
+        border-color: #30363d;
+        background-color: #21262d;
       }
-
       .model-item:hover {
-        background-color: #f5f5f5;
-        border-color: #2196f3;
+        background-color: #30363d;
+        border-color: #388bfd;
+        transform: translateX(4px);
       }
-
-      body.dark-mode .model-item:hover {
-        background-color: #3a3a3a;
-        border-color: #2196f3;
+      body.light-mode .model-item:hover {
+        background-color: #f6f8fa;
+        border-color: #0969da;
       }
-
       .model-item input[type="checkbox"] {
-        width: 20px;
-        height: 20px;
-        margin-right: 12px;
+        width: 18px;
+        height: 18px;
+        margin-right: 14px;
         cursor: pointer;
+        accent-color: #388bfd;
       }
-
+      body.light-mode .model-item input[type="checkbox"] {
+        accent-color: #0969da;
+      }
       .model-item label {
         cursor: pointer;
-        font-size: 16px;
-        color: #333;
+        font-size: 15px;
+        color: #e6edf3;
         user-select: none;
-        transition: color 0.3s;
+        font-weight: 500;
       }
-
       body.dark-mode .model-item label {
-        color: #e0e0e0;
+        color: #e6edf3;
       }
-
       .button-group {
         display: flex;
-        gap: 10px;
+        gap: 12px;
         justify-content: flex-end;
-        margin-right: 20px;
+        padding-right: 8px;
       }
-
       button {
-        padding: 12px 24px;
-        font-size: 16px;
+        padding: 10px 20px;
+        font-size: 14px;
         border: none;
-        border-radius: 4px;
+        border-radius: 6px;
         cursor: pointer;
-        transition: background-color 0.2s;
+        font-weight: 500;
+        transition: all 0.2s;
       }
-
       #save-button {
-        background-color: #4caf50;
-        color: white;
+        background-color: #238636;
+        color: #ffffff;
       }
-
       #save-button:hover {
-        background-color: #45a049;
+        background-color: #2da44e;
       }
-
       #cancel-button {
-        background-color: #f44336;
-        color: white;
+        background-color: #21262d;
+        color: #e6edf3;
+        border: 1px solid #30363d;
       }
-
       #cancel-button:hover {
-        background-color: #da190b;
+        background-color: #30363d;
+      }
+      body.light-mode #cancel-button {
+        background-color: #f6f8fa;
+        color: #24292f;
+        border-color: #d0d7de;
+      }
+      body.light-mode #cancel-button:hover {
+        background-color: #eaeef2;
+      }
+      .tooltip-container {
+        position: relative;
+      }
+      .tooltip-container .tooltip {
+        visibility: hidden;
+        background-color: #6e7681;
+        color: #ffffff;
+        text-align: center;
+        padding: 6px 10px;
+        border-radius: 6px;
+        position: absolute;
+        z-index: 1001;
+        bottom: 125%;
+        left: 50%;
+        transform: translateX(-50%);
+        font-size: 12px;
+        white-space: nowrap;
+        opacity: 0;
+        transition: opacity 0.2s;
+      }
+      .tooltip-container:hover .tooltip {
+        visibility: visible;
+        opacity: 1;
       }
     </style>
   </head>
